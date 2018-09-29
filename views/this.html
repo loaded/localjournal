@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html>
+  <head> 
+    <meta charset="utf-8">
+    <link rel='stylesheet' href='http://localhost:3000/public/css/gal.css'>   
+    <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.css">
+     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
+   integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="  crossorigin=""/>
+   
+    <script type="text/javascript" src="http://localhost:3000/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="http://localhost:3000/public/javascript/jquery-2.2.0.min.js"></script>    
+    <script type="text/javascript" src="http://localhost:3000/public/javascript/editor.js"></script>
+    <script type="text/javascript" src="http://localhost:3000/public/javascript/sortable.js"></script>
+     <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
+   integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
+   crossorigin=""></script>
+  
+<script src="https://cdn.jsdelivr.net/npm/simplebar@latest/dist/simplebar.js"></script>
+    
+  </head>
+  <body>
+    <span id='error'></span>    
+    <div id='main'>
+      <div id='header'>
+         <button id='cgbtn'>Create Gallery</button> 
+         
+         <div id="back-reset">galleries</div>   
+          <div id='back-next'>
+            <div id='back'>
+               <img id='back-img' src='http://localhost:3000/public/arrow/left.png'>
+            </div>
+            <div id='next'>
+               <img id='next-img' src='http://localhost:3000/public/arrow/right.png'>            
+            </div>         
+         </div>       
+      <div class='indt' id='homeback'>
+
+         <img src="http://localhost:3000/public/arrow/tile.png" alt=""  id ='tile' >      
+      </div>
+      </div>
+      <div id='tiler'>
+      <div id='uploader'>
+           <div id="input">
+             <div id="input-label">Gallery Name</div>
+             <input type="text" id="input-name"/>
+             <div id="input-create">create</div>           
+           </div>      
+      </div> 
+      <div id='space'>
+         <div id="space-wrapper">        
+             <div class="space--remove sp edt"></div>
+               <span class="space--remove-text sz txt edt" id='remove'>remove</span>
+             <div class="space--upload sp edt"></div>
+               <span class="space--upload-text sz txt lft edt" id='upload'>upload</span>
+             <div class="space--default sp indx"></div>
+               <span class="space--default-text sc txt lft indx" id='set-cover'>set cover</span>     
+             <img src="http://localhost:3000/public/arrow/add.png" class="edt" id='add-image'>
+               <span class="space--add-text sz txt edt" id="browse">Browse</span>    
+               <input id='files' type="file" name='files[]' multiple >
+        </div>  
+         
+        <div id='galback' class='indxt'>
+            <div id='gback'>
+               <img id='backimg' src='http://localhost:3000/public/arrow/left.png'>
+            </div>
+            <div id='gnext'>
+               <img id='nextimg' src='http://localhost:3000/public/arrow/right.png'>            
+            </div>         
+        </div>                   
+         
+         <div id="arrow">
+             <div id="arrow-up"><img src="http://localhost:3000/public/arrow/arrow-up.png" class="up-down" id="up--gal"></div>
+             <div id="arrow-down"><img src="http://localhost:3000/public/arrow/arrow-down.png" class="up-down" id="down--gal"></div>
+         </div>               
+      </div>
+       
+      <div id='pool'></div>
+            
+    </div>
+    </div>  
+    
+    <div id='videoContainer'>
+        <div id='video-container'>
+          <div id='v-header'>
+            <button id='v-header-btn'>Add Video</button>       
+            <button id='v-header-upload'>upload</button>       
+          </div>
+          
+          <div id='v-video-container'></div>
+        </div>   
+       <div id='v-inputWrapper'>
+         <input type="file" accept="video/webm" id="v-selectfile">  
+       </div>        
+    </div>
+    
+    <div id='indexContainer'>
+        <div id="iheader" draggable="true"></div>
+        <div id="contentArticle"></div>
+        <div id='inputWrapper'>
+         <input type="file" accept="image/*" id="selectfile">  
+        </div>
+        
+
+        
+      <div id='e-dialog'>
+        <div id='e-dialog-container'>
+          <div id='e-dialog-header'>
+            <img id='e-dialog-back' src="" alt="">
+            <button id='e-dialog-headerbtn'>Select Position</button>          
+          </div>
+          <div id='mapSelect'>
+          
+          </div>
+        </div>           
+      </div>
+      
+      
+       <div id='e-tags'>
+        <div id='e-tags-container'>
+          <div id='e-tags-header'>
+            <img id='e-tags-back' src="" alt="">
+            <button id='e-tags-headerbtn'>Add Tag</button>          
+          </div>
+          <div id='mytags'>
+             <div id='e-tags-current'></div>
+             <div id='e-tags-prev'>
+                <div id='e-tags-prevhead'>
+                   <div id='e-tags-mytags'>used tags</div>
+                   <div id='e-tags-trending'><span id='e-tags-trendspan'>trending</span></div>                
+                </div>
+             </div>
+          </div>
+        </div>           
+      </div>
+        
+    </div>
+    
+    
+          <div id='editor-archive'>
+        <div id='archive-container'>
+          <div id='e-header'>
+            <button id='e-header-btn'>Create Article</button>          
+          </div>
+          
+          <div id='a-archive-container'></div>
+        </div>           
+    </div>
+    
+    <div id="editor-article">
+    
+    </div>    
+    
+    <div id='pad'></div>
+    <div id="dialogBox">
+         <div id='dialog1' class='dialog'></div>
+         <div id='dialog2' class='dialog'></div>
+         <div id='dialog3' class='dialog'></div>          
+    </div>
+    
+    <div id='showArticle'>
+    </div>
+    
+     <script type="text/javascript" src="http://localhost:3000/public/javascript/test.js"></script>
+     <script type="text/javascript" src="http://localhost:3000/public/javascript/index.js"></script>
+     <script type="text/javascript" src="http://localhost:3000/public/javascript/video.js"></script>
+     <script type="text/javascript" src="http://localhost:3000/public/javascript/app.js"></script>
+  </body>
+</html>

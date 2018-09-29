@@ -1,0 +1,1 @@
+cmd_Release/obj.target/process.node := g++ -shared -pthread -rdynamic -m64  -Wl,-soname=process.node -o Release/obj.target/process.node -Wl,--start-group Release/obj.target/process/tst1.o -Wl,--end-group -lgd -ljpeg -lm -lz
