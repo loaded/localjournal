@@ -41,7 +41,7 @@ var View = {
                 d : 150
               },
               dialog : {
-                m : {},
+                m : {width:300,height:200},
                 d : {width : 600,height:300}                 
               },
             
@@ -78,7 +78,7 @@ var View = {
            	  for(var i= 0 ; i< this.config.events.length ; i++)
            	     this.defineProp(this,this.config.events[i],new Event(this))
            	     
-           	   this.config.mWidth = window.innerWidth;
+           	   this.config.mWidth = window.innerWidth -10;
            },         
            
            _archiveEditor : function(articles){             
@@ -428,7 +428,9 @@ var View = {
                    }                
                 }
               articleBody.style.display = 'block';
-              if(this._isMobile()){}else{
+              if(this._isMobile()){
+                 articleBody.style.width = this.config.mWidth + 'px';              
+              }else{
                  articleBody.style.width = this.config.mainWidth + 'px';                               
               }        
               
@@ -468,25 +470,36 @@ var View = {
             },
             
             _fitArticle : function(fit){
-                if(this._isMobile()){}else{
-                   const fitSize = this.config.mainWidth;
-                   let image = new Image();
-                   image.src = this._returnUrl(fit.url);
-                   let width = fit.width;
-                   let height = fit.height;
+            	 let fitSize;
+                if(this._isMobile()){
+                    fitSize = this.config.mWidth;
+                }else{
+                    fitSize = this.config.mainWidth;
+                               
+                }       
+                
+                let image = new Image();
+                image.src = this._returnUrl(fit.url);
+                let width = fit.width;
+                let height = fit.height;
                    
-                   const newHeight = parseInt((height/width) * fitSize);
+                const newHeight = parseInt((height/width) * fitSize);
                    
-                   image.width = fitSize;
-                   image.height = newHeight;
-                   image.classList.add('fit','fscreen');
-                   image.addEventListener('click',this._fullScreen.bind(this));
-                   document.getElementById('editor-article').appendChild(image);                                
-                }            
+                image.width = fitSize;
+                image.height = newHeight;
+                image.classList.add('fit','fscreen');
+                image.addEventListener('click',this._fullScreen.bind(this));
+                document.getElementById('editor-article').appendChild(image);      
             },
             
             _textArticle : function (text) {
-            	 const width = this.config.mainWidth;
+            	 let width ;
+            	 if(this._isMobile()){
+            	    width = this.config.mWidth;  
+            	 }else{
+            	    width = this.config.mainWidth;
+            	 }
+            	
             	 
             	 let container = document.createElement('div');
             	 container.innerHTML = text.html;
@@ -496,7 +509,13 @@ var View = {
             },
             
             _captionArticle : function(caption){
-                const width = this.config.mainWidth;
+                let width ;
+            	 if(this._isMobile()){
+            	    width = this.config.mWidth;  
+            	 }else{
+            	    width = this.config.mainWidth;
+            	 }
+            	
             	 
             	 let container = document.createElement('div');
             	 container.innerHTML = caption.html;
@@ -511,7 +530,9 @@ var View = {
               var main = document.getElementById('indexContainer');
               var header = document.getElementById('iheader');          
               var contentArticle = document.getElementById('contentArticle')               
-              if(this._isMobile()){}else{ 
+              if(this._isMobile()){
+       
+              }else{ 
                 // main.style.width = this.config.mainWidth + 'px';    
                 // header.style.height = this.config.header.d + 'px';      
                 // contentArticle.style.minHeight = (this.config.documentHeight - this.config.header.d) + 'px';              
@@ -802,7 +823,24 @@ var View = {
                var fileselect = document.getElementById('selectfile');
                fileselect.addEventListener('change',that._readFile.bind(this),false)
               
-               if(this._isMobile()){}else{ 
+               if(this._isMobile()){               
+                  dialog.style.width = this.config.dialog.m.width + 'px';
+                  dialog.style.height = this.config.dialog.m.height + 'px';
+                  
+                  var dialogs = document.getElementsByClassName('dialog');
+                  for(var i = 0 ; i < dialogs.length ; i++){
+                      dialogs[i].style.width = 100 + 'px';
+                      dialogs[i].style.height = 200 + 'px';
+                      dialogs[i].style.left = i*20 + 'px';
+                      dialogs[i].setAttribute('index',i); 
+                      dialogs[i].addEventListener('click',function(e){
+                      	  var index = e.target.getAttribute('index');
+                      	  that.index = index;                      	  
+                          that._handleAddPicture(index);                      
+                      })        
+                  }       
+                          
+               }else{ 
                   dialog.style.width = this.config.dialog.d.width + 'px';
                   dialog.style.height = this.config.dialog.d.height + 'px';
                   
@@ -814,8 +852,7 @@ var View = {
                       dialogs[i].setAttribute('index',i); 
                       dialogs[i].addEventListener('click',function(e){
                       	  var index = e.target.getAttribute('index');
-                      	  that.index = index;
-                      	  
+                      	  that.index = index;                      	  
                           that._handleAddPicture(index);                      
                       })        
                   }
@@ -891,9 +928,7 @@ var View = {
            	  }else{
            	    mainWidth = this.config.mainWidth;
            	  }
-                
-   
-                
+                             
                 let newImageHeight = parseInt(height/width * mainWidth);
                 im.width = mainWidth;
                 im.height = newImageHeight;
@@ -911,9 +946,7 @@ var View = {
                
                 })
             
-              	  
-           	  
-           	      
+                  	      
               document.getElementById('contentArticle').appendChild(div);          
               div.focus()         	
            	  
@@ -1001,7 +1034,7 @@ var View = {
            	    var contentArticle = document.getElementById('contentArticle');
                 var nextEditable = document.createElement('div');               
                 
-                if(this._isMobile()){
+                if(sender._isMobile()){
                    nextEditable.style.width = sender.config.mWidth + 'px';
                    nextEditable.style.minHeight = 20 + 'px';                 
                 }else{
@@ -1024,7 +1057,7 @@ var View = {
            	    var contentArticle = document.getElementById('contentArticle');
                 var nextEditable = document.createElement('div');
                 
-                if(this._isMobile()){
+                if(sender._isMobile()){
                   nextEditable.style.width = sender.config.mWidth + 'px';
                   nextEditable.style.minHeight = 100 + 'px';
                     nextEditable.style.marginTop = '5px';  
@@ -1364,7 +1397,14 @@ var View = {
                canvas.id= 'prgeditor';
                
                if(this._isMobile()){
-               
+                  canvas.width = 100;
+                  canvas.height = 100;
+                  canvas.style.position = 'fixed';
+                  canvas.style.top =  ((window.screen.height/2) - (50))+'px';
+                  canvas.style.left = ((window.screen.width/2) - (50)) + 'px';   
+                  var context = canvas.getContext('2d');
+                  
+                  dialog.appendChild(canvas);  
                }else{
                   canvas.width = 100;
                   canvas.height = 100;
