@@ -240,9 +240,9 @@ var View = {
                 archive.style.height = 110 + 'px';
                 archive.style.width = window.innerWidth + 'px';
                 archive.style.top = 15 + 'px';
-                timeContainer.style.width = 60 + 'px';
+                timeContainer.style.width = 50 + 'px';
                 timeContainer.style.height = 60  + 'px';   
-                timeContainer.style.top = 20+ 'px';
+                
                 articleContent.style.height = 100 + 'px';
                 articleContent.style.width = (window.innerWidth -60) + 'px';
                 thumbContainer.style.width = 100 + 'px';
@@ -253,20 +253,23 @@ var View = {
                     newWidth = 100;
                     img.style.width = 100 + 'px';
                     img.style.height = newHeight + 'px';
-                    img.style.marginTop = (100 - newHeight)/2 + 'px';           
+                    //img.style.marginTop = (100 - newHeight)/2 + 'px';           
                 }else {
                     newWidth = (width/height) * 100; 
                     newHeight = 100;
                     img.style.width = newWidth + 'px';
                     img.style.height = newHeight + 'px';
                     img.style.marginLeft = (100 - newWidth) + 'px';
+                    timeContainer.style.top = 20+ 'px';
                 }
                 
-                headerContainer.style.fontSize = 10 + 'px';                
-                tagsContainer.style.fontSize = 10 + 'px';
+                headerContainer.style.fontSize = 12 + 'px';                
+                tagsContainer.style.fontSize = 12 + 'px';
                 descContainer.style.display = 'none'
                 headerDesc.style.width = (window.innerWidth -160) + 'px';
                 headerDesc.style.height = 100 + 'px';    
+                headerDesc.style.paddingLeft = 10 + 'px';
+                
                 headerDesc.style.overflow = 'hidden';          
               }else{
                 archive.style.height = 170 + 'px';
@@ -274,7 +277,7 @@ var View = {
                 archive.style.top = 25 + 'px';
                 timeContainer.style.width = 60 + 'px';
                 timeContainer.style.height = 60  + 'px';   
-                timeContainer.style.top = 50+ 'px';
+               
                 articleContent.style.height = 150 + 'px';
                 articleContent.style.width = (this.config.mainWidth -60) + 'px';
                 thumbContainer.style.width = 150 + 'px';
@@ -283,11 +286,12 @@ var View = {
                 if(width > height){
                     newHeight = (height/width) * 150; 
                     newWidth = 150;
-                    img.style.marginTop = (150 - newHeight)/2 + 'px';           
+                    //img.style.marginTop = (150 - newHeight)/2 + 'px';           
                 }else {
                     newWidth = (width/height) * 150; 
                     newHeight = 150;
                     img.style.marginLeft = (150 - newWidth) + 'px';
+                     timeContainer.style.top = 50+ 'px';
                 }
                 headerDesc.style.width = (this.config.mainWidth -210) + 'px';
                 headerDesc.style.height = 150 + 'px';
@@ -1520,7 +1524,7 @@ var View = {
       function saveContent(){
           let content = new XMLHttpRequest();
           
-          let children = document.getElementById('contentArticle').childNodes; // it should be children 
+          let children = document.getElementById('contentArticle').children; // it should be children 
           if(children.length > 0){
               for(let i = 0 ; i < children.length ; i++){
                   if(children[i].hasOwnProperty('name') ){                    

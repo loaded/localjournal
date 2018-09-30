@@ -3,6 +3,7 @@ var Video = (function(){
     
     config : {
        mainWidth : window.innerWidth,    
+       
        d : {
            containerWidth : 900,
            headerHeight : 30       
@@ -48,14 +49,16 @@ var Video = (function(){
     	 let bodyContainer = document.getElementById('video-container');
     	 
     	 bodyContainer.classList.add('bodyContainer');
-    	 container.style.width = this.config.mainWidth + 'px';
+    	
     	 container.style.display = 'block';
       
        
        if(this._isMobile()){
-           bodyContainer.style.width = this.config.m.containerWidth + 'px';
+       	 container.style.width = window.innerWidth  + 'px';
+           bodyContainer.style.width = (this.config.m.containerWidth -10) + 'px';
        }else{          
            bodyContainer.style.width = this.config.d.containerWidth + 'px';
+            container.style.width = this.config.mainWidth + 'px';
        }
        
     },
@@ -365,6 +368,7 @@ var Video = (function(){
     	let mainContainer = document.getElementById('v-video-archive');
     	let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     	let video;
+    	
       for(let i = 0 ; i < videos.length ; i++){
       	 video = videos[i];
       	 
@@ -408,11 +412,11 @@ var Video = (function(){
            videoTags.classList.add('v-archive-tags');
            
            videoTitle.innerHTML = video.title;   
-               
+            
            for(let tg of video.tags){
               let span = document.createElement('span');
-              span.classList.add('v-archive-tagstg');
-              span.innerHTML = '#' + tg;
+              span.classList.add('v-archive-tagstg');          
+              span.innerHTML = '#' + tg;  
               videoTags.appendChild(span);              
             }        
             

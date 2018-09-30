@@ -1479,6 +1479,7 @@ box-sizing:border-box;
 #v-video-container {
  overflow-x: hidden;
  position:relative;
+ 
 }
 
 .v-containers{
@@ -1615,6 +1616,7 @@ box-sizing:border-box;
 
 .v-archive-content{
   float:left;
+  overflow:hidden;
   
 }
 
@@ -1623,6 +1625,8 @@ box-sizing:border-box;
   padding:2px;
   cursor:pointer;
   font-size: 12px;
+  
+ 
   color:blue;
 }
 
