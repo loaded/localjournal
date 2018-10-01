@@ -78,7 +78,7 @@ var View = {
            	  for(var i= 0 ; i< this.config.events.length ; i++)
            	     this.defineProp(this,this.config.events[i],new Event(this))
            	     
-           	   this.config.mWidth = window.innerWidth -10;
+           	   this.config.mWidth = window.innerWidth -40;
            },         
            
            _archiveEditor : function(articles){             
@@ -406,6 +406,24 @@ var View = {
               editor.appendChild(articleBody)
               this.currentContainer = document.getElementById('editor-article')
               articleBody.style.display = 'block';
+              
+              
+              let articles = [];
+              let sorted  = []
+              
+              for(let t in arti){
+                  articles.push(arti[t]);                               
+              }
+              
+              let isorted = articles.filter(function(elem){
+                 return elem.hasOwnProperty('pos');              
+              })
+              
+              isorted.sort(function(obj1,obj2){
+                     return parseInt(obj1.pos) - parseInt(obj2.pos);              
+              })
+             
+              arti = isorted;
                            
               for (var i in arti)
                 {
@@ -498,16 +516,19 @@ var View = {
             
             _textArticle : function (text) {
             	 let width ;
+            	  let container = document.createElement('div');
             	 if(this._isMobile()){
             	    width = this.config.mWidth;  
+            	   
             	 }else{
             	    width = this.config.mainWidth;
             	 }
             	
             	 
-            	 let container = document.createElement('div');
+            	
             	 container.innerHTML = text.html;
             	 container.classList.add('text','desktop');
+            	 
             	 container.style.width = width + 'px';
                 document.getElementById('editor-article').appendChild(container);  
             },
@@ -1295,6 +1316,7 @@ var View = {
                header.appendChild(location)
               
            },
+           
            _progress : function(progress){
            	  this.recieved = progress.recieved;
               let canvas = document.getElementById('prgeditor');
@@ -1556,7 +1578,7 @@ var View = {
           	return; //actually you must examine it before upload of pictures.
           }
            
-         
+          console.log(View.content)
           content.open('POST','/editor/save');
           content.onreadystatechange = function(data){
                if(this.readyState == 4){              

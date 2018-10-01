@@ -78,8 +78,11 @@ var controller = (function(){
    }
    
    function saveArticle(req,res,art){
+     
      art.sort(function(obj1,obj2){
-        return parseInt(obj1.pos) - parseInt(obj2.pos);     
+     	  
+          return parseInt(obj1.pos) - parseInt(obj2.pos);   
+          
      })
      
      art.push({type : 'date' , date : Date.now()})
