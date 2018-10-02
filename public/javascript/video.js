@@ -472,7 +472,7 @@ var Video = (function(){
                 
                 videoContent.style.width =  100 + 'px';
                 videoContent.style.height = 100 + 'px';
-                videoTitle.style.fontSize= 14 + 'px';     
+                videoTitle.style.fontSize= 12 + 'px';     
                 videoTitle.style.cursor = 'pointer';       
                 
                 videoTitle.style.color = 'black';

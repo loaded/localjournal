@@ -211,7 +211,7 @@ var View = {
               
               let headerContainer = document.createElement('div');
               headerContainer.classList.add('a-archive-header');
-              headerContainer.innerHTML ="<h3>"+ header +"</h3>";
+              headerContainer.innerHTML ="<div>"+ header +"</div>";
               
               headerContainer.addEventListener('click',function(){
               	 document.getElementById('editor-archive').style.display = 'none';
@@ -249,6 +249,8 @@ var View = {
                 thumbContainer.style.width = 100 + 'px';
                 thumbContainer.style.height = 100 + 'px';
                 
+                headerContainer.style.fontWeight = 600;
+                headerContainer.style.fontSize = 12 + 'px';
                 if(width > height){
                     newHeight = (height/width) * 100; 
                     newWidth = 100;
@@ -264,7 +266,7 @@ var View = {
                     timeContainer.style.top = 20+ 'px';
                 }
                 
-                headerContainer.style.fontSize = 12 + 'px';                
+               // headerContainer.style.fontSize = 12 + 'px';                
                 tagsContainer.style.fontSize = 12 + 'px';
                 descContainer.style.display = 'none'
                 headerDesc.style.width = (window.innerWidth -160) + 'px';
@@ -455,8 +457,7 @@ var View = {
                  articleBody.style.width = this.config.mWidth + 'px';              
               }else{
                  articleBody.style.width = this.config.mainWidth + 'px';                               
-              }        
-              
+              }                  
                      
             },          
             
