@@ -55,7 +55,7 @@ var Video = (function(){
        
        if(this._isMobile()){
        	 container.style.width = window.innerWidth  + 'px';
-           bodyContainer.style.width = (this.config.m.containerWidth -10) + 'px';
+           bodyContainer.style.width = (this.config.m.containerWidth -40) + 'px';
        }else{          
            bodyContainer.style.width = this.config.d.containerWidth + 'px';
             container.style.width = this.config.mainWidth + 'px';
@@ -71,6 +71,8 @@ var Video = (function(){
        if(this._isMobile()){
           vheader.style.height = this.config.m.headerHeight + 'px';
             btn.classList.add('mv-header-btn');
+            vheader.classList.add('mv-header');
+            vheader.style.width = (this.config.m.containerWidth - 40) + 'px'
        }else{       	
        	 vheader.style.height = this.config.d.headerHeight + 'px';
           btn.classList.add('dv-header-btn');
@@ -95,14 +97,14 @@ var Video = (function(){
     	 videoUploader.classList.add('v-containers');
     	 videoUploader.id = 'v-uploader';
     	 if(this._isMobile()){
-         mainContainer.style.width = this.config.m.containerWidth + 'px';
-         videoContainer.style.width = this.config.m.containerWidth + 'px';
-         videoUploader.style.width = this.config.m.containerWidth  + 'px';    	
+         mainContainer.style.width = (this.config.m.containerWidth -40) + 'px';
+         videoContainer.style.width = (this.config.m.containerWidth -40) + 'px';
+         videoUploader.style.width = (this.config.m.containerWidth -40)  + 'px';    	
          mainContainer.style.top = 20 + 'px';
          videoContainer.style.minHeight = (window.innerHeight -70) + 'px';
          videoUploader.style.minHeight = (window.innerHeight - 70) + 'px';         
          mainContainer.style.minHeight = (window.innerHeight - 70 ) + 'px';        
-         contentContainer.style.width = 2*(this.config.m.containerWidth ) + 'px';    	 
+         contentContainer.style.width = 2*(this.config.m.containerWidth -40 ) + 'px';    	 
     	 }else{
          mainContainer.style.width = this.config.d.containerWidth + 'px';
          videoContainer.style.width = this.config.d.containerWidth + 'px';
@@ -243,10 +245,10 @@ var Video = (function(){
         
         
         if(this._isMobile()){
-          input.style.width = this.config.m.containerWidth + 'px';
-          tagLocation.style.width = this.config.m.containerWidth + 'px';
-          hashInput.style.width = 3*(this.config.m.containerWidth/4) + 'px';
-          video.width = this.config.m.containerWidth;          
+          input.style.width = (this.config.m.containerWidth -40) + 'px';
+          tagLocation.style.width = (this.config.m.containerWidth-40) + 'px';
+          hashInput.style.width = 3*((this.config.m.containerWidth-40)/4) + 'px';
+          video.width = (this.config.m.containerWidth-40);          
         }else{
           input.style.width = this.config.d.containerWidth + 'px';
           tagLocation.style.width = this.config.d.containerWidth + 'px';
@@ -282,16 +284,16 @@ var Video = (function(){
         	   
         	   if(this._isMobile()){
         	      mapContainer.style.top = -video.videoHeight + 'px';
-           	   mapContainer.style.width = that.config.m.containerWidth + 'px';
+           	   mapContainer.style.width = (that.config.m.containerWidth -40) + 'px';
         	      mapContainer.style.height = video.offsetHeight + 'px';;
         	    
-        	      progress.style.width = that.config.m.containerWidth + 'px';
+        	      progress.style.width = (that.config.m.containerWidth-40) + 'px';
         	      progress.style.height = video.offsetHeight + 'px';
         	      
         	      canvas.width = 100;
         	      canvas.height = 100;
         	      canvas.style.top = (video.offsetHeight/2-50 ) + 'px';
-        	      canvas.style.left = (that.config.m.containerWidth/2 -50) + 'px';
+        	      canvas.style.left = ((that.config.m.containerWidth-40)/2 -50) + 'px';
         	   }else{
         	      mapContainer.style.top = -video.videoHeight + 'px';
            	   mapContainer.style.width = that.config.m.containerWidth + 'px';
@@ -573,7 +575,7 @@ var Video = (function(){
     	 // let vUploader = document.getElementById('v-uploader');
     	     	  
     	  let title = document.createElement('div')
-        title.style.height = 20 + 'px';
+        title.style.minHeight = 20 + 'px';
         title.color = 'green'
         title.marginTop = 5 +  'px';
         //title.style.borderBottom = '1px solid gray';
@@ -654,9 +656,9 @@ var Video = (function(){
         })
         
         if(this._isMobile()){
-           title.style.width = this.config.m.containerWidth + 'px';
-           tagLocation.style.width = this.config.m.containerWidth + 'px';
-           video.width = this.config.m.containerWidth;         
+           title.style.width = (this.config.m.containerWidth -40) + 'px';
+           tagLocation.style.width = (this.config.m.containerWidth-40) + 'px';
+           video.width = (this.config.m.containerWidth -40);         
         }else{
            title.style.width = this.config.d.containerWidth + 'px';
            tagLocation.style.width = this.config.d.containerWidth + 'px';
@@ -682,7 +684,7 @@ var Video = (function(){
         	   mapContainer.style.height = video.offsetHeight + 'px';;
         	   
         	   if(that._isMobile()){
-        	        mapContainer.style.width = that.config.m.containerWidth + 'px';  	
+        	        mapContainer.style.width = (that.config.m.containerWidth -40) + 'px';  	
         	   }else {
         	        mapContainer.style.width = that.config.d.containerWidth + 'px';  	
         	   }      	   
@@ -810,7 +812,7 @@ var Video = (function(){
     _slideContainer : function(){
     	let sliderWidth ;
     	if(this._isMobile()){
-    	  sliderWidth = this.config.m.containerWidth;
+    	  sliderWidth = (this.config.m.containerWidth -40);
     	}else{
     	  sliderWidth = this.config.d.containerWidth;
     	}

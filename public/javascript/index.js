@@ -102,8 +102,9 @@ var View = {
                if(this._isMobile()){
                   archiveContainer.style.width = window.innerWidth + 'px';
                  header.style.height = 30 + 'px';
-                
-                 btn.classList.add('me-header-btn');                                  
+                 header.style.width = this.config.mWidth +  'px';
+                 btn.classList.add('me-header-btn');    
+                 archiveContainer.style.width = this.config.mWidth  + 'px';                              
                }else{
                  archiveContainer.style.width = this.config.mainWidth + 'px';
                  header.style.height = 30 + 'px';
