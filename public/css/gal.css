@@ -1404,6 +1404,8 @@ box-sizing:border-box;
   background-color: white;
   padding:2px;
   cursor:pointer;
+  font-size: 12px;
+ 
 }
 
 .a-archive-tagstg:hover{

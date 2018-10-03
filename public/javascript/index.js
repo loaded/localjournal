@@ -285,7 +285,10 @@ var View = {
                 articleContent.style.width = (this.config.mainWidth -60) + 'px';
                 thumbContainer.style.width = 150 + 'px';
                 thumbContainer.style.height = 150 + 'px';
-                
+                headerContainer.style.fontWeight = 600;
+                headerContainer.style.fontSize = 14 + 'px';
+                descContainer.style.fontSize = 12 + 'px';
+               
                 if(width > height){
                     newHeight = (height/width) * 150; 
                     newWidth = 150;
