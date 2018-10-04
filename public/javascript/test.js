@@ -645,10 +645,29 @@ var Gallery = (function(){
        
        var txt = document.createElement('div');
        txt.classList.add("txtpng",'showImage');
+       
        var txtpng = document.createElement('img');
-       txtpng.src =makeUrl('public/arrow/text.png');
+       let txtXwar = document.createElement('img');
+       let txtJur = document.createElement('img');
+       
+       txtXwar.classList.add('txtXwar');
+       txtJur.classList.add('txtJur');
+       
+       txtXwar.src = makeUrl('public/arrow/xwar.png');
+       txtJur.src = makeUrl('public/arrow/jur.png');
+       
+       txtJur.style.left = -5 + 'px';
+       txtXwar.style.right = -5 + 'px';
+       
+       
+       txtpng.src =makeUrl('public/arrow/txt.png');
        txtpng.setAttribute('id','txtpng');
        txt.append(txtpng);
+       txt.append(txtJur);
+       txt.append(txtXwar);
+       
+       txt.style.opacity = 0.5;
+       
               
        closeSign.append(closeImage)
        this.header.el.append(closeSign)
@@ -656,27 +675,30 @@ var Gallery = (function(){
        this.header.el.appendChild(txt);
        
        $(txt).hover(function(){
+       	  closeSign.style.opacity = 0.2;
+       	  setting.style.opacity = 0.2;
+       	  this.style.opacity = 1;
        	  var uppng = document.createElement('img');
        	  var downpng = document.createElement('img');
-       	  this.innerHTML = "text"
+       	  //this.innerHTML = "text"
        	  uppng.id = 'uppng';
        	  downpng.id = 'downpng';
-       	  this.appendChild(uppng)
-       	  this.appendChild(downpng)
+       	  //this.appendChild(uppng)
+       	  //this.appendChild(downpng)
        	  uppng.src = makeUrl('public/arrow/up.png');
        	  downpng.src = makeUrl('public/arrow/down.png');
        	  
-       	  $(uppng).animate({left : "-=100"},400);
-       	  $(downpng).animate({right : "-=100"},400)      	  
+       	  $(txtJur).animate({left : "-=100"},400);
+       	  $(txtXwar).animate({right : "-=100"},400)      	  
        	  $(this).unbind('mouseover mouseenter mouseleave')
            //document.getElementById('txtpng').src = makeUrl('public/arrow/text1.png');     
-           uppng.addEventListener('click',function(){
+           txtJur.addEventListener('click',function(){
               if(that.galleries[gallery].length > (that.indexOfSlide +1) && !that.busy){                              
                 that._constructImage(++that.indexOfSlide,gallery,'up');                
               }
            })
                       
-           downpng.addEventListener('click',function(){
+           txtXwar.addEventListener('click',function(){
               if((that.indexOfSlide-1) > -1  && !that.busy){
                  that._constructImage(--that.indexOfSlide,gallery,'down')              
               }

@@ -212,7 +212,7 @@ var View = {
               let headerContainer = document.createElement('div');
               headerContainer.classList.add('a-archive-header');
               headerContainer.innerHTML ="<div>"+ header +"</div>";
-              
+        
               headerContainer.addEventListener('click',function(){
               	 document.getElementById('editor-archive').style.display = 'none';
                 that._showArticle(elem);

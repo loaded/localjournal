@@ -409,12 +409,14 @@ var Video = (function(){
            let videoTitle = document.createElement('div');
            let videoTags = document.createElement('div');
            
-           videoContent.classList.add('v-archive-content');
-           videoTitle.classList.add('v-archive-title');
-           videoTags.classList.add('v-archive-tags');
+
            
            videoTitle.innerHTML = video.title;   
-            
+           $(videoTitle).hover(function(){
+               this.style.color = 'limegreen';           
+           },function(){
+               this.style.color = 'black'           
+           })
            for(let tg of video.tags){
               let span = document.createElement('span');
               span.classList.add('v-archive-tagstg');          
@@ -527,6 +529,10 @@ var Video = (function(){
                   container.style.marginLeft = 100+ 'px';               
                        
            }
+       
+           videoContent.classList.add('v-archive-content');
+           videoTitle.classList.add('v-archive-title');
+           videoTags.classList.add('v-archive-tags');
            
            videoTitle.setAttribute('vid',i);
            videoTitle.addEventListener('click',function(){

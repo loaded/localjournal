@@ -621,7 +621,7 @@ body {
  }
  
  .txtpng {
-   width : 50px;
+   width : 35px;
    top : 12px;
    position:relative;
    margin-right: auto;
@@ -629,6 +629,18 @@ body {
    cursor : pointer;
    color:black;
    text-align:center; 
+ }
+ 
+ .txtXwar{
+   right:0;
+   position:absolute;
+   z-index:100; 
+ }
+ 
+ .txtJur{
+   position:absolute;
+   z-index:100;
+   right:0;
  }
  
  #uppng{
@@ -1372,11 +1384,10 @@ box-sizing:border-box;
   padding:3px;
   color:black;
   cursor:pointer;
-  
-}
+ }
 
 .a-archive-header:hover{
-  color:blue;
+  color:limegreen; 
 }
 
 .a-archive-tagsContainer{
@@ -1540,6 +1551,10 @@ box-sizing:border-box;
  margin-left: 3px;
  margin-top:4px;
  
+}
+
+.v-archive-title:hover{
+  color:green;
 }
 
 .v-video-contain{
