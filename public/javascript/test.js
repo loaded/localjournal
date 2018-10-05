@@ -7,6 +7,27 @@
     }
 /*=========================================== View =============================================== */  
 var Gallery = (function(){
+     function iMouseDown(e){
+     window.addEventListener('mousemove', iDivMove, true);
+       let editable = document.getElementById('Editor')
+               
+                 editable.removeAttribute('contenteditable');
+    
+   }
+   
+   function iMouseUp(e){
+      window.removeEventListener('mousemove', iDivMove, true);
+      document.getElementById('gheader').style.position = 'fixed';
+        let editable = document.getElementById('Editor');
+             editable.setAttribute('contenteditable','true');
+   }
+   function iDivMove(e){
+         let div = document.getElementById('gheader');
+         div.style.position = 'absolute';
+        div.style.top = e.clientY + 'px';
+         div.style.left = e.clientX + 'px';   
+   }	
+	
   var View = {
     windowWidth : $(document).width(),    
 	 windowHeight :$(document).height(),
@@ -24,6 +45,7 @@ var Gallery = (function(){
       margin: 20,
       top : 20
     },
+    btns : ['location','reorder','caption','text','tags','description','save'],
     menu : ["menu","cover","text","filter","location","share"],
     main : {
        mobile : {
@@ -275,8 +297,13 @@ var Gallery = (function(){
     },
     
     _start : function(){
-        for(var i = 0 ; i < this.events.length ; i++)
+        for(let i = 0 ; i < this.events.length ; i++)
     	  this.defineProp(this,this.events[i],new Event(this));    
+    	  
+  	     for(let t = 0 ; t < this.btns.length ; t++)
+      	     this.events.push(this.btns[t])
+    	  for(let i= 0 ; i< this.events.length ; i++)
+       	     this.defineProp(this,this.events[i],new Event(this))
     },
     _init: function(){ 
        this.inited = true;
@@ -836,6 +863,7 @@ var Gallery = (function(){
        
        input.id = "Editor";        
        input.classList.add('text-desc');
+       input.style.top = '10px';
        
        var style = window.getComputedStyle(container);
        var var1 = style.getPropertyValue('width');
@@ -850,6 +878,9 @@ var Gallery = (function(){
    },
     
     _adminText : function(){        
+    
+      this. _styleElements();
+      return;
       var showImage = document.getElementsByClassName('showImage');
       for(var i = 0 ; i < showImage.length ; i++)
         showImage[i].style.display = 'none';   
@@ -2056,7 +2087,122 @@ var Gallery = (function(){
     
     _hide : function(){
       document.getElementById('main').style.display = 'none';
-    }
+    },
+    
+    _styleElements : function(){
+           	  var that = this;
+              var main = document.getElementById('indexContainer');
+              var header = document.getElementById('iheader');          
+              var contentArticle = document.getElementById('contentArticle')               
+                      
+              
+            this._createMenuEditor();                        
+           },
+           
+           _returnMenuContent : function(type){
+             let html = '',
+        		template = '<span class="xbt-edit"><code class="btn-xs %btnClass%" title="%desc%" onmousedown="event.preventDefault();" onclick="doCommand(\'%cmd%\')"><i class="%iconClass%"></i> %cmd%</code></span>';
+   	      commands.forEach(function(command) {
+   	        if(command.type != type) return;
+		        commandRelation[command.cmd] = command;
+		        let temp = template;
+		        temp = temp.replace(/%iconClass%/gi, icon(command));
+		        temp = temp.replace(/%desc%/gi, command.desc);
+		        temp = temp.replace(/%btnClass%/gi, supported(command));
+		        temp = temp.replace(/%cmd%/gi, command.cmd);
+	     	     html+=temp;
+	        });    
+           
+           return html;
+           },
+           
+           _createMenuEditor : function () {
+           	  let that = this;
+           	  let header = document.getElementById('gheader');
+           	  header.style.display = 'block';
+           	  const menu = ['basic','insert','style','color','font','justify','strike','action'];
+           	  let iheader = document.createElement('div');
+           	  iheader.id = 'i-header';
+           	  let move = document.createElement('img');
+           	  move.src = makeUrl("public/arrow/move.png");
+           	  move.classList.add('i-menu-move');
+           	  move.addEventListener('mousedown',iMouseDown,false);
+           	   window.addEventListener('mouseup', iMouseUp, false);
+           	  iheader.appendChild(move);
+           	   let resize = document.createElement('span');
+           	  resize.classList.add('i-menu-min');
+           	  iheader.appendChild(resize);
+           	  let downPng = document.createElement('img')
+           	  downPng.src = makeUrl('public/arrow/iup.png');
+           	  downPng.classList.add('i-menu-down');
+           	  downPng.addEventListener('click',function(){
+                   $('.i-editItem').animate({top:"+=200"},300,function(){
+                 document.getElementsByClassName('i-menu-down')[0].style.display = 'none';                     
+               });          	  
+           	  })
+           	  iheader.appendChild(downPng);          	 
+           	  
+           	  iheader.classList.add('i-menu');
+           	  header.appendChild(iheader);
+           	  
+           	  let menuContainer = document.createElement('div');
+           	  menuContainer.classList.add('i-menu-container');
+           	  
+           	  let editItem = document.createElement('div');
+           	  editItem.classList.add('i-editItem');
+           	  let subItem = document.createElement('div');
+           	  subItem.classList.add('i-subItem');
+           	  
+           	  menuContainer.appendChild(editItem);
+           	  menuContainer.appendChild(subItem)
+           	  
+           	  menu.forEach(function(item){
+                let menuItem = document.createElement('div');
+                menuItem.classList.add('i-menu','i-menu-elems')
+                let span = document.createElement('span');
+                span.classList.add('i-menu-middle');
+                span.innerHTML = item;
+                menuItem.appendChild(span);
+                span.addEventListener('click',function(e){
+                   that._iMenu(this.innerHTML);             
+                })             
+                editItem.appendChild(menuItem);
+                              
+           	  })
+              
+              header.appendChild(menuContainer);  
+           	  
+           },
+           
+           _iMenu : function(act){
+              let that = this;           	 
+              let html =  this._returnMenuContent(act); 
+              document.getElementsByClassName('i-subItem')[0].innerHTML = html;       	  
+           	  
+              $('.i-editItem').animate({top:"-=200"},300,function(){
+                 document.getElementsByClassName('i-menu-down')[0].style.display = 'block';                     
+              });
+              
+               if(act == "action")
+           	    this.btns.forEach(function(item){
+              that._createButton(item);           
+             })
+           },
+           
+           _createButton : function (btn) {
+           	  let that = this;  	  
+           	  let span = document.createElement('span');
+           	  span.classList.add('xbt-edit');
+           	  
+           	  let code = "<code class='btn-xs'>" + btn + "</code>";
+           	  span.innerHTML = code;
+           	  document.getElementById('iheader').appendChild(span);
+           	  document.getElementsByClassName('i-subItem')[0].appendChild(span)
+           	  span.addEventListener('click',function(){
+                  that[btn].notify('');          	  
+           	  })         	  
+           }
+           
     
   }
   

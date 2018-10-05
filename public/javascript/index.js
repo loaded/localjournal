@@ -2,9 +2,7 @@
      function connector(arg){
         View.insertImage.notify(arg);     
      }   
-
-
-   
+        
    function iMouseDown(e){
      window.addEventListener('mousemove', iDivMove, true);
        let editable = document.getElementsByClassName('ndrag');
@@ -561,7 +559,7 @@ var View = {
               var header = document.getElementById('iheader');          
               var contentArticle = document.getElementById('contentArticle')               
               if(this._isMobile()){
-       
+                    
               }else{ 
                 // main.style.width = this.config.mainWidth + 'px';    
                 // header.style.height = this.config.header.d + 'px';      

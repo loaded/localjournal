@@ -684,7 +684,7 @@ body {
  
  .text-desc {
    position:absolute;
-   z-index:201;
+   z-index:500;
    border:none;
    background:transparent;
    font-size:20px;
@@ -820,6 +820,20 @@ body {
   opacity : 0.8;
   background-color:white;  
 
+}
+
+#gheader {
+  position : fixed;
+  top: 0;
+  left:0; 
+  z-index: 501;
+  width:180px;
+  height:225px;
+  border:1px solid gray;
+  font-family: Cantarell;
+  opacity : 0.8;
+  background-color:white;  
+  display: none;
 }
 
 
