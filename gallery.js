@@ -196,14 +196,7 @@ var controller =  (function Controller(){
        
       form.on('file',function(name,file){
        	       	
-       	imagePath = path.join(gallery,file.name); 
-       	//var newPath = path.join(gallery,file.name)
-       	console.log("processing " + imagePath + "\n");			
-       	console.log("filepath is : " + file.path);		
-         //fs.rename(file.path,imagePath,(err)=>{
-         	// console.log("in rename : " + imagePath + "\n");
-              //if(err) throw err;   
-             
+       	imagePath = path.join(gallery,file.name);             
               addon.process(file.path,imagePath,function(im_width,im_height){
                        var client = sockets.find(socketId);   
                         client.emit('thumb' , {
@@ -214,8 +207,8 @@ var controller =  (function Controller(){
                          insert({gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
                                
                                                                                     
-         	                   })
-                         //})  
+         })
+                          
        })
        form.on('error',function(err){
            console.log("\n this is fucking error " + err);       

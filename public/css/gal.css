@@ -605,7 +605,7 @@ body {
  .close-sign {
    width:15px;
    height : 15px;
-   top:13px;
+   top:10px;
    position: relative;
    float : left; 
    cursor: pointer;
@@ -614,15 +614,24 @@ body {
  .setting {
     width:20px;
     height:20px;
-    top:8px;
+    top:10px;
     position:relative;
     float:right;
     cursor: pointer; 
  }
  
+ .g-gallery-title{
+    height : 20px;
+    position:relative;
+    
+    color:grey;
+    padding:3px;
+    float:right; 
+ }
+ 
  .txtpng {
    width : 35px;
-   top : 12px;
+   top : 10px;
    position:relative;
    margin-right: auto;
    margin-left:auto;
@@ -630,6 +639,8 @@ body {
    color:black;
    text-align:center; 
  }
+ 
+ 
  
  .txtXwar{
    right:0;
@@ -697,6 +708,9 @@ body {
    border:none;
    background:transparent;
    color:tomato; 
+   top:10px;
+   padding:5px;
+   
  }
  
  .hideHeader {

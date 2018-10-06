@@ -74,6 +74,7 @@ var Gallery = (function(){
     queue     : [],
     files : [],
     busy : 0,
+    activeEditor : false,
     removedDownload : [],
     orientation : -1,
     header : {
@@ -630,8 +631,27 @@ var Gallery = (function(){
        	 }
        	 
           that._upOrDown(upOdown,currentMaxZIndex);
-       })                 
-      
+       })     
+       
+          let txt = document.getElementById('txtpng');
+           let jur = document.getElementsByClassName('txtJur')[0];
+           let xwar = document.getElementsByClassName('txtXwar')[0];       
+           let txtContainer =      document.getElementsByClassName('txtpng')[0];
+       if(this.galleries[gallery][index].text !== undefined ){     
+       
+            txtContainer.style.opacity = 1;     
+             
+           txt.style.opacity = 1;
+           jur.style.opacity = 1;
+           xwar.style.opacity = 1;
+           txt['gallery'] = gallery;
+           txt['i'] = index;    
+           txt['overlay'] = 1;
+       }else {
+           document.getElementsByClassName('txtpng')[0].style.opacity = 0.5;      
+           txt['overlay'] = 0;           
+       }
+       
        document.getElementById('pool').appendChild(div); 
        window.history.pushState(null,null,"/"+prevUrl);
        
@@ -652,13 +672,12 @@ var Gallery = (function(){
     	 
     	 this.indexOfSlide = index;
     	 
-    	 this._constructImage(index,gallery,null);
-    	 
-    	
-    	      
+    
+    	     	      
        if(document.getElementsByClassName('back-sign')[0])
           document.getElementsByClassName('back-sign')[0].style.display = 'none';  // add id to it
-       
+       if(document.getElementsByClassName('g-gallery-title')[0])
+          document.getElementsByClassName('g-gallery-title')[0].style.display = 'none';
        var setting = document.createElement('div');
        setting.classList.add('setting','showImage');
         var imgSetting = document.createElement('img');
@@ -684,6 +703,7 @@ var Gallery = (function(){
        txtJur.src = makeUrl('public/arrow/jur.png');
        
        txtJur.style.left = -5 + 'px';
+       
        txtXwar.style.right = -5 + 'px';
        
        
@@ -693,7 +713,11 @@ var Gallery = (function(){
        txt.append(txtJur);
        txt.append(txtXwar);
        
-       txt.style.opacity = 0.5;
+       txtpng.addEventListener('click',function(){
+          if(parseInt(this['overlay'])){ 
+             that._showText(this.gallery,this.i)          
+          }       
+       })
        
               
        closeSign.append(closeImage)
@@ -718,15 +742,28 @@ var Gallery = (function(){
        	  $(txtJur).animate({left : "-=100"},400);
        	  $(txtXwar).animate({right : "-=100"},400)      	  
        	  $(this).unbind('mouseover mouseenter mouseleave')
-           //document.getElementById('txtpng').src = makeUrl('public/arrow/text1.png');     
+           //document.getElementById('txtpng').src = makeUrl('public/arrow/text1.png');   
+           
+           if(parseInt(txtpng['overlay'])){
+               txtpng.style.opacity = 1;
+               txtJur.style.opacity = 0.5;
+               txtXwar.style.opacity = 0.5;         
+           }else{
+               txtpng.style.opacity = 0.5; 
+               txtJur.style.opacity = 0.5;
+               txtXwar.style.opacity = 0.5;          
+           }           
+             
            txtJur.addEventListener('click',function(){
-              if(that.galleries[gallery].length > (that.indexOfSlide +1) && !that.busy){                              
+              if(that.galleries[gallery].length > (that.indexOfSlide +1) && !that.busy){    
+                if(that.activeEditor) that._closeEditor();                          
                 that._constructImage(++that.indexOfSlide,gallery,'up');                
               }
            })
                       
            txtXwar.addEventListener('click',function(){
               if((that.indexOfSlide-1) > -1  && !that.busy){
+              	  if(that.activeEditor) that._closeEditor();
                  that._constructImage(--that.indexOfSlide,gallery,'down')              
               }
            })          
@@ -734,11 +771,16 @@ var Gallery = (function(){
        })      
 
        closeSign.addEventListener('click',function(){
+       	 if(that.activeEditor)
+       	   that._closeEditor();
+       	    
        	 window.history.back()
           this.remove();
           $('.image-view').remove();
           if(document.getElementsByClassName('back-sign')[0])
              document.getElementsByClassName('back-sign')[0].style.display = 'block'; 
+          if(document.getElementsByClassName('g-gallery-title')[0])
+             document.getElementsByClassName('g-gallery-title')[0].style.display = 'block'; 
           setting.remove();    
           document.getElementsByClassName('txtpng')[0].remove();
           if(that.slideShow)
@@ -748,10 +790,18 @@ var Gallery = (function(){
        setting.addEventListener('click',function () {
        	 that._createMenu(that);
        })
+       this._constructImage(index,gallery,null);
        
-       this._showText(gallery,index);   
     },
     
+    _closeEditor : function(){
+       let editor = document.getElementById('gheader');
+       editor.innerHTML = '';
+     
+       editor.style.left = 0;
+       editor.style.top = 0;
+       editor.style.display = 'none';
+    }, 
     
     _upOrDown : function(upOdown,zIndex){
        var activeElement = document.getElementsByClassName('active-image')[0];
@@ -770,11 +820,11 @@ var Gallery = (function(){
     
     _showText : function(gal,i){ 
        var txt = document.createElement("div");
-       var container = document.getElementsByClassName('image-view')[0];
+       var container = document.getElementsByClassName('active-image')[0];
        if(typeof(this.galleries[gal][i].text ) !== 'undefined')
         txt.innerHTML = this.galleries[gal][i].text;
        
-       txt.id = "txt";        
+              
        txt.classList.add('text-ovrlay');
        
        var style = window.getComputedStyle(container);
@@ -784,8 +834,16 @@ var Gallery = (function(){
        //input.height = parseInt(var2.substr(0,var2.length-2)) ;
        txt.style.width = var1;
        txt.style.height =var2;
+       txt.style.opacity = 0;
        
-       container.append(txt);
+       let child = container.children;
+       child[0].style.opacity = 0.2;
+       $(child[0]).animate({opacity : 0.2},400,function(){
+             $(txt).animate({opacity : 1},1000)  
+       })
+       container.append(txt); 
+       
+     
     },
     
     _createMenu : function(t){    	
@@ -855,7 +913,7 @@ var Gallery = (function(){
      
        
        if(this.galleries[gal][index].text !== undefined ){ 
-       	   document.getElementById('txt').remove();
+       	   //document.getElementById('txt').remove();
            input.innerHTML = this.galleries[gal][index].text;
            
        } else      
@@ -937,12 +995,12 @@ var Gallery = (function(){
        var img = document.getElementsByClassName('pimage')[0];
        var index = document.getElementsByClassName('image-view')[0];
        var i = index.getAttribute('index');
-       alert(index)
+       
        var obj = {gallery : img['gallery'],src : img['url'],text : editor.innerHTML};
        var xhr = new XMLHttpRequest();
-      	xhr.open('post','/text');
+      	xhr.open('post','/gallery/text');
       	xhr.onreadystatechange = function(){
-            if(this.readyState == 4){
+            if(this.readyState == 4){ alert(xhr.responseText)
                //do something to show it has saved      
             }      	
       	}
@@ -1056,8 +1114,15 @@ var Gallery = (function(){
        image.src = makeUrl('public/arrow/home.png');
        backSign.appendChild(image);
        
+       let span = document.createElement('span');
+       span.classList.add('g-gallery-title');
+       
+       backSign.style.float = 'left'
+         span.innerHTML = gallery;       
+       
        backSign.addEventListener('click',function(){
        	 this.remove();
+       	 span.remove()
           document.getElementById('homeback').style.display = 'block';
           document.getElementById('cgbtn').style.display = 'block';
         if(gal != null)
@@ -1067,11 +1132,19 @@ var Gallery = (function(){
        },false)
        
        
-      if(mobile)
-         backSign.classList.add('mback-sign');
-      else
-        backSign.classList.add('dback-sign'); 
+      if(mobile){
+        backSign.classList.add('mback-sign');
+        span.style.fontSize = 12 + 'px';
+        span.style.top = 8 + 'px';
+      }         
+      else{
+         backSign.classList.add('dback-sign');
+         span.style.fontSize = 14 + 'px';
+         span.style.top = 8 + 'px'; 
+      }
+       
         this.header.el.append(backSign); 
+        this.header.el.appendChild(span)
        
       var arr = this.galleries[gallery];
       for(var i=0 ; i < arr.length ; i++){
@@ -2095,8 +2168,8 @@ var Gallery = (function(){
               var header = document.getElementById('iheader');          
               var contentArticle = document.getElementById('contentArticle')               
                       
-              
-            this._createMenuEditor();                        
+              this.activeEditor = true;
+              this._createMenuEditor();                        
            },
            
            _returnMenuContent : function(type){
@@ -2382,6 +2455,10 @@ var Gallery = (function(){
      View.showImage.attach(function(sender,args){     
          View._showImage(args);     
      }) 
+     
+     View.save.attach(function(sender,args){
+        sender._saveContent()     
+     })
      
      View.gallery.attach(function(sender,args){
          View._showImages(args);     
