@@ -767,10 +767,8 @@ napi_value Init(napi_env env,napi_value exports){
   
   napi_property_descriptor desc = NAPI_DECLARE_METHOD("process",Process);
   status = napi_define_properties(env,exports,1,&desc);
-  if(status != napi_ok) return nullptr;
-  
-  return exports;
-  
+  if(status != napi_ok) return nullptr;  
+  return exports;  
 }
 
 NAPI_MODULE(process,Init)

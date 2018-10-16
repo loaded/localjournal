@@ -537,7 +537,7 @@ var Gallery = (function(){
        
          //currentMaxZIndex = window.getComputedStyle(currentActiveImage[0],null).getPropertyValue('z-index'); 
           currentMaxZIndex = $(currentActiveImage[0]).css('zIndex'); 
-          $(currentActiveImage[0]).animate({opacity : 0.3},400);   
+         // $(currentActiveImage[0]).animate({opacity : 0.3},400);   
              currentActiveImage[0].classList.remove('active-image'); 
        }
        
@@ -622,8 +622,10 @@ var Gallery = (function(){
        
        image.src = makeUrl(url);       
        image.style.opacity = 0;
+       image.style.display = 'none';
        image.addEventListener('load',function(){
        	 that.busy = 0;
+       	 image.style.display = 'block'
        	 if(upOdown == null){
             $(this).animate({opacity : 1},400);       	 
        	 }else {
@@ -754,17 +756,17 @@ var Gallery = (function(){
                txtXwar.style.opacity = 0.5;          
            }           
              
-           txtJur.addEventListener('click',function(){
-              if(that.galleries[gallery].length > (that.indexOfSlide +1) && !that.busy){    
-                if(that.activeEditor) that._closeEditor();                          
-                that._constructImage(++that.indexOfSlide,gallery,'up');                
+           txtJur.addEventListener('click',function(){  
+              if((that.galleries[gallery].length) > (parseInt(that.indexOfSlide) +1) && !that.busy){   
+                if(that.activeEditor) that._closeEditor();                     
+                that._constructImage(++that.indexOfSlide,gallery,'up');              
               }
            })
                       
            txtXwar.addEventListener('click',function(){
               if((that.indexOfSlide-1) > -1  && !that.busy){
-              	  if(that.activeEditor) that._closeEditor();
-                 that._constructImage(--that.indexOfSlide,gallery,'down')              
+              	  if(that.activeEditor) that._closeEditor(); 
+                 that._constructImage(--that.indexOfSlide,gallery,'down');         
               }
            })          
              
@@ -1550,7 +1552,7 @@ var Gallery = (function(){
              
           preview.classList.add('preview'); 
           templateGallery.classList.add('dtemplate-gallery'); 
-           label.classList.add('gallery-name')
+          label.classList.add('gallery-name')
        }
        
        label.innerHTML = img.gallery;  
@@ -2325,10 +2327,8 @@ var Gallery = (function(){
       return -1;
     }
     
-  }    
-  
-  
-    
+  }  
+      
        var Router = (function () {     
                     	     
      	     let that = this; 

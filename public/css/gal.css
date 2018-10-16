@@ -1730,8 +1730,6 @@ box-sizing:border-box;
   margin-left: auto;
   margin-right:auto;
  color:black;
- 
-
 }
 
 #m-search-input {
@@ -1739,8 +1737,7 @@ box-sizing:border-box;
   color: black;
   box-sizing:box-border;
   padding-bottom:4px;
-  font-size: 16px;
- 
+  font-size: 16px; 
 }
 
 #m-search-input::placeholder {

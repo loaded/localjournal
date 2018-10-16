@@ -1407,9 +1407,7 @@ var View = {
            
            _hide : function(){
            	 if(this.currentContainer != null)
-           	    this.currentContainer.style.display = 'none';       	
-           
-                
+           	    this.currentContainer.style.display = 'none';                 
            },
            
            _dialog : function(){
@@ -1549,7 +1547,7 @@ var View = {
       function saveContent(){
           let content = new XMLHttpRequest();
           
-          let children = document.getElementById('contentArticle').children; // it should be children 
+          let children = document.getElementById('contentArticle').children; 
           if(children.length > 0){
               for(let i = 0 ; i < children.length ; i++){
                   if(children[i].hasOwnProperty('name') ){                    
