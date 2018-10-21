@@ -117,7 +117,7 @@ var View = {
               btnArticle.addEventListener('click',this._createArticle.bind(this));
            },
            
-           _setArticles : function(articles){
+           _setArticles : function(articles){ 
            	 let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
            	 let archiveContainer = document.getElementById('a-archive-container')
            	 
@@ -125,7 +125,7 @@ var View = {
                    return this.substr(0, index) + replacement+ this.substr(index ,this.length);
               }
            	 
-             for (let elem of articles) {
+             for (let elem of articles) { 
              	 let that = this;
              	 let articleContainer = document.createElement('div');
              	 articleContainer.classList.add('e-article-container');
@@ -204,8 +204,7 @@ var View = {
               headerDesc.classList.add('a-archive-headerDesc');
               
               articleContent.appendChild(thumbContainer);
-              articleContent.appendChild(headerDesc);
-              
+              articleContent.appendChild(headerDesc);              
               
               let headerContainer = document.createElement('div');
               headerContainer.classList.add('a-archive-header');
@@ -213,7 +212,10 @@ var View = {
         
               headerContainer.addEventListener('click',function(){
               	 document.getElementById('editor-archive').style.display = 'none';
-                that._showArticle(elem);
+              	 //that.article.notify(elem);
+                //that._showArticle(elem);
+                
+                Router.route('show/' + elem._id);
               })
               
               let tagsContainer = document.createElement('div');
@@ -499,8 +501,7 @@ var View = {
                 if(this._isMobile()){
                     fitSize = this.config.mWidth;
                 }else{
-                    fitSize = this.config.mainWidth;
-                               
+                    fitSize = this.config.mainWidth;                               
                 }       
                 
                 let image = new Image();
@@ -561,9 +562,7 @@ var View = {
               if(this._isMobile()){
                     
               }else{ 
-                // main.style.width = this.config.mainWidth + 'px';    
-                // header.style.height = this.config.header.d + 'px';      
-                // contentArticle.style.minHeight = (this.config.documentHeight - this.config.header.d) + 'px';              
+            
               }               
               
             this._createMenuEditor();                        
@@ -967,9 +966,7 @@ var View = {
                 div['name'] = prop.name;
                 
                 div.classList.add('fit')
-                div.append(im)
-              // div.addEventListener('dragstart',this._dragstart.bind(this))
-               //div.addEventListener('dragend',this._dragEnd.bind(this))
+                div.append(im)           
                 div.addEventListener('dragend',function(e){
                
                 })
@@ -1008,8 +1005,7 @@ var View = {
            	  	   div.style.width = width + 'px';
            	  	   div.style.height = height + 'px';
            	  	   
-           	  	   div.append(im)
-           	     // div.addEventListener('dragstart',this._dragstart.bind(this))	   
+           	  	   div.append(im)          	       
    
            	      document.getElementById('contentArticle').appendChild(div);
            	      div.focus();
@@ -1034,7 +1030,6 @@ var View = {
               editable.classList.add('editable');                
               container['name'] = prop.name;
               container.dragable = true;
-              //container.addEventListener('dragstart',this._dragstart.bind(this))
   
               im.width = documentWidth;
               im.height = newImageHeight;
@@ -1349,8 +1344,7 @@ var View = {
            
            _dragEnd : function(e){ return;
               
-               let elems =   document.getElementsByClassName('ndrag');
-               
+               let elems =   document.getElementsByClassName('ndrag');               
                for (let i = 0 ; i < elems.length ; i++) {
               	 elems[i].setAttribute('contenteditable',true);
               }  
@@ -1453,7 +1447,7 @@ var View = {
      var Router = (function () {     
                     	     
      	     let that = this; 
-           let validUrl = ['create','archive'];
+           let validUrl = ['create','archive','show'];
            let events = {};
            
            for(let elem of validUrl)
@@ -1461,10 +1455,29 @@ var View = {
           
      	    
      	     function router(url){	
-     	     	  if(validUrl.indexOf(url) == -1) return;
-     	     	  events[url].notify('')
-     	        window.history.pushState(null,null,'/editor/' + url);    
-     	     }     	     
+     	     
+     	        let splited = url.split('/');
+     	        if(splited.length == 1 ){
+     	            process(url,null)      	 
+     	        }else if(splited.length == 2){
+     	            process(splited[0],splited[1])
+     	        }else return;
+     	        
+     	        
+     	    
+     	     }     	    
+     	     
+     	     function process (action,id){
+              let url ;     	        
+     	        if(validUrl.indexOf(action) == -1) return;
+     	     	  events[action].notify(id);
+     	     	  if(id){
+                 url = action + '/' + id;     	     	  
+     	     	  }else{
+                 url = action;     	     	  
+     	     	  }
+     	        window.history.pushState(null,null,'/editor/' + url);  
+     	     } 
      	     
      	     return {
                route : router ,
@@ -1473,9 +1486,25 @@ var View = {
      })()
      
      /*  Collection */     
-     var Collection = function(){
-     
-     }
+     var Collection = (function(){
+       let models = [];
+       
+       function setModels(data){
+         models = data;
+       }
+       
+       
+       function getModel(id){
+          return models.find(function (elem) {
+          	  return elem._id == id;
+          })
+       }
+       
+       return {
+           setArchive : setModels,
+           getModel : getModel        
+       }
+     })()
      
      /*   Main Controller */
        
@@ -1515,6 +1544,10 @@ var View = {
       	 else 
       	   View.currentContainer.style.display = 'block';             
       })
+      
+      Router.event['show'].attach(function(sender,args){
+         View._showArticle(Collection.getModel(args)); 
+      })
      	  
      // Router.route('archive')     
       
@@ -1529,6 +1562,8 @@ var View = {
       View.reorder.attach(function(sender,args){
           sender._reorder();        
       })
+      
+  
         
       function getModels(){
         let xhr = new XMLHttpRequest();
@@ -1536,6 +1571,7 @@ var View = {
         xhr.onreadystatechange = function(data){
            if(this.readyState == 4){
               let result = JSON.parse(xhr.responseText);
+              Collection.setArchive(result);
               View._archiveEditor(result)             
            }
         } 
