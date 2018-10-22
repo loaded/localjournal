@@ -458,8 +458,8 @@ var Gallery = (function(){
            $(templateDownload).animate({opacity: 1},400);           
        })       
              
-       templateDownload.addEventListener('click',function(e){
-          that.gallery.notify(e);       
+       templateDownload.addEventListener('click',function(e){             
+         Router.route('gallery/' + e.target.parentElement.getAttribute('name'))
        },false)
        templateDownload.appendChild(image);       
        container.appendChild(templateDownload)     
@@ -468,7 +468,7 @@ var Gallery = (function(){
     /*-------------------------------------- View Port ---------------------------------------*/
   
     
-    _galleryShow : function(thumb,index,mypool,gallery){  
+    _galleryShow : function(thumb,index,mypool,gallery){  console.log(thumb)
        var that = this;
     	 var mobile = this.isMobile();
        var templateDownload = document.createElement('div');
@@ -506,6 +506,8 @@ var Gallery = (function(){
        templateDownload.setAttribute('name',thumb.src);
        templateDownload.setAttribute('index',index-1);
        templateDownload.setAttribute('gallery',gallery);
+       
+       
           
                              
        image.style.position = 'relative';
@@ -520,7 +522,9 @@ var Gallery = (function(){
              
        templateDownload.appendChild(image);        
        templateDownload.addEventListener('click',function(e){
-           that.showImage.notify(e);
+          // that.showImage.notify(e);
+          //alert(e.target.parentElement.getAttribute('name'))
+          Router.route('show/' + thumb._id)
        },false);       
        
        mypool.appendChild(templateDownload)            
@@ -655,7 +659,9 @@ var Gallery = (function(){
        }
        
        document.getElementById('pool').appendChild(div); 
-       window.history.pushState(null,null,"/"+prevUrl);
+      // window.history.pushState(null,null,"/show"+prevUrl);
+      
+    
        
     },    
     
@@ -758,7 +764,9 @@ var Gallery = (function(){
              
            txtJur.addEventListener('click',function(){  
               if((that.galleries[gallery].length) > (parseInt(that.indexOfSlide) +1) && !that.busy){   
-                if(that.activeEditor) that._closeEditor();                     
+                if(that.activeEditor) that._closeEditor();     
+                let model = Collection.getModelTwo(gallery,that.galleries[gallery][that.indexOfSlide + 1].src);       
+                window.history.pushState(null,null,'/gallery/show/' + model._id);  
                 that._constructImage(++that.indexOfSlide,gallery,'up');              
               }
            })
@@ -766,6 +774,8 @@ var Gallery = (function(){
            txtXwar.addEventListener('click',function(){
               if((that.indexOfSlide-1) > -1  && !that.busy){
               	  if(that.activeEditor) that._closeEditor(); 
+              	  let model = Collection.getModelTwo(gallery,that.galleries[gallery][that.indexOfSlide - 1].src);       
+                 window.history.pushState(null,null,'/gallery/show/' + model._id);  
                  that._constructImage(--that.indexOfSlide,gallery,'down');         
               }
            })          
@@ -1082,15 +1092,15 @@ var Gallery = (function(){
        
     },    
     
-    _showImages : function(e,gal){
-    	 var gallery,elem;
+    _showImages : function(arr,gallery){ 
+    	/* var gallery,elem;
        var that = this;    	
     	 if(gal == null){
     	   elem = e.target;
          gallery =  elem.parentElement.getAttribute('name');
     	 }else{
     	  gallery = gal; 
-    	 }
+    	 }*/
        
        if(document.getElementById('thumbview'))
        document.getElementsByClassName('thumbview')[0].remove();
@@ -1148,7 +1158,7 @@ var Gallery = (function(){
         this.header.el.append(backSign); 
         this.header.el.appendChild(span)
        
-      var arr = this.galleries[gallery];
+      //var arr = this.galleries[gallery];
       for(var i=0 ; i < arr.length ; i++){
          this._galleryShow(arr[i],i+1,div,gallery);      
       }       
@@ -1156,7 +1166,7 @@ var Gallery = (function(){
       pool.appendChild(div);
        
       $(div).animate({left : '+=' + this.uploader.view},400)
-      window.history.pushState(null,null,'/'+gallery+'/'+'images');
+     
     },
     
     
@@ -2293,46 +2303,43 @@ var Gallery = (function(){
   
 /*============================================ Collections ==========================================*/
 
-  var Collection = function(controller){ 
-  	 this.models = [];
-      
-    var that = this;
-    this.addModel = function (model){ 
-    	 that.models.push(model);    	
-       controller.addedToCollection(model,that.models.length);  
-    }
-    
-    this.removeModel = function (model){ 
-       var index = search(model); 
-       if(index > -1)
-         that.models.splice(index,1);
-       else return -1;
+     var Collection = (function(){
+       let models = [];
        
-       return controller.removedFromCollection(model)
+       function setModels(data){
+         models = data;         
+       }       
        
-    }
-    
-    this.removeCollection = function(queue){      
-       while(queue.length != 0)
-         that.removeModel(queue[0])        
-    }
-    
-    function search(model){ 
-    	var index ; 
-      for(index = 0 ; that.models.length ; index++){
-      	 if(that.models[index].src == model.src)        
-            return index;
-      }
-      
-      return -1;
-    }
-    
-  }  
+       function getModel(id){
+          return models.find(function (elem) {
+          	  return elem._id == id;
+          })
+       }
+       
+       function getModelTwo(gallery,src){
+          return models.find(function(elem){
+                 return (elem.gallery == gallery && elem.src == src)          
+          })       
+       }
+       
+       function getGallery(gal){
+          return models.filter(function(elem){
+             return elem.gallery == gal         
+          })       
+       }
+       
+       return {
+           setArchive : setModels,
+           getModel : getModel,
+           getGallery : getGallery,
+           getModelTwo : getModelTwo
+       }
+     })()
       
        var Router = (function () {     
                     	     
      	     let that = this; 
-           let validUrl = ['archive'];
+           let validUrl = ['archive','gallery','show','slide'];
            let events = {};
            
            for(let elem of validUrl)
@@ -2340,10 +2347,29 @@ var Gallery = (function(){
           
      	    
      	     function router(url){	
-     	     	  if(validUrl.indexOf(url) == -1) return;
-     	     	  events[url].notify('')
-     	        //window.history.pushState(null,null,'/video/' + url);    
-     	     }     	     
+     	        let splited = url.split('/');
+     	        let length = splited.length;
+     	        if(length == 1){
+     	          process(splited[0])
+     	        }
+     	        else if(length == 2){
+     	          process(splited[0],splited[1])
+     	        }else return;   
+     	     }     	
+     	     
+     	     function process(arg1,arg2){
+              let url;              
+              if(validUrl.indexOf(arg1) == -1) return;
+     	     	  events[arg1].notify(arg2)
+     	     	  
+     	     	  if(arg2 == null){
+     	     	     url = arg1 ;
+     	     	  }else{
+     	     	     url = arg1 + '/' + arg2;
+     	     	  }
+     	     	 
+     	        window.history.pushState(null,null,'/gallery/' + url);     	     
+     	     }     
      	     
      	     return {
                route : router ,
@@ -2355,7 +2381,7 @@ var Gallery = (function(){
   
   var Controller = (function(){ 
      
-     this.collection = new Collection(this);
+    // this.collection = new Collection(this);
      //this.view = new View(View,this);     
      View._start();
      
@@ -2369,6 +2395,16 @@ var Gallery = (function(){
      	   
      })
      
+     Router.event['gallery'].attach(function(sender,args){ 
+         View._showImages(Collection.getGallery(args),args);  
+     })
+     
+     Router.event['show'].attach(function(sender,args){
+     	   let model = Collection.getModel(args)
+         View._showImage(null,model.gallery,model.src)     
+     })     
+     
+  
 
      var that =  this;
         
@@ -2398,8 +2434,10 @@ var Gallery = (function(){
       	xhr.open('GET','/gallery/index');
       	window.history.pushState(null,null,'/gallery/index')
       	xhr.onreadystatechange = function(){
-            if(this.readyState == 4){
-               View.loadGalleries(xhr.responseText);                
+            if(this.readyState == 4){ 
+               View.loadGalleries(xhr.responseText);  
+               Collection.setArchive(JSON.parse(xhr.responseText));    
+               
                View._showTile();
                
                //readyUrl();        
