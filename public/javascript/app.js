@@ -31,6 +31,11 @@ window.onload = function(){
           for (let i = 0 ; i < this.config.menubar.length ; i++) {
        	    this.defineProp(this,this.config.menubar[i],new Event(this))
           }    
+          
+          window.addEventListener('popstate',function(){
+               Router.route(document.location + '');          
+          },false)
+          //window.onpopstate = Router.route(document.location)
       },
 		 
 	   _init : function(){
@@ -228,8 +233,7 @@ window.onload = function(){
        return this.config.mainWidth < this.config.d.containerWidth ? 0 : 1;
     },
     
-    _hideMenu : function(e){
-    	
+    _hideMenu : function(e){    
     	document.getElementsByClassName('menubar-a')[0].remove();
       let that = this;      
       let canvas = document.getElementById('m-menu')
@@ -263,6 +267,34 @@ window.onload = function(){
     
 	   
 	}
+	
+	
+	var Router = (function(){
+      const modules = ['gallery','video','editor'];
+		
+		function router(path){        
+        let route ;        
+        var pathArray = location.href.split( '/' );
+        var protocol = pathArray[0];
+        var host = pathArray[2];
+        var url = protocol + '//' + host;
+        
+        if(url.length == path.length) return;    
+       
+        route = path.slice(url.length + 1);
+        let routeSplited = route.split('/');
+        
+        let index = modules.indexOf(routeSplited[0]);        
+        if(index == -1) return;
+        
+        Gallery.router(route.slice(routeSplited[0] + 1))                		
+		}
+		
+		
+      return {
+         route : router      
+      }      	
+	})()
    
    var Controller = (function(){   
           Video.router('archive');

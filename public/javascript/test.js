@@ -1101,7 +1101,7 @@ var Gallery = (function(){
     	 }else{
     	  gallery = gal; 
     	 }*/
-       
+       var that = this; 
        if(document.getElementById('thumbview'))
        document.getElementsByClassName('thumbview')[0].remove();
        var mobile = this.isMobile();       
@@ -1137,8 +1137,7 @@ var Gallery = (function(){
        	 span.remove()
           document.getElementById('homeback').style.display = 'block';
           document.getElementById('cgbtn').style.display = 'block';
-        if(gal != null)
-           that._forSlideShow(that);
+
           $(div).animate({left : '-=' + that.uploader.view},400)
           
        },false)
@@ -2339,7 +2338,7 @@ var Gallery = (function(){
        var Router = (function () {     
                     	     
      	     let that = this; 
-           let validUrl = ['archive','gallery','show','slide'];
+           let validUrl = ['archive','gallery','show'];
            let events = {};
            
            for(let elem of validUrl)
@@ -2357,7 +2356,7 @@ var Gallery = (function(){
      	        }else return;   
      	     }     	
      	     
-     	     function process(arg1,arg2){
+     	     function process(arg1,arg2){ alert(arg1 + ' ' + arg2)
               let url;              
               if(validUrl.indexOf(arg1) == -1) return;
      	     	  events[arg1].notify(arg2)
@@ -2391,8 +2390,7 @@ var Gallery = (function(){
      	  }else{
      	    View._init();
          galleries();
-     	  }
-     	   
+     	  }     	   
      })
      
      Router.event['gallery'].attach(function(sender,args){ 
@@ -2402,12 +2400,9 @@ var Gallery = (function(){
      Router.event['show'].attach(function(sender,args){
      	   let model = Collection.getModel(args)
          View._showImage(null,model.gallery,model.src)     
-     })     
-     
-  
+     })  
 
-     var that =  this;
-        
+     var that =  this;     
      
       var socket = io("http://localhost:3000");
       socket.on("id",function(data){
