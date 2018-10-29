@@ -23,8 +23,7 @@ window.onload = function(){
         
 		 _start : function(){
 		 	 this._addEvents(); 	
-		 	 this._init();
-         	 
+		 	 this._init();         	 
 		 },
 		 
 		_addEvents : function(){
@@ -33,9 +32,9 @@ window.onload = function(){
           }    
           
           window.addEventListener('popstate',function(){
-               Router.route(document.location + '');          
+               Router.route('#' + document.location + '');          
           },false)
-          //window.onpopstate = Router.route(document.location)
+          
       },
 		 
 	   _init : function(){
@@ -145,9 +144,7 @@ window.onload = function(){
 	      }else{
 	        search.remove();
 	        cover.remove();      
-	      }
-	
-	     
+	      }	     
 	   },
 	   
 	   _menubar : function () {
@@ -224,9 +221,7 @@ window.onload = function(){
          e.stopPropagation();
          let search = document.getElementById('m-search');
          search['searching'] = '1';
-         this._hideMenu();
-         
-         
+         this._hideMenu();    
       },	   
 	       
     _isMobile : function(){
@@ -272,8 +267,16 @@ window.onload = function(){
 	var Router = (function(){
       const modules = ['gallery','video','editor'];
 		
-		function router(path){        
-        let route ;        
+		function router(path){   
+		  let backOrNext = false;
+		  let route ; 
+		  let inside  ;
+		  
+		  if(path[0] == '#') {
+           path = path.substring(1,path.length)
+           backOrNext = true;		  
+		  }  
+               
         var pathArray = location.href.split( '/' );
         var protocol = pathArray[0];
         var host = pathArray[2];
@@ -286,8 +289,28 @@ window.onload = function(){
         
         let index = modules.indexOf(routeSplited[0]);        
         if(index == -1) return;
-        
-        Gallery.router(route.slice(routeSplited[0] + 1))                		
+        inside = backOrNext ? '#':'';
+        switch(index){
+           case 0:
+             Index.hide();
+             Video.hide();
+             Gallery.router(inside + route.slice(routeSplited[0] + 1))  ;
+             break;
+           case 1:
+             Index.hide();
+             Gallery.hide()
+             Video.router('archive')
+             break;
+           case 2:
+             Video.hide();
+             Gallery.hide();
+             Index.router(inside + route.slice(routeSplited[0] + 1)) ;
+             break;
+           default:
+            break;                         
+        }
+         
+                       		
 		}
 		
 		

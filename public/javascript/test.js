@@ -10,22 +10,20 @@ var Gallery = (function(){
      function iMouseDown(e){
      window.addEventListener('mousemove', iDivMove, true);
        let editable = document.getElementById('Editor')
-               
-                 editable.removeAttribute('contenteditable');
-    
+       editable.removeAttribute('contenteditable');   
    }
    
    function iMouseUp(e){
       window.removeEventListener('mousemove', iDivMove, true);
       document.getElementById('gheader').style.position = 'fixed';
-        let editable = document.getElementById('Editor');
-             editable.setAttribute('contenteditable','true');
+      let editable = document.getElementById('Editor');
+      editable.setAttribute('contenteditable','true');
    }
    function iDivMove(e){
-         let div = document.getElementById('gheader');
-         div.style.position = 'absolute';
-        div.style.top = e.clientY + 'px';
-         div.style.left = e.clientX + 'px';   
+      let div = document.getElementById('gheader');
+      div.style.position = 'absolute';
+      div.style.top = e.clientY + 'px';
+      div.style.left = e.clientX + 'px';   
    }	
 	
   var View = {
@@ -459,7 +457,7 @@ var Gallery = (function(){
        })       
              
        templateDownload.addEventListener('click',function(e){             
-         Router.route('gallery/' + e.target.parentElement.getAttribute('name'))
+         Router.route('images/' + e.target.parentElement.getAttribute('name'))
        },false)
        templateDownload.appendChild(image);       
        container.appendChild(templateDownload)     
@@ -468,7 +466,7 @@ var Gallery = (function(){
     /*-------------------------------------- View Port ---------------------------------------*/
   
     
-    _galleryShow : function(thumb,index,mypool,gallery){  console.log(thumb)
+    _galleryShow : function(thumb,index,mypool,gallery){  
        var that = this;
     	 var mobile = this.isMobile();
        var templateDownload = document.createElement('div');
@@ -505,8 +503,7 @@ var Gallery = (function(){
          templateDownload.style.marginRight = this.pool.marginRight  + 'px';    
        templateDownload.setAttribute('name',thumb.src);
        templateDownload.setAttribute('index',index-1);
-       templateDownload.setAttribute('gallery',gallery);
-       
+       templateDownload.setAttribute('gallery',gallery);   
        
           
                              
@@ -665,6 +662,21 @@ var Gallery = (function(){
        
     },    
     
+    _browserConstruct : function(a,b){
+    	   let index,gallery;
+    	   
+       	 for(var i = 0 ; i < this.galleries[a].length ; i++)
+    	 	   if (this.galleries[a][i].src == b) index = i;           
+          gallery = a;
+          
+          let activeImageIndex = document.getElementsByClassName('active-image')[0].getAttribute('index');
+          
+          if(activeImageIndex > index)
+             this._constructImage(index,gallery,'up')
+          else 
+             this._constructImage(index,gallery,'down');
+    },
+    
     _showImage : function(e,a,b){ 
     	 var that = this;
     	 var index,gallery;
@@ -688,12 +700,13 @@ var Gallery = (function(){
           document.getElementsByClassName('g-gallery-title')[0].style.display = 'none';
        var setting = document.createElement('div');
        setting.classList.add('setting','showImage');
+       setting.id = 'show-setting'
         var imgSetting = document.createElement('img');
        imgSetting.src = makeUrl('public/arrow/setting.png');     
        setting.appendChild(imgSetting);       
        var closeSign = document.createElement('div');
        closeSign.classList.add('close-sign','showImage');   
-      
+       closeSign.id = 'show-close-sign'
        var closeImage = document.createElement('img');
        closeImage.src = makeUrl('public/arrow/close.png');
        
@@ -783,20 +796,8 @@ var Gallery = (function(){
        })      
 
        closeSign.addEventListener('click',function(){
-       	 if(that.activeEditor)
-       	   that._closeEditor();
-       	    
-       	 window.history.back()
-          this.remove();
-          $('.image-view').remove();
-          if(document.getElementsByClassName('back-sign')[0])
-             document.getElementsByClassName('back-sign')[0].style.display = 'block'; 
-          if(document.getElementsByClassName('g-gallery-title')[0])
-             document.getElementsByClassName('g-gallery-title')[0].style.display = 'block'; 
-          setting.remove();    
-          document.getElementsByClassName('txtpng')[0].remove();
-          if(that.slideShow)
-            that._forSlideShow(that);                                  
+          that._closeShowImage.call(that);
+          window.history.pushState(null,null,'/gallery/images/' + gallery)
        },false)
        
        setting.addEventListener('click',function () {
@@ -804,6 +805,23 @@ var Gallery = (function(){
        })
        this._constructImage(index,gallery,null);
        
+    },
+    
+    _closeShowImage : function(){ 
+    	    
+          if(this.activeEditor)
+       	   this._closeEditor();    	  
+          
+          document.getElementById('show-close-sign').remove();
+          $('.image-view').remove();
+          if(document.getElementsByClassName('back-sign')[0])
+             document.getElementsByClassName('back-sign')[0].style.display = 'block'; 
+          if(document.getElementsByClassName('g-gallery-title')[0])
+             document.getElementsByClassName('g-gallery-title')[0].style.display = 'block'; 
+          document.getElementById('show-setting').remove();    
+          document.getElementsByClassName('txtpng')[0].remove();
+          if(this.slideShow)
+            this._forSlideShow(this); 
     },
     
     _closeEditor : function(){
@@ -1108,6 +1126,7 @@ var Gallery = (function(){
        var div = document.createElement('div');
        
        div.classList.add('thumbview');
+       div.id = 'thumbview';
        var pool = document.getElementById('pool');
        
        div.style.width = this.uploader.view + 'px';
@@ -1120,6 +1139,7 @@ var Gallery = (function(){
        
        var backSign = document.createElement('div');  //        add id to it 
        backSign.classList.add('back-sign');
+       backSign.id = 'back-sign';
        
        var image = new Image();
        
@@ -1127,20 +1147,13 @@ var Gallery = (function(){
        backSign.appendChild(image);
        
        let span = document.createElement('span');
+       span.id = 'g-gallery-title';
        span.classList.add('g-gallery-title');
        
        backSign.style.float = 'left'
          span.innerHTML = gallery;       
        
-       backSign.addEventListener('click',function(){
-       	 this.remove();
-       	 span.remove()
-          document.getElementById('homeback').style.display = 'block';
-          document.getElementById('cgbtn').style.display = 'block';
-
-          $(div).animate({left : '-=' + that.uploader.view},400)
-          
-       },false)
+       backSign.addEventListener('click',this._backToIndex.bind(this),false)
        
        
       if(mobile){
@@ -1166,6 +1179,16 @@ var Gallery = (function(){
        
       $(div).animate({left : '+=' + this.uploader.view},400)
      
+    },
+    
+    _backToIndex : function(){
+          document.getElementById('back-sign').remove();
+       	 document.getElementById('g-gallery-title').remove()
+          document.getElementById('homeback').style.display = 'block';
+          document.getElementById('cgbtn').style.display = 'block';
+          
+          $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
+          window.history.pushState(null,null,'/gallery/archive')
     },
     
     
@@ -2338,26 +2361,36 @@ var Gallery = (function(){
        var Router = (function () {     
                     	     
      	     let that = this; 
-           let validUrl = ['archive','gallery','show'];
+           let validUrl = ['archive','images','show','gallery'];
            let events = {};
            
            for(let elem of validUrl)
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){	
+     	     function router(url){
+     	     	  let backOrNext = false; 
+     	        if(url[0] == '#'){
+     	           url = url.substring(1,url.length);
+     	           backOrNext = true;
+     	        }
+     	        
+     	       
      	        let splited = url.split('/');
      	        let length = splited.length;
      	        if(length == 1){
      	          process(splited[0])
      	        }
      	        else if(length == 2){
-     	          process(splited[0],splited[1])
-     	        }else return;   
+     	          process(splited[0],splited[1],backOrNext)
+     	        }else if(length == 3){
+                 process(splited[1],splited[2],backOrNext)     	        
+     	        };   
      	     }     	
      	     
-     	     function process(arg1,arg2){ alert(arg1 + ' ' + arg2)
+     	     function process(arg1,arg2,arg3){     	     
               let url;              
+              
               if(validUrl.indexOf(arg1) == -1) return;
      	     	  events[arg1].notify(arg2)
      	     	  
@@ -2366,8 +2399,12 @@ var Gallery = (function(){
      	     	  }else{
      	     	     url = arg1 + '/' + arg2;
      	     	  }
-     	     	 
-     	        window.history.pushState(null,null,'/gallery/' + url);     	     
+     	     	  
+     	     	  if(arg1 == 'gallery')
+     	     	    url = 'archive'
+     	     	  
+     	     	  if(!arg3)
+     	          window.history.pushState(null,null,'/gallery/' + url);     	     
      	     }     
      	     
      	     return {
@@ -2384,6 +2421,14 @@ var Gallery = (function(){
      //this.view = new View(View,this);     
      View._start();
      
+     Router.event['gallery'].attach(function (sender,args) {
+     	  let style = window.getComputedStyle(document.getElementById('main'));
+     	  
+     	  if(style.getPropertyValue('display') == 'block'){
+     	      View._backToIndex(View);
+     	  }
+     })
+     
      Router.event['archive'].attach(function(sender,args){ 
      	  if(View.inited){
           document.getElementById('main').style.display = 'block';     	  
@@ -2393,14 +2438,55 @@ var Gallery = (function(){
      	  }     	   
      })
      
-     Router.event['gallery'].attach(function(sender,args){ 
+     Router.event['images'].attach(function(sender,args){ 
+         let style = window.getComputedStyle(document.getElementById('main'));
+         
+         if(style.getPropertyValue('display')== 'block'){
+            let st = state()            
+            if(st == 'show'){ 
+               View._closeShowImage.call(View) ;                
+               return;
+            }else if(st == 'index'){
+               
+            }
+         }else if(View.inited){
+          
+         }else {
+         
+         }
+         
          View._showImages(Collection.getGallery(args),args);  
      })
      
      Router.event['show'].attach(function(sender,args){
      	   let model = Collection.getModel(args)
-         View._showImage(null,model.gallery,model.src)     
+     	   let style = window.getComputedStyle(document.getElementById('main'));
+         let st = state();
+         if(style.getPropertyValue('display') == 'block'){
+         	
+         	if(st == 'show')
+         	    View._browserConstruct.call(View,model.gallery,model.src)               
+             else 
+                 View._showImage(null,model.gallery,model.src)  
+            return;
+         }else if(View.inited){
+         
+         }else {
+         
+         }   	
+            
      })  
+     
+     function state(){
+         let show = document.getElementsByClassName('image-view').length;
+         let gallery = document.getElementsByClassName('thumbview').length;
+         
+         if(show)
+           return 'show';
+         else if(gallery) 
+           return 'gallery';
+         else return 'archive';     
+     }
 
      var that =  this;     
      
@@ -2427,7 +2513,7 @@ var Gallery = (function(){
       function galleries () {
       	var xhr = new XMLHttpRequest();
       	xhr.open('GET','/gallery/index');
-      	window.history.pushState(null,null,'/gallery/index')
+      	//window.history.pushState(null,null,'/gallery/archive')
       	xhr.onreadystatechange = function(){
             if(this.readyState == 4){ 
                View.loadGalleries(xhr.responseText);  

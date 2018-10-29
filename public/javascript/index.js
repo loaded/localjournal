@@ -86,8 +86,10 @@ var View = {
            },
            
            _styleEditorArchive : function(){
+           	
+           	   
            	   let archive = document.getElementById('editor-archive');
-           	  
+           	   
            	   this.currentContainer = archive; 
                archive.style.display = 'block';
                archive.style.width = window.innerWidth + 'px';
@@ -113,8 +115,11 @@ var View = {
            },
            
            _archiveEventListner : function(){
+           	  if(this.btncreated == true) 
+           	    return;
+           	  this.btncreated = true;
               let btnArticle = document.getElementById('e-header-btn');
-              btnArticle.addEventListener('click',this._createArticle.bind(this));
+              btnArticle.addEventListener('click',this._createArticle.bind(this),false);
            },
            
            _setArticles : function(articles){ 
@@ -211,10 +216,9 @@ var View = {
               headerContainer.innerHTML ="<div>"+ header +"</div>";
         
               headerContainer.addEventListener('click',function(){
-              	 document.getElementById('editor-archive').style.display = 'none';
-              	 //that.article.notify(elem);
-                //that._showArticle(elem);
-                
+                          
+                document.getElementById('a-archive-container').innerHTML = '';
+                document.getElementById('editor-archive').style.display = 'none';  
                 Router.route('show/' + elem._id);
               })
               
@@ -309,7 +313,7 @@ var View = {
            
            _createArticle : function(){
                document.getElementById('editor-archive').style.display = 'none';
-               Router.route('create');
+               Router.route('create'); 
            },
            
            _createEditor : function(){
@@ -405,6 +409,7 @@ var View = {
               document.getElementById('indexContainer').style.display = 'none';
           
               let editor = document.getElementById('editor-article');
+              editor.style.display = 'block';
               var articleBody = document.createElement('div');
               
               articleBody.setAttribute('id','editor-article1');
@@ -526,9 +531,7 @@ var View = {
             	   
             	 }else{
             	    width = this.config.mainWidth;
-            	 }
-            	
-            	 
+            	 }         	 
             	
             	 container.innerHTML = text.html;
             	 container.classList.add('text','desktop');
@@ -1454,29 +1457,40 @@ var View = {
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){	
+     	     function router(url){
+     	     
+     	        let backOrNext = false;
+     	        
+     	        if(url[0] == '#'){
+                 backOrNext = true;
+                 url = url.substring(1,url.length);    	        
+     	        }
      	     
      	        let splited = url.split('/');
-     	        if(splited.length == 1 ){
-     	            process(url,null)      	 
+     	        if(splited.length == 1  ){
+     	            process(url,null,backOrNext)      	 
      	        }else if(splited.length == 2){
-     	            process(splited[0],splited[1])
-     	        }else return;
-     	        
-     	        
+     	            process(splited[0],splited[1],backOrNext)
+     	        }else return;   	        
      	    
      	     }     	    
      	     
-     	     function process (action,id){
-              let url ;     	        
-     	        if(validUrl.indexOf(action) == -1) return;
-     	     	  events[action].notify(id);
+     	     function process (action,id,bn){
+     	     	  
+              let url ;     	
+              if(bn){
+                if(action == 'editor') action = 'archive';              
+              }
+     	        if(validUrl.indexOf(action) == -1) return; 
+     	     	  events[action].notify({id : id,bn : bn});
      	     	  if(id){
                  url = action + '/' + id;     	     	  
      	     	  }else{
                  url = action;     	     	  
      	     	  }
-     	        window.history.pushState(null,null,'/editor/' + url);  
+     	     	  
+     	     	  if(!bn)
+     	         window.history.pushState(null,null,'/editor/' + url);  
      	     } 
      	     
      	     return {
@@ -1500,9 +1514,15 @@ var View = {
           })
        }
        
+       
+       function getArchive(){
+           return models;        
+       }
+       
        return {
            setArchive : setModels,
-           getModel : getModel        
+           getModel : getModel,
+           getArchive : getArchive        
        }
      })()
      
@@ -1534,20 +1554,85 @@ var View = {
          View._progress(data);
       })          
       
-      Router.event['create'].attach(function(sender,args){
+      Router.event['create'].attach(function(sender,args){ 
+      	 switch(state()){
+             case 'create':
+               break;
+             case 'show':
+               document.getElementById('editor-article').innerHTML = ''
+               document.getElementById('editor-article').style.display = 'none';
+               break;
+             case 'archive':
+               document.getElementById('editor-archive').innerHTML = '';
+               document.getElementById('editor-archive').style.display = 'none';
+               break;
+             default:
+               break;      	 
+      	 }
+      	 
           View._createEditor();     
       })
       
-      Router.event['archive'].attach(function(sender,args){     
-          if(View.currentContainer == null) 	
-      	   getModels(); 
-      	 else 
-      	   View.currentContainer.style.display = 'block';             
+      Router.event['archive'].attach(function(sender,args){    
+          if(View.currentContainer == null) 	{
+              	   getModels();
+              	   return;    
+          }
+      
+      	 else if(!args.bn){
+      	     View.currentContainer.style.display = 'block';
+      	     return;
+      	 }      	 
+      	 else { 
+            switch(state()){
+             case 'create':
+               document.getElementById('contentArticle').innerHTML = '';
+               document.getElementById('iheader').innerHTML = '';
+               document.getElementById('indexContainer').style.display = 'none';
+               break;
+             case 'show':
+               document.getElementById('editor-article').innerHTML = ''
+               document.getElementById('editor-article').style.display = 'none';
+               break;
+             case 'archive':
+               document.getElementById('editor-archive').innerHTML = '';
+               document.getElementById('editor-archive').style.display = 'none';
+               break;
+             default:
+               break;      	 
+      	  }             	 
+      	 } 
+      	 
+      	 View._archiveEditor(Collection.getArchive());    
+      	                
       })
       
       Router.event['show'].attach(function(sender,args){
-         View._showArticle(Collection.getModel(args)); 
+      	   if(!args.bn){
+      	        View._showArticle(Collection.getModel(args.id)); 
+      	        return;
+      	   }
+                   
+      	  	 switch(state()){
+             case 'create':
+               document.getElementById('contentArticle').innerHTML = '';
+               document.getElementById('iheader').innerHTML = '';
+               document.getElementById('indexContainer').style.display = 'none';
+               break;
+             case 'show':
+               document.getElementById('editor-article').innerHTML = ''
+               //document.getElementById('editor-article').style.display = 'none';
+               break;
+             case 'archive':
+               document.getElementById('a-archive-container').innerHTML = '';
+               document.getElementById('editor-archive').style.display = 'none';
+               break;
+             default:
+               break;      	 
+      	 }
+         View._showArticle(Collection.getModel(args.id)); 
       })
+          
      	  
      // Router.route('archive')     
       
@@ -1563,7 +1648,22 @@ var View = {
           sender._reorder();        
       })
       
-  
+      function state() {
+      	      	              	
+      	let createStyle = window.getComputedStyle(document.getElementById('indexContainer'));
+      	let archiveStyle = window.getComputedStyle(document.getElementById('editor-archive'));
+      	let articleStyle = window.getComputedStyle(document.getElementById('editor-article'));
+      	
+      	if(createStyle.getPropertyValue('display') == 'block'){
+            return 'create' ;        	
+      	}else if(archiveStyle.getPropertyValue('display') == 'block'){
+            return 'archive';      	
+      	}else if(articleStyle.getPropertyValue('display') == 'block'){
+            return 'show';      	
+      	}else 
+      	   return '';
+      	
+      }  
         
       function getModels(){
         let xhr = new XMLHttpRequest();
@@ -1574,8 +1674,7 @@ var View = {
               Collection.setArchive(result);
               View._archiveEditor(result)             
            }
-        } 
-        
+        }       
         
         xhr.send()  
       } 

@@ -1478,6 +1478,10 @@ box-sizing:border-box;
  width: 120px;
 }
 
+#editor-article{
+  display : none;
+}
+
 .md-header-btn{
  
   font-size : 10px;
