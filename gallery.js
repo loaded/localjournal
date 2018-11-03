@@ -1,14 +1,14 @@
-var io = require('socket.io')
-var sockets = require('./sockets.js')
+
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
 var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
+var sockets = require('./sockets.js')
 
-var controller =  (function Controller(){
-  
+
+  var sockets ;  
   var clients = [];  
   var options = {
      route : {    
@@ -142,10 +142,8 @@ var controller =  (function Controller(){
   	  
   	  req.on('end',function(){
        var dt	 = JSON.parse(txt);  	
-       updateOne(dt,res); 
-      
-  	  }) 
-  	  
+       updateOne(dt,res);       
+  	  })   	  
   }
   
   function _delete(req,res){
@@ -163,9 +161,9 @@ var controller =  (function Controller(){
           fs.unlinkSync(path.join(__dirname + '/uploads/'+gallery + '/thumb/',arr[i].src));                 
        }
        
-       remove(arr,gallery,res)
-      
+       remove(arr,gallery,res)     
      })
+     
      return;
   }
   
@@ -204,9 +202,9 @@ var controller =  (function Controller(){
           	                 height : im_height,
           	                 width : im_width
                          })                            
-                         insert({gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
-                               
-                                                                                    
+                                                 
+              insert({gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
+                                                                                              
          })
                           
        })
@@ -248,7 +246,7 @@ var controller =  (function Controller(){
   
   /*---------------------------     Socket      ------------------------------------*/
 
-  function comunicate(server){
+ /* function comunicate(server){
       io.listen(server).on('connection',function(socket){ 
       socket.emit('id',{id : socket.id})
       clients.push(socket)
@@ -258,7 +256,7 @@ var controller =  (function Controller(){
         if(index > -1) clients.splice(index,1)  
       })
     })      
-  }
+  } */
    
   /*--------------------------- Helper Functions -----------------------------------*/
   
@@ -281,7 +279,8 @@ var controller =  (function Controller(){
             obj,{'upsert':true},function(err,result){
             if(err) throw err;           
             res.statusCode = 200;
-            res.end();
+             res.setHeader('Content-Type','application/json');	
+            res.end('');
             db.close();        
         })     
      })
@@ -335,12 +334,7 @@ var controller =  (function Controller(){
      return path.parse(req.url).ext.toLowerCase();  
   }
   
-  return {
-     router : router,
-     comunicate : comunicate  
-  }
-})()
 
 
-module.exports.router = controller.router;
-module.exports.comunicate = controller.comunicate
+module.exports.router = router;
+

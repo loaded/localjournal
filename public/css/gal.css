@@ -1490,7 +1490,11 @@ box-sizing:border-box;
   width : 90px;  
 
 }
-
+#v-header{
+  position:fixed;
+  top: 10px;
+  background-color:white;
+}
 .mv-header{
   position:relative;
   background-color:white;
@@ -1525,7 +1529,7 @@ box-sizing:border-box;
 #v-video-container {
  overflow-x: hidden;
  position:relative;
- 
+ top:50px;
 }
 
 .v-containers{

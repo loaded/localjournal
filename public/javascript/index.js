@@ -275,8 +275,8 @@ var View = {
                 descContainer.style.display = 'none'
                 headerDesc.style.width = (window.innerWidth -160) + 'px';
                 headerDesc.style.height = 100 + 'px';    
-                headerDesc.style.paddingLeft = 10 + 'px';
-                
+                headerDesc.style.paddingLeft = 5 + 'px';
+                headerDesc.style.paddingRight = 5 + 'px';
                 headerDesc.style.overflow = 'hidden';          
               }else{
                 archive.style.height = 170 + 'px';
@@ -1530,13 +1530,10 @@ var View = {
        
      var Controller = (function(){
       var uploaded = 0;
-     	var socketId ;
-     	var socket = io("http://localhost:3000");
+     	
+     
      	 View._init() 
-      
-      socket.on("id",function(data){
-         socketId = data.id; 
-      });
+
       
       socket.on("eduprog",function(data){         
           ++uploaded;

@@ -1,14 +1,12 @@
-var io = require('socket.io')
-var sockets = require('./sockets.js')
+
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
 var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
-
-var controller = (function(){
-
+var sockets = require('./sockets.js')
+   
    const options = {
      route : "/editor",
      db:"mongodb://localhost:27017/cg",
@@ -25,7 +23,7 @@ var controller = (function(){
        route = '';
      else 
        route = route[0].replace(new RegExp('/','g'),'');
-         console.log(route);
+         
      switch(route){
        case 'save' : 
          _saveToDb(req,res);
@@ -128,11 +126,8 @@ var controller = (function(){
           var imagePath = path.join(uploadPath,file.name);
           let filename = file.name;
           addon.process(file.path,imagePath,function(im_width,im_height){        
-                let socket = sockets.find(socketId);
-                console.log(imagePath + '\n')
-                 socket.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')});                       
-             
-                                                             
+              let socket = sockets.find(socketId);                
+              socket.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')});                                                                 
           })
        })
        
@@ -147,10 +142,6 @@ var controller = (function(){
       
    }
    
-   return {
-      router : router   
-   }
    
-})()
 
-module.exports.router = controller.router;
+module.exports.router = router;

@@ -42,7 +42,7 @@ function _public(req,res){
 	
 	
    let ext = path.parse(req.url).ext.toLowerCase();
-   console.log(myurl + '\n');
+   
    if(ext in extentions){
      fs.exists(__dirname + myurl,function(exist){
         if(exist){

@@ -1,30 +1,34 @@
-var http = require('http');
-
-var io = require('socket.io')
+var server = require('http').createServer(myApp);
+var io = require('socket.io')(server);
 var url = require('url')
-var fs = require('fs')
-var path  = require('path')
-var formidable = require('formidable')
-var addon = require("bindings")("process")
-var database = require('mongodb').MongoClient;
-
-var sockets = require("./sockets.js")
-
-var gallery = require('./gallery.js');
-var editor = require('./editor.js');
+var sockets = require('./sockets.js')
+var gallery = require('./gallery.js')
+var editor = require('./editor.js')
 var home = require('./index.js');
-var video = require('./video.js');
-  
-  
-
+var video = require('./video.js')
    
   /*--------------------------- Helper Functions -----------------------------------*/
   
-  
+  io.on('connection',function(socket){  
+      socket.emit('id',{id:socket.id});
+      sockets.add(socket);
+      
+      socket.on('disconnect',function(socket){
+      	 sockets.remove(socket);                     
+      });
+      
+      
+      socket.on('start',video.start.bind(socket));
+      socket.on('upload',video.upload.bind(socket))
+      
+   });
 
- var server = http.createServer(function(request,response){	
- 	 
- 	 let reqUrl = request.url;
+ 
+ server.listen(3000);
+
+
+ function myApp(request,response){
+   let reqUrl = request.url;
  	 let pathname = url.parse(reqUrl).pathname;
  	 
  	 let route = pathname.match(/^\/[a-z]+\/?/);
@@ -58,12 +62,7 @@ var video = require('./video.js');
         break;
           	 
  	 }	   
- })
- 
- sockets.init(server);
- //gallery.comunicate(server)
- server.listen(3000);
-
+ }
 
  
 // url must check to not being too long

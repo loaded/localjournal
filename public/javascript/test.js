@@ -2328,7 +2328,8 @@ var Gallery = (function(){
      var Collection = (function(){
        let models = [];
        
-       function setModels(data){
+       function setModels(data){ 
+       
          models = data;         
        }       
        
@@ -2350,11 +2351,16 @@ var Gallery = (function(){
           })       
        }
        
+       function addModel(model){
+          models.push(model);      
+       }
+       
        return {
            setArchive : setModels,
            getModel : getModel,
            getGallery : getGallery,
-           getModelTwo : getModelTwo
+           getModelTwo : getModelTwo,
+           addModel : addModel
        }
      })()
       
@@ -2489,15 +2495,19 @@ var Gallery = (function(){
      }
 
      var that =  this;     
-     
+      /*
       var socket = io("http://localhost:3000");
       socket.on("id",function(data){
          that.id = data.id;         
       });
+      */
       
+      //that.id = socketId;
      
-      socket.on('thumb',function(data){ 
-      	 that.collection.addModel(data);          
+     
+      socket.on('thumb',function(data){
+      	 Collection.addModel(data);     
+      	 that.addedToCollection(data,null)
       })
       
       socket.on('progress',function(data){
@@ -2517,11 +2527,8 @@ var Gallery = (function(){
       	xhr.onreadystatechange = function(){
             if(this.readyState == 4){ 
                View.loadGalleries(xhr.responseText);  
-               Collection.setArchive(JSON.parse(xhr.responseText));    
-               
-               View._showTile();
-               
-               //readyUrl();        
+               Collection.setArchive(JSON.parse(xhr.responseText));               
+               View._showTile();   
             }      	
       	}
       	
@@ -2535,10 +2542,15 @@ var Gallery = (function(){
           file.append(sender.files[i].name,sender.files[i]);
           var xhr = new XMLHttpRequest();
           xhr.open('POST','/gallery/upload'); 
-          xhr.setRequestHeader('id',that.id);
+          xhr.setRequestHeader('id',socketId);
           xhr.setRequestHeader('imageName',sender.files[i].name);
           xhr.setRequestHeader('gallery',sender.galleryName )
-          xhr.send(file);     	  
+          xhr.send(file);    
+          xhr.onreadystatechange = function () {
+          	 if(this.readyState == 4){
+               alert('done')          	 
+          	 }
+          } 	  
      	  }
      }
    

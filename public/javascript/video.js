@@ -31,7 +31,7 @@ var Video = (function(){
       
     _init : function(){
     	 this.inited = true;
-       this._addEvents();
+       //this._addEvents();
        this._configIt();
        this._setHeader();
        this._setMain(); 
@@ -39,7 +39,7 @@ var Video = (function(){
     },
     
     _addEvents : function(){
-       for (let i = 0 ; i < this.config.events.length ; i++) {
+       for (let i = 0 ; i < this.config.events.length ; i++) { 
        	 this.defineProp(this,this.config.events[i],new Event(this))
        }    
     },
@@ -100,7 +100,7 @@ var Video = (function(){
          mainContainer.style.width = (this.config.m.containerWidth -40) + 'px';
          videoContainer.style.width = (this.config.m.containerWidth -40) + 'px';
          videoUploader.style.width = (this.config.m.containerWidth -40)  + 'px';    	
-         mainContainer.style.top = 20 + 'px';
+         mainContainer.style.top = 60 + 'px';
          videoContainer.style.minHeight = (window.innerHeight -70) + 'px';
          videoUploader.style.minHeight = (window.innerHeight - 70) + 'px';         
          mainContainer.style.minHeight = (window.innerHeight - 70 ) + 'px';        
@@ -109,7 +109,7 @@ var Video = (function(){
          mainContainer.style.width = this.config.d.containerWidth + 'px';
          videoContainer.style.width = this.config.d.containerWidth + 'px';
          videoUploader.style.width = this.config.d.containerWidth  + 'px';    	
-         mainContainer.style.top = 20 + 'px';
+         mainContainer.style.top = 60 + 'px';
          videoContainer.style.minHeight = (window.innerHeight -70) + 'px';
          videoUploader.style.minHeight = (window.innerHeight - 70) + 'px';         
          mainContainer.style.minHeight = (window.innerHeight - 70 ) + 'px';        
@@ -282,7 +282,7 @@ var Video = (function(){
 
         	   
         	   
-        	   if(this._isMobile()){
+        	   if(that._isMobile()){
         	      mapContainer.style.top = -video.videoHeight + 'px';
            	   mapContainer.style.width = (that.config.m.containerWidth -40) + 'px';
         	      mapContainer.style.height = video.offsetHeight + 'px';;
@@ -525,7 +525,7 @@ var Video = (function(){
                 topContainer.style.height = 120 + 'px';
                 
                 
-                if(i == 1 || i == 3)
+                if(i % 2 == 1)
                   container.style.marginLeft = 100+ 'px';               
                        
            }
@@ -758,7 +758,7 @@ var Video = (function(){
         $('#v-selectfile').trigger('click');        
     },
     
-    _upload : function(){      
+    _upload : function(){     
       let rawTitle = document.getElementById('v-video-title').value;
       let rawTags = document.getElementById('v-video-hinput').value;
       let location = this.location;
@@ -779,6 +779,7 @@ var Video = (function(){
       document.getElementById('v-video-progress').style.opacity = 0.8;
       
       this.upload.notify(args);
+    
     },
     
     _progress : function(progress){       
@@ -888,9 +889,9 @@ var Video = (function(){
   
   var Controller = (function(){ 
       let reader = new FileReader();  	 
-  	   var socket = io('http://localhost:3000');     
+  	   //var socket = io('http://localhost:3000');     
       
-      View._addEvents();
+      View._addEvents()
       Router.event['archive'].attach(function(sender,args){
       	 if(!View.inited){                    	   
       	   View._init(); 
@@ -900,16 +901,17 @@ var Video = (function(){
       	 	 document.querySelector('#videoContainer').style.display = 'block';
       	 }
              
-      })
-     	  
+      })  
+   
+     
+     View.upload.attach(function(sender,args){ 
       
-      View.upload.attach(function(sender,args){
           reader.onload = function(e){
              socket.emit('upload',{'name' : sender.file.name, data : e.target.result})          
           }
           
-          socket.emit('start',{'name' :sender.file.name, 'size' : sender.file.size,args : args})
-      })
+          socket.emit('start',{'name' :sender.file.name, 'size' : sender.file.size,args : args}) ;
+      })   
       
       socket.on('continue', function (data){
 		      View._progress(data['percent']);

@@ -77,7 +77,7 @@ var database = require('mongodb').MongoClient;
   }
   
   
-  function startUpload(data){
+  function startUpload(data){ console.log('start upload \n')
   	let that = this;
    let filename = data['name'];
    let args = data['args'];
@@ -119,7 +119,7 @@ var database = require('mongodb').MongoClient;
   }
    
   
-  function upload(data){
+  function upload(data){ console.log('upload ing \n')
   	 let that = this;
     let filename = data['name'];
     let imageName = filename.replace(options.regex,'.png')
@@ -159,6 +159,9 @@ var database = require('mongodb').MongoClient;
    	
   }
   
+
+  
 module.exports.start = startUpload
 module.exports.upload = upload
 module.exports.router = router
+

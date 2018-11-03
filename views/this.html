@@ -163,7 +163,13 @@
     
     <div id='showArticle'>
     </div>
-    
+     <script type="text/javascript">
+     var socketId;
+     	var socket = io("http://localhost:3000"); 
+      socket.on("id",function(data){ 
+         socketId = data.id; 
+      });
+     </script>    
      <script type="text/javascript" src="http://localhost:3000/public/javascript/test.js"></script>
      <script type="text/javascript" src="http://localhost:3000/public/javascript/index.js"></script>
      <script type="text/javascript" src="http://localhost:3000/public/javascript/video.js"></script>
