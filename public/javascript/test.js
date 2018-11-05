@@ -2507,7 +2507,9 @@ var Gallery = (function(){
      
       socket.on('thumb',function(data){
       	 Collection.addModel(data);     
-      	 that.addedToCollection(data,null)
+      	 let child = document.getElementById('pool').children; 
+      	 that.addedToCollection(data,child)
+      	 View._recalculateMargin()
       })
       
       socket.on('progress',function(data){
@@ -2548,7 +2550,7 @@ var Gallery = (function(){
           xhr.send(file);    
           xhr.onreadystatechange = function () {
           	 if(this.readyState == 4){
-               alert('done')          	 
+                       	 
           	 }
           } 	  
      	  }

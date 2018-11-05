@@ -50,8 +50,7 @@ var Video = (function(){
     	 
     	 bodyContainer.classList.add('bodyContainer');
     	
-    	 container.style.display = 'block';
-      
+    	 container.style.display = 'block';     
        
        if(this._isMobile()){
        	 container.style.width = window.innerWidth  + 'px';
@@ -85,6 +84,7 @@ var Video = (function(){
     },   
     
     _setMain : function () {
+    	 
     	 let mainContainer = document.getElementById('v-video-container');   	 
     	 let videoContainer = document.createElement('div');
     	 videoContainer.id = 'v-video-archive';
@@ -96,29 +96,44 @@ var Video = (function(){
     	 videoContainer.classList.add('v-containers');
     	 videoUploader.classList.add('v-containers');
     	 videoUploader.id = 'v-uploader';
+    	 
+    	 let videoArchiveWrapper = document.createElement('div');
+    	 videoArchiveWrapper.id= 'v-archiveWrapper'
+    	 
+    	 let totalVideo = Collection.total(); 
     	 if(this._isMobile()){
          mainContainer.style.width = (this.config.m.containerWidth -40) + 'px';
          videoContainer.style.width = (this.config.m.containerWidth -40) + 'px';
          videoUploader.style.width = (this.config.m.containerWidth -40)  + 'px';    	
-         mainContainer.style.top = 60 + 'px';
-         videoContainer.style.minHeight = (window.innerHeight -70) + 'px';
-         videoUploader.style.minHeight = (window.innerHeight - 70) + 'px';         
-         mainContainer.style.minHeight = (window.innerHeight - 70 ) + 'px';        
-         contentContainer.style.width = 2*(this.config.m.containerWidth -40 ) + 'px';    	 
+         mainContainer.style.top = 50 + 'px';
+        // videoContainer.style.height = (totalVideo * 205)   + 'px';
+         videoUploader.style.height = (window.innerHeight - 70) + 'px';         
+         mainContainer.style.height = (window.innerHeight -50) + 'px';    
+         videoArchiveWrapper.style.height = (window.innerHeight -70) + 'px';
+         videoArchiveWrapper.style.width = (this.config.m.containerWidth - 40) + 'px';    
+         contentContainer.style.width = 2*(this.config.m.containerWidth -40 ) + 'px'; 
+         contentContainer.style.height = (window.innerHeight -70) + 'px';   	 
     	 }else{
          mainContainer.style.width = this.config.d.containerWidth + 'px';
          videoContainer.style.width = this.config.d.containerWidth + 'px';
          videoUploader.style.width = this.config.d.containerWidth  + 'px';    	
-         mainContainer.style.top = 60 + 'px';
-         videoContainer.style.minHeight = (window.innerHeight -70) + 'px';
+         mainContainer.style.top = 50 + 'px';
+        // videoContainer.style.height = totalVideo * 215 + 'px';
          videoUploader.style.minHeight = (window.innerHeight - 70) + 'px';         
-         mainContainer.style.minHeight = (window.innerHeight - 70 ) + 'px';        
+         mainContainer.style.height = (window.innerHeight - 70 ) + 'px';        
          contentContainer.style.width = 2*(this.config.d.containerWidth ) + 'px';
+         videoArchiveWrapper.style.width = this.config.d.containerWidth + 'px'
+         videoArchiveWrapper.style.height = (window.innerHeight - 70) + 'px'
     	 }
     	 
-    	 contentContainer.appendChild(videoContainer);
+    	 videoArchiveWrapper.appendChild(videoContainer);
+    	 contentContainer.appendChild(videoArchiveWrapper);
     	 contentContainer.appendChild(videoUploader);
     	 mainContainer.appendChild(contentContainer);
+    	 
+    	 const ps = new PerfectScrollbar(videoArchiveWrapper,{
+          suppressScrollX:true	 
+    	 });
     },
     
     _eventBinding : function(){
@@ -745,7 +760,7 @@ var Video = (function(){
         video.style.marginRight = 'auto';
         video.style.marginTop = 5 + 'px';
         video.style.display = 'block';       
-       
+        
         back.addEventListener('click',this._slideLeft.bind(this))
        // this._slideContainer();
     },
@@ -862,7 +877,23 @@ var Video = (function(){
     }   
   
   }
-  
+        
+      
+              
+       var Collection = (function(){
+          let videos ;
+          function videoCount() {
+          	return videos.length
+          }
+          
+          function setVideos(arr) {
+          	videos = arr;
+          }
+          return {
+             total : videoCount,
+             setVideos : setVideos          
+          }
+       })()        
   
        var Router = (function () {     
                     	     
@@ -894,7 +925,7 @@ var Video = (function(){
       View._addEvents()
       Router.event['archive'].attach(function(sender,args){
       	 if(!View.inited){                    	   
-      	   View._init(); 
+      	  
       	   getModels();       	 
       	 }     	 
       	 else {
@@ -937,6 +968,8 @@ var Video = (function(){
         xhr.onreadystatechange = function (data) {
         	 if(this.readyState == 4){
              let result = JSON.parse(xhr.responseText);
+             Collection.setVideos(result)
+              View._init(); 
              View._showVideos(result);        	 
         	 }
         }	  

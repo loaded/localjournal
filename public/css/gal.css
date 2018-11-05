@@ -1527,11 +1527,18 @@ box-sizing:border-box;
 }
 
 #v-video-container {
- overflow-x: hidden;
+ 
  position:relative;
+ overflow: hidden;
  top:50px;
 }
 
+
+#v-video-archive{
+  position: relative;
+  
+ 
+}
 .v-containers{
 	
   float: left;
@@ -1540,6 +1547,14 @@ box-sizing:border-box;
 #v-content-container{
   position: relative;
   left:0;
+  
+  
+}
+
+#v-archiveWrapper{
+  position: relative;
+  overflow:hidden;
+  float:left;
 }
 
 #v-inputWrapper{
