@@ -76,7 +76,7 @@ var View = {
            	  for(var i= 0 ; i< this.config.events.length ; i++)
            	     this.defineProp(this,this.config.events[i],new Event(this))
            	     
-           	   this.config.mWidth = window.innerWidth -40;
+           	   this.config.mWidth = window.innerWidth -5;
            },         
            
            _archiveEditor : function(articles){             
@@ -89,6 +89,7 @@ var View = {
            	
            	   
            	   let archive = document.getElementById('editor-archive');
+           	   let viewPort = document.getElementById('a-archive-container');
            	   
            	   this.currentContainer = archive; 
                archive.style.display = 'block';
@@ -104,13 +105,25 @@ var View = {
                  header.style.height = 30 + 'px';
                  header.style.width = this.config.mWidth +  'px';
                  btn.classList.add('me-header-btn');    
-                 archiveContainer.style.width = this.config.mWidth  + 'px';                              
+                 archiveContainer.style.width = this.config.mWidth  + 'px';     
+                 viewPort.style.width = this.config.mWidth + 'px';
+                 viewPort.style.top = 50 + 'px';         
+                 viewPort.style.height = (window.innerHeight - 70) + 'px';   
+                 header.style.width = this.config.mWidth + 'px';             
                }else{
                  archiveContainer.style.width = this.config.mainWidth + 'px';
                  header.style.height = 30 + 'px';
-                
+                 viewPort.style.width = this.config.mainWidth + 'px';
+                 viewPort.style.height = (window.innerHeight - 70) + 'px';
+                 viewPort.style.top = 50 + 'px';
                  btn.classList.add('de-header-btn');
-               }                 
+                 header.style.width = this.config.mainWidth + 'px';
+               }         
+               
+                   	 
+    	 const ps = new PerfectScrollbar(viewPort,{
+          suppressScrollX:true	 
+    	 });        
                
            },
            
@@ -245,7 +258,7 @@ var View = {
                 archive.style.height = 110 + 'px';
                 archive.style.width = window.innerWidth + 'px';
                 archive.style.top = 15 + 'px';
-                timeContainer.style.width = 50 + 'px';
+                timeContainer.style.width = 45 + 'px';
                 timeContainer.style.height = 60  + 'px';   
                 
                 articleContent.style.height = 100 + 'px';
@@ -273,7 +286,7 @@ var View = {
                // headerContainer.style.fontSize = 12 + 'px';                
                 tagsContainer.style.fontSize = 12 + 'px';
                 descContainer.style.display = 'none'
-                headerDesc.style.width = (window.innerWidth -160) + 'px';
+                headerDesc.style.width = 155 + 'px';
                 headerDesc.style.height = 100 + 'px';    
                 headerDesc.style.paddingLeft = 5 + 'px';
                 headerDesc.style.paddingRight = 5 + 'px';
@@ -409,12 +422,15 @@ var View = {
               document.getElementById('indexContainer').style.display = 'none';
           
               let editor = document.getElementById('editor-article');
+              let viewPort = document.createElement('div');
+              viewPort.classList.add('editor-article-view');
               editor.style.display = 'block';
               var articleBody = document.createElement('div');
               
               articleBody.setAttribute('id','editor-article1');
              // document.body.append(articleBody)
-              editor.appendChild(articleBody)
+              editor.appendChild(viewPort);
+               viewPort.appendChild(articleBody)
               this.currentContainer = document.getElementById('editor-article')
               articleBody.style.display = 'block';
               
@@ -462,10 +478,19 @@ var View = {
                 }
               articleBody.style.display = 'block';
               if(this._isMobile()){
-                 articleBody.style.width = this.config.mWidth + 'px';              
+                 articleBody.style.width = window.innerWidth + 'px';   
+                 viewPort.style.width = window.innerWidth+ 'px';
+                 viewPort.style.height = (window.innerHeight -10) + 'px';           
               }else{
-                 articleBody.style.width = this.config.mainWidth + 'px';                               
+                 articleBody.style.width = window.innerWidth + 'px'; 
+                 viewPort.style.width = window.innerWidth + 'px';
+                 viewPort.style.height = (window.innerHeight - 10 ) + 'px';                              
               }                  
+             
+              
+              const ps = new PerfectScrollbar(viewPort,{
+                 suppressScrollX:true	 
+    	        });
                      
             },          
             
@@ -482,7 +507,7 @@ var View = {
                image.height = newHeight;
                image.classList.add('full','fscreen');
                image.addEventListener('click',this._fullScreen.bind(this));
-               document.getElementById('editor-article').appendChild(image);
+               document.getElementById('editor-article1').appendChild(image);
             	
             },
             
@@ -496,7 +521,7 @@ var View = {
                   image.height = medium.width;
                   image.classList.add('medium','fscreen');
                    image.addEventListener('click',this._fullScreen.bind(this));
-                  document.getElementById('editor-article').appendChild(image);               
+                  document.getElementById('editor-article1').appendChild(image);               
                }else 
                     this._fullArticle(medium);
             },
@@ -504,9 +529,9 @@ var View = {
             _fitArticle : function(fit){
             	 let fitSize;
                 if(this._isMobile()){
-                    fitSize = this.config.mWidth;
+                    fitSize = this.config.mWidth-15;
                 }else{
-                    fitSize = this.config.mainWidth;                               
+                    fitSize = this.config.mainWidth;                              
                 }       
                 
                 let image = new Image();
@@ -520,14 +545,14 @@ var View = {
                 image.height = newHeight;
                 image.classList.add('fit','fscreen');
                 image.addEventListener('click',this._fullScreen.bind(this));
-                document.getElementById('editor-article').appendChild(image);      
+                document.getElementById('editor-article1').appendChild(image);      
             },
             
             _textArticle : function (text) {
             	 let width ;
             	  let container = document.createElement('div');
             	 if(this._isMobile()){
-            	    width = this.config.mWidth;  
+            	    width = this.config.mWidth-15;  
             	   
             	 }else{
             	    width = this.config.mainWidth;
@@ -537,13 +562,13 @@ var View = {
             	 container.classList.add('text','desktop');
             	 
             	 container.style.width = width + 'px';
-                document.getElementById('editor-article').appendChild(container);  
+                document.getElementById('editor-article1').appendChild(container);  
             },
             
             _captionArticle : function(caption){
                 let width ;
             	 if(this._isMobile()){
-            	    width = this.config.mWidth;  
+            	    width = this.config.mWidth -15;  
             	 }else{
             	    width = this.config.mainWidth;
             	 }
@@ -553,7 +578,7 @@ var View = {
             	 container.innerHTML = caption.html;
             	 container.classList.add('text','desktop');
             	 container.style.width = width + 'px';
-                document.getElementById('editor-article').appendChild(container);  
+                document.getElementById('editor-article1').appendChild(container);  
             },
             
             
@@ -954,7 +979,7 @@ var View = {
            	  let mainWidth ;
            	  
            	  if(this._isMobile()){
-           	     mainWidth = this.config.mWidth;
+           	     mainWidth = this.config.mWidth -10;
            	  }else{
            	    mainWidth = this.config.mainWidth;
            	  }
@@ -1061,7 +1086,7 @@ var View = {
                 var nextEditable = document.createElement('div');               
                 
                 if(sender._isMobile()){
-                   nextEditable.style.width = sender.config.mWidth + 'px';
+                   nextEditable.style.width = (sender.config.mWidth -10) + 'px';
                    nextEditable.style.minHeight = 20 + 'px';                 
                 }else{
                    nextEditable.style.width = sender.config.mainWidth + 'px';
@@ -1084,7 +1109,7 @@ var View = {
                 var nextEditable = document.createElement('div');
                 
                 if(sender._isMobile()){
-                  nextEditable.style.width = sender.config.mWidth + 'px';
+                  nextEditable.style.width = (sender.config.mWidth -10) + 'px';
                   nextEditable.style.minHeight = 100 + 'px';
                     nextEditable.style.marginTop = '5px';  
                 }else{

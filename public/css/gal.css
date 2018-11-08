@@ -10,6 +10,8 @@
 body {
   overflow-x: hidden;
    font-family: Cantarell;
+ 
+
 }
 
 
@@ -575,8 +577,11 @@ body {
    position:absolute; 
    background-color: white;
    z-index = 50;
+   top:0;
  }
- 
+ .active-image{
+     top:0; 
+ }
  
  .mback-sign img {
    position:relative;
@@ -600,6 +605,11 @@ body {
  
  #pool {
    position:relative; 
+ }
+ 
+ #g-archive-view{
+   position:relative;
+   overflow:hidden; 
  }
  
  .close-sign {
@@ -1083,6 +1093,11 @@ box-sizing: border-box;
 font-size : 10px;
 }
 
+
+#a-archive-container{
+  overflow: hidden;
+  position: relative;
+}
 #editor-archive {
  display:none;
 }
@@ -1094,7 +1109,7 @@ font-size : 10px;
 }
 
 #e-header { 
-  position:relative;
+  position:fixed;
   background-color:white;
   top: 10px;
   border-bottom:1px solid gray;
@@ -1127,6 +1142,15 @@ font-size : 10px;
 
 }
 
+.editor-article-view{
+  overflow: hidden;
+  position: relative;
+}
+
+#editor-article1{
+  margin-left: auto;
+  margin-right: auto;
+}
 #e-dialog{
   display:none;
 }

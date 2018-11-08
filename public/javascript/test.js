@@ -162,11 +162,11 @@ var Gallery = (function(){
     	 main.style.display = 'block'
     	
     	 if(mobile) { 
-    	   main.style.width = (this.windowWidth -10) + 'px';
+    	   main.style.width = (this.windowWidth -5) + 'px';
     	   main.style.height = (this.windowHeight -10) + 'px';
     	   main.style.left = this.main.mobile.left + 'px';    	    
     	 }else {    	 
-         main.style.width = this.mainWidth + 'px';
+         main.style.width = (this.mainWidth  +5)+ 'px';
          main.style.height = (this.mainHeight -10) +  'px';      
          var margin_left = parseInt((this.windowWidth - 900)/2);
          main.style.left = margin_left + 'px';     
@@ -290,7 +290,31 @@ var Gallery = (function(){
          $('#arrow').addClass('darrow')
        }    
     },
+    
+    _setPoolView : function(){
+        let viewPort = document.createElement('div');
+    	 
+    	 viewPort.setAttribute('id','g-archive-view')
+    	 if(this.isMobile()){
+    	   viewPort.style.width = (this.windowWidth  - 5) + 'px';
+    	   viewPort.style.height = (this.windowHeight - 50) + 'px';
+    	 }else{
+    	   viewPort.style.width = (this.mainWidth +5) + 'px';
+    	   viewPort.style.height = (this.mainHeight - 50) + 'px';
+    	 }
+    	 
+    	 let pool = document.getElementById('pool');
+    	 pool.appendChild(viewPort)
+    	
+    	 const ps = new PerfectScrollbar(viewPort,{
+           suppressScrollX:true	 
+    	 });    
+    },
+    
+    
     _setPool : function () {
+
+    	 
     	 this._marginRight();
     
     },
@@ -376,6 +400,8 @@ var Gallery = (function(){
       }else {
       document.getElementById('pool').innerHTML = '';
       $('#tiler').css('z-index',-200)  ; // I am not sure this is necessary
+      
+      this._setPoolView();
       if(this.windowWidth < this.mainWidth )             
         $('#tiler').animate({top : '-=155'},400,function(){
            document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
@@ -397,9 +423,9 @@ var Gallery = (function(){
     
     
     _showGalleries : function(){
-      var container = document.createElement('div');
-     
-       document.getElementById('pool').appendChild(container);
+      var container = document.getElementById('g-archive-view')
+      console.log(container)
+       //document.getElementById('pool').appendChild(container);
        var t = 1;
        for (var i in this.galleries) {
        	 this._addGallery(this.galleries[i][0],t,container,i); 
@@ -656,10 +682,7 @@ var Gallery = (function(){
        }
        
        document.getElementById('pool').appendChild(div); 
-      // window.history.pushState(null,null,"/show"+prevUrl);
-      
-    
-       
+      // window.history.pushState(null,null,"/show"+prevUrl);     
     },    
     
     _browserConstruct : function(a,b){
@@ -1153,8 +1176,7 @@ var Gallery = (function(){
        backSign.style.float = 'left'
          span.innerHTML = gallery;       
        
-       backSign.addEventListener('click',this._backToIndex.bind(this),false)
-       
+       backSign.addEventListener('click',this._backToIndex.bind(this),false)       
        
       if(mobile){
         backSign.classList.add('mback-sign');
@@ -1167,28 +1189,30 @@ var Gallery = (function(){
          span.style.top = 8 + 'px'; 
       }
        
-        this.header.el.append(backSign); 
-        this.header.el.appendChild(span)
+      this.header.el.append(backSign); 
+      this.header.el.appendChild(span)
        
       //var arr = this.galleries[gallery];
-      for(var i=0 ; i < arr.length ; i++){
+      for(var i = 0 ; i < arr.length ; i++){
          this._galleryShow(arr[i],i+1,div,gallery);      
       }       
-       
+      
       pool.appendChild(div);
+      const ps = new PerfectScrollbar(div,{
+           suppressScrollX:true	 
+    	});
        
-      $(div).animate({left : '+=' + this.uploader.view},400)
-     
+      $(div).animate({left : '+=' + this.uploader.view},400)     
     },
     
     _backToIndex : function(){
-          document.getElementById('back-sign').remove();
-       	 document.getElementById('g-gallery-title').remove()
-          document.getElementById('homeback').style.display = 'block';
-          document.getElementById('cgbtn').style.display = 'block';
+       document.getElementById('back-sign').remove();
+       document.getElementById('g-gallery-title').remove()
+       document.getElementById('homeback').style.display = 'block';
+       document.getElementById('cgbtn').style.display = 'block';
           
-          $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
-          window.history.pushState(null,null,'/gallery/archive')
+       $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
+       window.history.pushState(null,null,'/gallery/archive')
     },
     
     
