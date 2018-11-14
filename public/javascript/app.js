@@ -7,7 +7,8 @@ window.onload = function(){
 		 config : {
 		 	  mainWidth : 900,
 		 	  d : {containerWidth : window.innerWidth},
-           menubar : ['home','article','video','gallery','about','login']		 
+           menubar : ['home','article','video','gallery','about','login'],
+           inputs : ['username','password','email']
 		 },
 		 
 		 defineProp : function(obj,key,value){  
@@ -258,6 +259,173 @@ window.onload = function(){
                 
       },10)      
       
+    },
+    
+    _login : function(){
+       let container = document.createElement('div');
+       container.id = 'a-login-container';
+       let that = this;
+       container.style.width = 300 + 'px';
+       container.style.height = 230 + 'px';
+       let innerHeight = window.innerHeight;
+       container.style.top = (innerHeight -230)/3 + 'px';
+       let input ;
+       container.appendChild(this._loginBox())       
+       this.config.inputs.forEach(function(elem){
+           input = that._createInput(elem);
+           container.appendChild(input);
+       })
+       
+       
+       container.appendChild(this._term())
+       document.body.appendChild(container)
+    },
+    
+    _loginBox : function(){
+        let loginTitle = document.createElement('div');
+        loginTitle.style.height = 20 + 'px';
+        loginTitle.style.width = 300 + 'px';
+        loginTitle.style.fontSize = 16 + 'px';
+        loginTitle.style.fontWeight = 600;
+        
+        let login = document.createElement('span');
+        login.style.height = 20 + 'px';
+        login.current = 1;
+        login.innerHTML = 'Login'
+        login.style.cursor = 'pointer'
+        
+        let register = document.createElement('span');
+        register.style.height = 20 + 'px';
+        register.style.color = 'lightgrey';
+        register.innerHTML = 'Register' 
+        register.style.cursor = 'pointer'
+        
+        register.addEventListener('mouseenter',function(){
+           if(this.current == 1){
+               this.style.color = 'lightgrey'
+               login.style.color = 'black'           
+           }else{
+                this.style.color = 'black'
+                login.style.color = 'lightgrey'
+           }        
+        })        
+        
+        
+        register.addEventListener('mouseleave',function(){ 
+            if(this.current == 1){
+                 this.style.color = 'black';
+                 login.style.color = 'lightgrey'            
+            }else{
+                 this.style.color = 'lightgrey'
+                 login.style.color = 'black'
+            }        
+        })
+        
+        let span = document.createElement('span');
+        span.innerHTML = '/'
+        loginTitle.appendChild(login);
+        loginTitle.appendChild(span);
+        loginTitle.appendChild(register)
+        
+        
+        return loginTitle;
+    },
+    
+    _term : function(){
+        let term = document.createElement('div');
+        let span = document.createElement('span');
+        
+        term.style.width = 200 + 'px';
+        span.innerHTML = 'Remember me';
+        span.style.marginLeft = 5 + 'px';
+        let canvas = this._checkbox(20,20);
+        canvas.style.float = 'left';
+        canvas.style.cursor = 'pointer';
+        term.appendChild(canvas);
+        term.appendChild(span);
+        term.style.marginTop = 25 + 'px';
+        term.style.marginLeft = 100 + 'px';
+        
+        return term;
+       
+                     
+    },
+    
+    _checkbox : function(width,height){
+       
+        let canvas = document.createElement('canvas');
+	      canvas.width = width;
+	      canvas.height = height;
+	  
+	      
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = width/2;
+	      
+	      context.beginPath();
+	      context.arc(width/2,width/2,radius,0,2*Math.PI);
+	      context.closePath();
+	      context.fillStyle = 'lightblue';
+	      context.fill();
+	      
+	      	      
+	      canvas.addEventListener('click',function(){
+             	      
+	      });
+	      
+	      return canvas;  
+    },
+    
+    
+    _createInput : function(name){
+        let mainContainer = document.createElement('div');
+        let input = document.createElement('input');
+        mainContainer.style.width = 300 + 'px';
+        mainContainer.style.marginTop = 18 + 'px'
+        mainContainer.style.position = 'relative';
+        input.type = 'text';
+        input.style.width = 200 + 'px';
+        mainContainer.style.height = 20 + 'px';
+        input.style.height = 20 + 'px';
+        input.style.position = 'relative';
+        input.style.left = 100 + 'px';
+        input.style.border= 'none';
+        input.style.borderBottom = '1px solid grey';
+        input.style.padding = '3px';       
+         
+        input.style.paddingLeft = 0;
+        input.style.boxSizing = 'box-border'        
+        input.style.zIndex = 101;
+        input.style.opacity = 0.5;
+        let title = document.createElement('span');
+        title.style.height = 20 + 'px';
+        title.style.position = 'absolute';
+        title.style.zIndex = 100;
+        title.innerHTML  = name;
+        title.style.left = 100 + 'px'; 
+        title.style.paddingTop = 5 + 'px';
+        title.style.color= 'black';
+        title.style.boxSizing = 'box-border'
+        title.style.paddingRight = 5 + 'px';
+        input.classList.add('a-login-text');
+                
+        
+        input.addEventListener('focus',function(){
+        	    if(this.hasOwnProperty('animated')) return;
+             let style = window.getComputedStyle(title);
+             let width = style.getPropertyValue('width');
+             let toLeft = parseInt(width) + 10;
+             this.style.borderBottom = '2px solid red'
+             this.style.paddingBottom = '1px'
+             this.animated = true;
+            
+             $(title).animate({left : '-=' + toLeft+ 'px'},400)        
+        })        
+        
+        mainContainer.appendChild(input);
+        mainContainer.appendChild(title);
+       
+        return mainContainer;    
     }
     
 	   
@@ -320,9 +488,9 @@ window.onload = function(){
 	})()
    
    var Controller = (function(){   
-          Video.router('archive');
-          View._start();
           
+          View._start();
+          View._login()
           View.article.attach(function(sender,args){
           	 sender._hideMenu()
           	 Video.hide();
@@ -345,7 +513,9 @@ window.onload = function(){
              
              Gallery.router('archive');
                        
-          })         
+          })
+          
+        //  Video.router('archive');         
    })()
 
 })()

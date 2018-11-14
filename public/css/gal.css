@@ -1790,3 +1790,12 @@ box-sizing:border-box;
 #m-search-input::placeholder {
   color:black;
 }
+
+#a-login-container {
+  position: relative;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: auto;
+  margin-bottom: auto;
+  border-left:'1px solid grey';
+}
