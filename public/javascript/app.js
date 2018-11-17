@@ -266,18 +266,44 @@ window.onload = function(){
        container.id = 'a-login-container';
        let that = this;
        container.style.width = 300 + 'px';
-       container.style.height = 230 + 'px';
+       //container.style.height = 230 + 'px';
        let innerHeight = window.innerHeight;
+       container.style.overflow = 'hidden'
        container.style.top = (innerHeight -230)/3 + 'px';
        let input ;
-       container.appendChild(this._loginBox())       
+       container.appendChild(this._loginBox());
+       
+       let mainBox = document.createElement('div');
+       mainBox.id = 'a-login-mainBox';
+       mainBox.style.position = 'relative'
+       mainBox.animated = 'login'
+       let loginDiv = document.createElement('div');
+       loginDiv.id = 'a-login-loginDiv' ;
+       loginDiv.style.width = 300 + 'px';
+       loginDiv.style.float = 'left';        
+       let registerDiv = document.createElement('div');
+       registerDiv.id = 'a-login-registerDiv';
+       
+       loginDiv.style.width = 300 + 'px';
+       registerDiv.style.width = 300 + 'px';
+       registerDiv.style.float = 'right'
+       registerDiv.style.backgroundColor = 'tomato';
+       registerDiv.style.height = 200 + 'px'       
+       mainBox.style.width = 600 + 'px';
+       
        this.config.inputs.forEach(function(elem){
            input = that._createInput(elem);
-           container.appendChild(input);
+           loginDiv.appendChild(input);
        })
        
+       loginDiv.appendChild(this._term());
+       mainBox.appendChild(loginDiv);
+       mainBox.appendChild(registerDiv);
        
-       container.appendChild(this._term())
+       
+    
+       
+       container.appendChild(mainBox)
        document.body.appendChild(container)
     },
     
@@ -287,6 +313,7 @@ window.onload = function(){
         loginTitle.style.width = 300 + 'px';
         loginTitle.style.fontSize = 16 + 'px';
         loginTitle.style.fontWeight = 600;
+        loginTitle.style.marginLeft = 100 + 'px';
         
         let login = document.createElement('span');
         login.style.height = 20 + 'px';
@@ -299,6 +326,9 @@ window.onload = function(){
         register.style.color = 'lightgrey';
         register.innerHTML = 'Register' 
         register.style.cursor = 'pointer'
+        
+        
+     
         
         register.addEventListener('mouseenter',function(){
            if(this.current == 1){
@@ -321,12 +351,60 @@ window.onload = function(){
             }        
         })
         
+        
+        register.addEventListener('click',function () { 
+           let mainBox = document.getElementById('a-login-mainBox');          
+           if(mainBox.animated == 'login'){
+               mainBox.animated = 'register'           	   
+           	   $(mainBox).animate({left : '-=300'},200)  
+           }        	  
+        	
+        })
+        
+        login.addEventListener('click',function(){
+        	  let mainBox = document.getElementById('a-login-mainBox');
+        	  if(mainBox.animated == 'register'){
+               mainBox.animated ='login';        	    
+        	     $(mainBox).animate({left : '+=300'},200)  
+        	  }
+                    
+        })
         let span = document.createElement('span');
         span.innerHTML = '/'
         loginTitle.appendChild(login);
         loginTitle.appendChild(span);
         loginTitle.appendChild(register)
         
+        
+        let slash = document.createElement('span');
+        slash.innerHTML = '/'
+        
+        loginTitle.appendChild(slash)
+        let send = document.createElement('span');
+        send.style.height = 20 + 'px';
+        //send.style.backgroundColor = 'green';
+        send.style.color = 'green';
+        send.innerHTML = 'Send';
+        //send.style.float = 'right';
+        send.style.cursor  = 'pointer';
+        send.style.marginTop = 18 + 'px';
+        send.style.fontSize = 16 + 'px';
+        send.style.fontWeight = 600;
+        send.style.boxSizing = 'border-box';
+        send.style.padding = 3 + 'px';
+        send.style.textAlign = 'center';
+        send.style.lineHeight = 16 + 'px';
+        send.style.verticalAlign = 'middle';
+        $(send).hover(function(){
+             this.style.backgroundColor = 'green' ;
+             this.style.color = 'white';       
+        },function(){
+              this.style.backgroundColor = 'white';
+              this.style.color = 'green';        
+        })
+        
+        
+        loginTitle.appendChild(send)
         
         return loginTitle;
     },
@@ -336,28 +414,70 @@ window.onload = function(){
         let span = document.createElement('span');
         
         term.style.width = 200 + 'px';
-        span.innerHTML = 'Remember me';
+        span.innerHTML = 'I agree with this';
         span.style.marginLeft = 5 + 'px';
         let canvas = this._checkbox(20,20);
         canvas.style.float = 'left';
         canvas.style.cursor = 'pointer';
+        canvas.style.position = 'relative';
+        canvas.style.zIndex = 100;
         term.appendChild(canvas);
         term.appendChild(span);
         term.style.marginTop = 25 + 'px';
         term.style.marginLeft = 100 + 'px';
+        term.style.position = 'relative';
+        
+        canvas.addEventListener('click',this._checked.bind(this,term))
         
         return term;
        
                      
     },
     
-    _checkbox : function(width,height){
-       
+    _checked : function(term){
+          let canvas = document.createElement('canvas');
+	      canvas.width = 20;
+	      canvas.height = 20;
+	   
+	      
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = 1;
+	
+	      
+	      canvas.style.position = 'absolute'	      
+	     
+	     canvas.style.zIndex = 101;
+	     canvas.style.left = 0;
+	     canvas.style.top = 0;
+	      
+	     
+	     	//canvas.id = 'm-menu';
+		      term.appendChild(canvas);    
+	      
+	        
+          let id = window.setInterval(function(){ 
+            if(radius > 4){
+               clearInterval(id);               
+               
+               return;            
+            }
+            
+         radius +=1;
+	      context.beginPath();
+	      context.arc(10,10,radius,0,2*Math.PI);
+	      context.closePath();	
+	      context.fillStyle = 'green';
+	      context.fill();
+	        
+
+         },50)	 
+    },
+    
+    _checkbox : function(width,height){       
         let canvas = document.createElement('canvas');
 	      canvas.width = width;
-	      canvas.height = height;
-	  
-	      
+	      canvas.height = height;      
 	      let context = canvas.getContext('2d');
 	      
 	      let radius = width/2;
@@ -366,8 +486,7 @@ window.onload = function(){
 	      context.arc(width/2,width/2,radius,0,2*Math.PI);
 	      context.closePath();
 	      context.fillStyle = 'lightblue';
-	      context.fill();
-	      
+	      context.fill();      
 	      	      
 	      canvas.addEventListener('click',function(){
              	      
@@ -394,7 +513,7 @@ window.onload = function(){
         input.style.padding = '3px';       
          
         input.style.paddingLeft = 0;
-        input.style.boxSizing = 'box-border'        
+        input.style.boxSizing = 'border-box'        
         input.style.zIndex = 101;
         input.style.opacity = 0.5;
         let title = document.createElement('span');
@@ -403,10 +522,11 @@ window.onload = function(){
         title.style.zIndex = 100;
         title.innerHTML  = name;
         title.style.left = 100 + 'px'; 
-        title.style.paddingTop = 5 + 'px';
+        //title.style.paddingTop = 5 + 'px';
         title.style.color= 'black';
-        title.style.boxSizing = 'box-border'
+        title.style.boxSizing = 'border-box'
         title.style.paddingRight = 5 + 'px';
+        
         input.classList.add('a-login-text');
                 
         
@@ -419,7 +539,7 @@ window.onload = function(){
              this.style.paddingBottom = '1px'
              this.animated = true;
             
-             $(title).animate({left : '-=' + toLeft+ 'px'},400)        
+             $(title).animate({left : '-=' + toLeft+ 'px',paddingTop : '+=3'},200)        
         })        
         
         mainContainer.appendChild(input);
