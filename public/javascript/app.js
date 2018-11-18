@@ -287,25 +287,41 @@ window.onload = function(){
        loginDiv.style.width = 300 + 'px';
        registerDiv.style.width = 300 + 'px';
        registerDiv.style.float = 'right'
-       registerDiv.style.backgroundColor = 'tomato';
-       registerDiv.style.height = 200 + 'px'       
+       
+       registerDiv.style.height = 200 + 'px';
        mainBox.style.width = 600 + 'px';
        
-       this.config.inputs.forEach(function(elem){
-           input = that._createInput(elem);
-           loginDiv.appendChild(input);
-       })
+     
        
-       loginDiv.appendChild(this._term());
+       this._fillRegister(registerDiv);
+       this._fillLogin(loginDiv)
        mainBox.appendChild(loginDiv);
-       mainBox.appendChild(registerDiv);
-       
-       
-    
+       mainBox.appendChild(registerDiv);  
        
        container.appendChild(mainBox)
        document.body.appendChild(container)
     },
+    
+    
+    _fillRegister : function(register){
+    	let that = this;
+       ['username','password','email'].forEach(function(elem){
+          register.appendChild(that._createInput(elem))       
+       })
+       
+       register.appendChild(this._term('I agree with this'))
+    },
+    
+    _fillLogin : function(login){
+      let that = this;
+      ['username','password'].forEach(function(elem){
+          login.appendChild(that._createInput(elem))      
+      })
+      
+      login.appendChild(this._term('Reset Password'))
+    },
+    
+    
     
     _loginBox : function(){
         let loginTitle = document.createElement('div');
@@ -331,7 +347,7 @@ window.onload = function(){
      
         
         register.addEventListener('mouseenter',function(){
-           if(this.current == 1){
+           if(mainBox.animated == 'register'){
                this.style.color = 'lightgrey'
                login.style.color = 'black'           
            }else{
@@ -342,7 +358,7 @@ window.onload = function(){
         
         
         register.addEventListener('mouseleave',function(){ 
-            if(this.current == 1){
+            if(mainBox.animated == 'register'){
                  this.style.color = 'black';
                  login.style.color = 'lightgrey'            
             }else{
@@ -355,7 +371,9 @@ window.onload = function(){
         register.addEventListener('click',function () { 
            let mainBox = document.getElementById('a-login-mainBox');          
            if(mainBox.animated == 'login'){
-               mainBox.animated = 'register'           	   
+               mainBox.animated = 'register'
+               this.style.color = 'black';
+               login.style.color = 'lightgray'           	   
            	   $(mainBox).animate({left : '-=300'},200)  
            }        	  
         	
@@ -364,13 +382,16 @@ window.onload = function(){
         login.addEventListener('click',function(){
         	  let mainBox = document.getElementById('a-login-mainBox');
         	  if(mainBox.animated == 'register'){
-               mainBox.animated ='login';        	    
+               mainBox.animated ='login';        	
+               this.style.color = 'black'    
+               register.style.color = 'lightgray'
         	     $(mainBox).animate({left : '+=300'},200)  
         	  }
                     
         })
         let span = document.createElement('span');
         span.innerHTML = '/'
+        span.classList.add('slash')
         loginTitle.appendChild(login);
         loginTitle.appendChild(span);
         loginTitle.appendChild(register)
@@ -378,7 +399,7 @@ window.onload = function(){
         
         let slash = document.createElement('span');
         slash.innerHTML = '/'
-        
+        slash.classList.add('slash')
         loginTitle.appendChild(slash)
         let send = document.createElement('span');
         send.style.height = 20 + 'px';
@@ -409,12 +430,12 @@ window.onload = function(){
         return loginTitle;
     },
     
-    _term : function(){
+    _term : function(title){
         let term = document.createElement('div');
         let span = document.createElement('span');
         
         term.style.width = 200 + 'px';
-        span.innerHTML = 'I agree with this';
+        span.innerHTML = title;
         span.style.marginLeft = 5 + 'px';
         let canvas = this._checkbox(20,20);
         canvas.style.float = 'left';
@@ -435,6 +456,7 @@ window.onload = function(){
     },
     
     _checked : function(term){
+    	    let that = this;
           let canvas = document.createElement('canvas');
 	      canvas.width = 20;
 	      canvas.height = 20;
@@ -471,7 +493,39 @@ window.onload = function(){
 	      context.fill();
 	        
 
-         },50)	 
+         },50)	
+         
+         canvas.addEventListener('click',function(){
+              that._uncheck(this);       
+         }) 
+    },
+    
+    _uncheck : function(canvas){
+           	      
+      let radius = 4;
+       
+      let context = canvas.getContext('2d');
+      let x = canvas.width/2;
+      let y = canvas.height/2;
+      let id = window.setInterval(function(){
+          if(radius < 2){
+             clearInterval(id);
+             canvas.remove();
+             
+             
+          }
+                     
+      context.beginPath();
+      context.arc(x, y, radius, 0, 2*Math.PI);
+      context.lineWidth = 3;
+      radius -= 2;      
+
+      // line color
+      context.strokeStyle = 'lightblue';
+      context.stroke();  
+          
+                
+      },50)  
     },
     
     _checkbox : function(width,height){       
