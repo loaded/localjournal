@@ -5,10 +5,11 @@ var path  = require('path')
 var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
-var sockets = require('./sockets.js')
-
-
-  var sockets ;  
+//var sockets = require('./sockets.js')
+let socket = null;
+  //this socket should be removed
+  
+// var sockets ;  
   var clients = [];  
   var options = {
      route : {    
@@ -184,8 +185,8 @@ var sockets = require('./sockets.js')
        form.uploadDir = gallery;
          
        form.on('progress',function(byteRecived,byteExpected){      
-          var client = sockets.find(socketId);       
-          client.emit('progress' , {
+          //var client = sockets.find(socketId);       
+          socket.to(socketId).emit('progress' , {
           	 recived : byteRecived,
              expected : byteExpected,
              name : fileName    
@@ -196,8 +197,8 @@ var sockets = require('./sockets.js')
        	       	
        	imagePath = path.join(gallery,file.name);             
               addon.process(file.path,imagePath,function(im_width,im_height){
-                       var client = sockets.find(socketId);   
-                        client.emit('thumb' , {
+                       //var client = sockets.find(socketId);   
+                        socket.to(socketId).emit('thumb' , {
           	                 src : file.name,
           	                 height : im_height,
           	                 width : im_width
@@ -336,5 +337,10 @@ var sockets = require('./sockets.js')
   
 
 
+ function io(io){
+    socket = io; 
+ }
+ 
 module.exports.router = router;
+module.exports.to = io
 

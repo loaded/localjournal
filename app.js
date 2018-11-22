@@ -1,20 +1,38 @@
 var server = require('http').createServer(myApp);
 var io = require('socket.io')(server);
 var url = require('url')
-var sockets = require('./sockets.js')
-var gallery = require('./gallery.js')
-var editor = require('./editor.js')
+//var sockets = require('./sockets.js')
+var gallery = require('./gallery.js');
+var editor = require('./editor.js');
 var home = require('./index.js');
 var video = require('./video.js')
+//var redis = require('redis')
+//var client = redis.createClient();
+var login = require('./login.js')
    
   /*--------------------------- Helper Functions -----------------------------------*/
+
+  /*io.use((socket,next) =>{
+       let token = socket.handshake.query.token;
+       if(login.isValidToken(token)){
+        return next();
+       }
+         
+      return next(new Error('authentication error'));
+  })*/
   
+   
+ gallery.to(io);
+ editor.to(io)  
+  
+    
   io.on('connection',function(socket){  
+
       socket.emit('id',{id:socket.id});
-      sockets.add(socket);
+      //sockets.add(socket);
       
       socket.on('disconnect',function(socket){
-      	 sockets.remove(socket);                     
+      	                  
       });
       
       
@@ -27,8 +45,15 @@ var video = require('./video.js')
  server.listen(3000);
 
 
- function myApp(request,response){
-   let reqUrl = request.url;
+ function myApp(req,res){
+ 	
+   login.router(req,res,findRoute);
+   //findRoute(req,res);
+ }
+
+
+ function findRoute(request,response) {
+ 	let reqUrl = request.url;
  	 let pathname = url.parse(reqUrl).pathname;
  	 
  	 let route = pathname.match(/^\/[a-z]+\/?/);
@@ -63,7 +88,6 @@ var video = require('./video.js')
           	 
  	 }	   
  }
-
  
 // url must check to not being too long
 // requests should check to prevent sending big file to my darling server

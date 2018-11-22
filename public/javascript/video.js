@@ -492,7 +492,7 @@ var Video = (function(){
                 videoTitle.style.fontSize= 12 + 'px';     
                 videoTitle.style.cursor = 'pointer';       
                 
-                videoTitle.style.color = 'black';
+                videoTitle.style.color = '#00509d';
                 videoTitle.style.padding = 4 + 'px';    
                 videoContent.style.marginLeft = 10 + 'px';
                 videoTitle.style.fontWeight = 600;
@@ -525,8 +525,9 @@ var Video = (function(){
                 videoTitle.style.cursor = 'pointer';       
                   
                
-                videoTitle.style.color = 'black';
-                videoTitle.style.fontWeight = 600;
+                videoTitle.style.color = '#00509d';
+                videoTitle.style.transform = 'scaleX(1.02265)'
+               // videoTitle.style.fontWeight = 600;
                 //videoTitle.style.backgroundColor = 'lightblue'
                 videoTitle.style.padding = 4 + 'px';    
                 videoTitle.style.marginTop = 5 + 'px'

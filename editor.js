@@ -5,8 +5,8 @@ var path  = require('path')
 var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
-var sockets = require('./sockets.js')
-   
+//var sockets = require('./sockets.js')
+let socket = null;   
    const options = {
      route : "/editor",
      db:"mongodb://localhost:27017/cg",
@@ -118,16 +118,16 @@ var sockets = require('./sockets.js')
          fs.mkdirSync(uploadPath)       
        
        form.on('progress',function(byteRecieved,byteExpected){ 
-           var client = sockets.find(socketId);          
-           client.emit('progresseditor',{recieved : byteRecieved,expected : byteExpected});
+           //var client = sockets.find(socketId);          
+           socket.to(socketId).emit('progresseditor',{recieved : byteRecieved,expected : byteExpected});
        })  
        
        form.on('file',function(name,file){
           var imagePath = path.join(uploadPath,file.name);
           let filename = file.name;
           addon.process(file.path,imagePath,function(im_width,im_height){        
-              let socket = sockets.find(socketId);                
-              socket.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')});                                                                 
+              //let socket = sockets.find(socketId);                
+              socket.to(socketId).emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')});                                                                 
           })
        })
        
@@ -143,5 +143,9 @@ var sockets = require('./sockets.js')
    }
    
    
-
+  function io(io){
+       socket = io;
+  }
+  
 module.exports.router = router;
+module.exports.to = io;
