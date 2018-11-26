@@ -1,67 +1,112 @@
 const crypto = require('crypto')
 const database = require('mongodb').MongoClient
 const url = require('url')
-var fs = require('fs')
+let fs = require('fs')
+let redis = require('redis');
+let client = redis.createClient();
+const {promisify} = require('util');
+const getAsync = promisify(client.get).bind(client);
   
-   const option = {
-     db : 'mongodb://localhost:27017/users'   
+   const options = {
+     db : 'mongodb://localhost:27017/users',
+     route : '/login'
    }  
   
   function router(req,res,next){
-  	
-  	  if(validCookie(req,res)) return next(req,res);
-  	  
-     let reqUrl = req.url;
-     let pathname = url.parse(reqUrl).pathname;
-     let newUrl = pathname.replace(options.route,'');
-     let route = newUrl.match(/\/[a-z]+\/?/)
+  	 
+  	  middleware(req,res,next)
+
      
-     if(route == null || route == '/'){
-       route = '';     
-     }else {
-       route = route[0].replace(new RegExp('/','g'),'')     
-     }
-     
-     switch(route){     
+  }
+  
+  
+  async function middleware(req,res,next){
+  	   let cookies = parseCookies(req);
+  	   
+  	   if(cookies['cook'] === undefined || cookies['cook'] == null) return route(req,res);
+      let cook = await getAsync(cookies['cook']);
+    
+      
+      if(cook === undefined || cook == null) return route(req,res)  
+      
+      return next(req,res);
+  } 
+
+function route(req,res){ 
+      let action = req.headers.action;
+    
+     switch(action){     
         case 'register':
+           registerPath(req,res);
            break;
         case 'login' : 
-          _loginHtml(req,res);
+          loginPath(req,res);
           break;        
         default : 
-          _sendIndex(req,res);
+          _loginHtml(req,res);
           break;     
      }     
-  }
-
-function hashPassword(password) {
-    var salt = crypto.randomBytes(128).toString('base64');
-    var iterations = 10000;
-    var hash = crypto.pbkdf2(password, salt, iterations);
-
-    return {
-        salt: salt,
-        hash: hash,
-        iterations: iterations
-    };
 }
 
-function isPasswordCorrect(savedHash, savedSalt, savedIterations, passwordAttempt) {
-    return savedHash == pbkdf2(passwordAttempt, savedSalt, savedIterations);
-}
 
 
 function validToken(token){
+	
+	if(token === undefined || token == null) return false;
+   client.get(token,function(err,value){
+          if(value) isOk(true);
+          else isOk(false)
+   })    
+}
+
+
+function loginPath(req,res) {
+	let json = '';
+	
+	req.on('data',function(data){
+        json += data;	
+	})
+	
+	req.on('end',function(){
+      let obj = JSON.parse(json);
+      
+      let username = obj.user;
+      let password = obj.pass;
+      
+      
+      if(isValidUser(username)){
+            database.connect(options.db,function(err,db){
+               if(err) return null;
+        
+              db.collection('users').findOne({username : username},{username : 1,password:1,email : 1,date:1},function(err,data){
+                 if(err ) throw err;
+                 console.log(data)
+                
+                 if(data != null)
+                   crypto.pbkdf2(password, data.password.salt, data.password.iterations,64,'sha512',(err,drivedkey)=>{
+                      if(err) throw err;
+                       
+                      if(data.password.hash == drivedkey.toString('hex')){
+                         _sendIndex(req,res);
+                      }else {
+                         _loginHtml(req,res);                          
+                      }
+                                       
+                    }); 
+                    
+                    db.close()         
+                })  
+           })              
+      }    
   
+	})
 }
 
 
-function login(username,password){
-   
-}
 
 function registerPath(req,res){
   let json = '';
+  
   
   req.on('data',function(data){
      json += data;  
@@ -74,31 +119,38 @@ function registerPath(req,res){
      let password = obj.pass;
      let email = obj.mail;
      
-     if(register(username,password,email))
-       _sendIndex(req,res);
-     else 
-       _loginHtml(req,res)   
+     register(username,password,email,req,res)
+      
         
   })
 }
 
-function register(user,pass,mail){
-    if(checkUser(user) && checkMail(mail)){
-       let hashObject = hashPassword(pass);
-       let saveObject = {username : user,email : mail,password : hashObject,date : Date.now()};       
-       return saveUser(saveObject);         
+function register(user,pass,mail,req,res){
+    if(checkUser(user) && checkMail(mail)){       
+        let salt = crypto.randomBytes(128).toString('base64');
+        let iterations = 10000;     
+    
+        crypto.pbkdf2(pass,salt,iterations,64,'sha512',(err,key)=>{
+           if(err) throw err;        
+           
+           let hashObject = {salt : salt,iterations : iterations,hash : key.toString('hex')}
+           let saveObject = {username : user,email : mail,password : hashObject,date : Date.now()}; 
+
+           saveUser(saveObject,req,res);            
+        })                
+            
     }
 }
 
-function saveUser(obj){
-  database.connect(config.db,function(err,db){
-     if(err) return false;
+function saveUser(obj,req,res){
+  database.connect(options.db,function(err,db){
+     if(err) throw err;
      
-     db.insert(obj,function(err,result){
-         if(err) return false;
+     db.collection('users').insert(obj,function(err,result){
+         if(err) _loginHtml(req,res)
          
-         db.close();
-         return true;     
+         db.close();        
+         _sendIndex(req,res);        
      })
   })
 }
@@ -122,7 +174,7 @@ function existsUser(user){
     database.connect(options.db,function(err,db){
         if(err) throw err;
         
-        db.collection('users').findOne({username : user }).toArray(function(err,data){
+        db.collection('users').findOne({username : user },function(err,data){
         	   db.close();
         	   
             if(data) return true;
@@ -134,9 +186,11 @@ function existsUser(user){
 
 
 function validCookie(req,res){
-    let cookie = parseCookies(req);
+    let cookie = parseCookies(req); 
     
-    if(validToken(cookie['cook'])
+   
+    
+    if(validToken(cookie['cook']))
       return true;
     else 
      return false; 
@@ -168,22 +222,22 @@ function _loginHtml(req,res){
    })
 }
 
-function createCookie(){
-    var current_date = (new Date()).valueOf().toString();
-    var random = Math.random().toString();
-   return crypto.createHash('sha1').update(current_date + random).digest('hex');
+async function createCookie(req,res){
+    let now = (new Date()).valueOf().toString();
+    let rand = Math.random().toString();
+    let cook = crypto.createHash('sha256').update(now + rand).digest('hex');      
+    await client.set(cook,"adnan");
+    
+    res.setHeader('Set-Cookie','cook='+cook + ';Expires='+new Date(new Date().getTime() + 60 * 60 * 1000).toUTCString());   
+    
+    res.setHeader('Content-Type','text/html');
+    
+    res.end('')
+    
 }
 
-function _sendIndex(req,res){
-  fs.readFile(__dirname + "/views/this.html",function(err,data){
-     if(err)
-       console.log('error')
-     else {
-        res.setHeader('Set-Cookie','cook='+createCookie());     	  
-     	  res.setHeader('Content-Type','text/html');
-     	  res.end(data)
-     }  
-  })
+function _sendIndex(req,res){ 
+   createCookie(req,res); 
 }
 
 module.exports.router = router
