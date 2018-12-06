@@ -63,7 +63,8 @@
     "v8_trace_maps": 0,
     "v8_use_snapshot": "true",
     "want_separate_host_toolset": 0,
-    "nodedir": "/home/fedorer/.node-gyp/9.2.0",
+    "nodedir": "/usr/share/node",
+    "copy_dev_lib": "true",
     "standalone_static_library": 1
   }
 }

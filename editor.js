@@ -60,6 +60,21 @@ let socket = null;
           saveArticle(req,res,article);       
        })
      }  
+     
+    function _article(data){
+        let id = data.id; console.log(id);
+        let that = this;
+        database.connect(options.db,function(err,db){
+           if(err) throw err;
+           
+           db.collection('article').findOne({_id : new require('mongodb').ObjectID(id)},function(err,data){
+              if(err) throw err;
+              
+              that.emit('article',{article : data});
+              db.close() 
+           })        
+        })    
+    }
    
    function _articles(req,res){
           database.connect(options.db,function(err,db){
@@ -77,18 +92,24 @@ let socket = null;
    
    function saveArticle(req,res,art){
      
-     art.sort(function(obj1,obj2){
-     	  
-          return parseInt(obj1.pos) - parseInt(obj2.pos);   
-          
+     art.sort(function(obj1,obj2){     	  
+          return parseInt(obj1.pos) - parseInt(obj2.pos);             
      })
      
      art.push({type : 'date' , date : Date.now()})
      var article = {};
      
      for(let i = 0 ; i < art.length ; i++){
-         article[i] = art[i];     
+     	   if(!art[i].hasOwnProperty('getloc'))
+         article[i] = art[i]; 
+         else 
+           article['getloc'] = art[i].getloc;
+           
+           if(art[i].hasOwnProperty('location'))
+             article['location'] = art[i].location;
      }
+     
+     article['type'] = 'article';    
 
      database.connect(options.db,function(err,db){
           if(err) throw err;
@@ -149,3 +170,4 @@ let socket = null;
   
 module.exports.router = router;
 module.exports.to = io;
+module.exports.article = _article

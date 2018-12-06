@@ -621,6 +621,92 @@ void makeThumbnail(const char* name){
 }  
 
 
+void makeMobile(const char* name){
+    char * thumbnails = "mobile/";
+    char * result;
+    int l1,l2,height,width;
+    float temp;
+                 
+    gdImagePtr image;
+
+    char* str_name = (char*) malloc(strlen(name) + 1);
+    strcpy(str_name,name);
+    char* file_name = strrchr(str_name,'/');
+    file_name = file_name + 1;
+    int file_name_length = strlen(file_name);
+    str_name[strlen(name) - strlen(file_name)] = '\0';     
+    result = (char*) malloc(strlen(thumbnails) + strlen(name) + 1);
+     
+    strcpy(result,str_name);
+    strcat(result,thumbnails);
+               
+    image = loadImageJpeg(name);
+    width = gdImageSX(image);
+    height = gdImageSY(image);
+   
+           
+    if(width > height ){         
+      temp =(float) height/width;
+      width = 500;  
+      height = (int)(temp * width);
+             
+    }else {
+      temp = (float) width/height;
+      height = 500;
+      width = (int)(temp * height);           
+    }
+    
+     
+
+    
+   
+    printf("be resized %s \n",name);           
+    resize(name,result,width,height); 
+    return;
+}  
+
+void makeDesktop(const char* name){
+    char * thumbnails = "desktop/";
+    char * result;
+    int l1,l2,height,width;
+    float temp;
+                 
+    gdImagePtr image;
+
+    char* str_name = (char*) malloc(strlen(name) + 1);
+    strcpy(str_name,name);
+    char* file_name = strrchr(str_name,'/');
+    file_name = file_name + 1;
+    int file_name_length = strlen(file_name);
+    str_name[strlen(name) - strlen(file_name)] = '\0';     
+    result = (char*) malloc(strlen(thumbnails) + strlen(name) + 1);
+     
+    strcpy(result,str_name);
+    strcat(result,thumbnails);
+               
+    image = loadImageJpeg(name);
+    width = gdImageSX(image);
+    height = gdImageSY(image);
+   
+           
+    if(width > height ){         
+      temp =(float) height/width;
+      width = 900;  
+      height = (int)(temp * width);
+             
+    }else {
+      temp = (float) width/height;
+      height = 900;
+      width = (int)(temp * height);           
+    }
+    
+
+   
+    printf("be resized %s \n",name);           
+    resize(name,result,width,height); 
+    return;
+}  
+
 int process_it(char* name){
   char* str = (char*)malloc(strlen(name) + 1); // free this
   strcpy(str,name);
@@ -690,7 +776,12 @@ int process_it(char* name){
                   break;
             }          
             printf("makethumb %s\n",name);
+         
+            makeDesktop(name);
+            
+            makeMobile(name);
             makeThumbnail(name);
+            
             
   }else  return 0; 
 }

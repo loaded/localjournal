@@ -4,9 +4,6 @@ TOOLSET := target
 TARGET := process
 DEFS_Debug := \
 	'-DNODE_GYP_MODULE_NAME=process' \
-	'-DUSING_UV_SHARED=1' \
-	'-DUSING_V8_SHARED=1' \
-	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DBUILDING_NODE_EXTENSION' \
@@ -35,16 +32,11 @@ CFLAGS_CC_Debug := \
 	-std=gnu++0x
 
 INCS_Debug := \
-	-I/home/fedorer/.node-gyp/9.2.0/include/node \
-	-I/home/fedorer/.node-gyp/9.2.0/src \
-	-I/home/fedorer/.node-gyp/9.2.0/deps/uv/include \
-	-I/home/fedorer/.node-gyp/9.2.0/deps/v8/include
+	-I/usr/include/node \
+	-I/usr/include
 
 DEFS_Release := \
 	'-DNODE_GYP_MODULE_NAME=process' \
-	'-DUSING_UV_SHARED=1' \
-	'-DUSING_V8_SHARED=1' \
-	'-DV8_DEPRECATION_WARNINGS=1' \
 	'-D_LARGEFILE_SOURCE' \
 	'-D_FILE_OFFSET_BITS=64' \
 	'-DBUILDING_NODE_EXTENSION'
@@ -70,10 +62,8 @@ CFLAGS_CC_Release := \
 	-std=gnu++0x
 
 INCS_Release := \
-	-I/home/fedorer/.node-gyp/9.2.0/include/node \
-	-I/home/fedorer/.node-gyp/9.2.0/src \
-	-I/home/fedorer/.node-gyp/9.2.0/deps/uv/include \
-	-I/home/fedorer/.node-gyp/9.2.0/deps/v8/include
+	-I/usr/include/node \
+	-I/usr/include
 
 OBJS := \
 	$(obj).target/$(TARGET)/tst1.o

@@ -67,6 +67,13 @@ var Video = (function(){
        
        let btn = document.getElementById('v-header-btn');
        btn.classList.add('v-header-btn');
+       
+       if(!this._isLoggedIn()){
+          btn.style.display = 'none';
+          vheader.appendChild(this._profilePic());       
+       }else{
+       
+       }
        if(this._isMobile()){
           vheader.style.height = this.config.m.headerHeight + 'px';
             btn.classList.add('mv-header-btn');
@@ -100,7 +107,7 @@ var Video = (function(){
     	 let videoArchiveWrapper = document.createElement('div');
     	 videoArchiveWrapper.id= 'v-archiveWrapper'
     	 
-    	 let totalVideo = Collection.total(); 
+    	 //let totalVideo = Collection.total(); 
     	 if(this._isMobile()){
          mainContainer.style.width = (this.config.m.containerWidth -5) + 'px';
          videoContainer.style.width = (this.config.m.containerWidth -5) + 'px';
@@ -143,7 +150,143 @@ var Video = (function(){
     
     _returnUrl : function(url){
       return "http://localhost:3000" + url
-    },   
+    },  
+        _hideProfileMenu : function(){
+          
+                let canvas = document.getElementById('v-profile-menu')
+    
+      let radius = canvas.getAttribute('radius');
+        radius -=1
+      let context = canvas.getContext('2d');
+      let x = canvas.width/2;
+      let y = canvas.height/2;
+      let id = window.setInterval(function(){
+          if(radius < 10){
+             clearInterval(id);
+             canvas.remove();
+          
+          }
+                     
+      context.beginPath();
+      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+      context.lineWidth = 21;
+      radius -= 15;      
+
+      // line color
+      context.strokeStyle = 'white';
+      context.stroke();  
+          
+                
+      },2)   
+        },
+    
+    	   _showProfileMenu : function(){
+	       
+          let left  ;
+          let top = 40;	       
+	       if(this._isMobile()){
+             left = window.innerWidth - 200;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 -200;	   
+          }
+	       
+	      let canvas = document.createElement('canvas');
+	      canvas.width = 300;
+	      canvas.height = 300;
+	   
+	      canvas.id = 'v-profile-menu'
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = 1;
+	
+	      
+	      canvas.style.position = 'fixed';
+	      
+	      canvas.style.top = top;
+	      canvas.style.left = left + 'px';
+	      
+	      canvas.style.zIndex = 100;
+	      
+	     
+	      
+	      canvas.id = 'v-profile-menu';
+	      document.body.appendChild(canvas);         
+	        
+          let id = window.setInterval(function(){ 
+            if(radius > 200){
+               clearInterval(id);               
+               
+             
+               canvas.setAttribute('radius',radius)
+               
+               return;            
+            }
+            
+         radius +=2;
+	      context.beginPath();
+	      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+	      context.closePath();
+	      context.fillStyle = 'lightblue';
+	      context.fill();    
+
+         },1)	  
+	       
+	   },
+	       
+    _isLoggedIn : function(){
+      return false;
+    },
+   
+   _profilePic : function () {
+    	  let container = document.createElement('div');
+    	  container.style.width = 200 + 'px';
+    	  container.style.height = 30 + 'px';
+    	  container.style.float = 'right';
+    	  container.id = 'pp'
+    	  container.classList.add('m-profile')
+    	  let span = document.createElement('span');
+    	  span.innerHTML = 'neanthertal';
+    	  span.style.float = 'right';
+    	  
+    	  span.style.color = 'black';
+    	  span.style.cursor = 'pointer';
+    	  span.style.marginRight = 5 + 'px';
+    	  span.style.marginTop = 7 + 'px';
+    	  span.state = 'hide';
+    	  span.style.fontSize = 12 + 'px';
+    	  let profile = new Image();
+    	  profile.src = makeUrl('public/arrow/me.png');
+    	  profile.style.width = 30 + 'px';
+    	  profile.style.height = 30 + 'px';
+    	  profile.style.float = 'right';
+    	  profile.style.borderRadius = '50%';
+    	  profile.style.objectFit = 'cover';
+    	  container.appendChild(profile);
+    	  container.appendChild(span);
+    	  span.addEventListener('click',this._hideOrShowMenu.bind(this))     	  
+    	  
+    	  return container;   	  
+    	  
+    },
+    
+    _hideOrShowMenu : function(e){
+      let elem = e.target;
+      
+      if(elem.state == 'show'){
+      	this._hideProfileMenu();
+          elem.state = 'hide';      
+      }        
+      else {
+        
+          this._showProfileMenu();   
+           elem.state = 'show';
+              
+       }
+         
+        
+    
+    },
     
     _addVideoFiles : function(e){    	    
         this.file = e.target.files[0];
@@ -559,12 +702,13 @@ var Video = (function(){
       }
     },
     
-    _showVideo : function(model){
+    _showVideo : function(model){console.log(model)
        // this.file = e.target.files[0];
        
         try {
           document.getElementById('v-video-back').remove();	
         }catch(e){}
+     
         
         let vUploader = document.getElementById('v-uploader');
         let upload = document.getElementById('v-header-upload');
@@ -763,7 +907,8 @@ var Video = (function(){
         video.style.display = 'block';       
         
         back.addEventListener('click',this._slideLeft.bind(this))
-       // this._slideContainer();
+        if(this.slide != 1)
+         this._slideContainer();
     },
     
     _isMobile : function(){
@@ -786,7 +931,8 @@ var Video = (function(){
           args = {
              title : title,
              tags : tags,
-             location : location           
+             location : location ,
+             getloc : [location.lng,location.lat]
           }    
       } else return;    	
      
@@ -824,12 +970,17 @@ var Video = (function(){
     },
     
     _slideLeft : function(){
-    	 document.getElementById('v-header-upload').style.display = 'none'
+    	try {
+    	   document.getElementById('v-header-upload').style.display = 'none'	
+    	}catch(e){
+    	}
+    	
         this._slideContainer();
     },
     
     _hide : function(){
         document.getElementById('videoContainer').style.display = 'none';
+        
      },
     
     _slideContainer : function(){
@@ -852,7 +1003,10 @@ var Video = (function(){
          $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){
            that.slide = 0;
              document.getElementById('v-video-back').remove()
-    	       document.getElementById('v-header-btn').style.display = 'block';  
+             if(!that._isLoggedIn()){
+                 document.getElementById('v-header-btn').style.display = 'none';; 
+             }
+    	        
     	       document.getElementById('v-uploader').innerHTML = '';  
          }) ;
          
@@ -869,7 +1023,10 @@ var Video = (function(){
          $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){
            that.slide = 0;
              document.getElementById('v-video-back').remove()
-    	       document.getElementById('v-header-btn').style.display = 'block';  
+             if(!that._isLoggedIn()){
+                   document.getElementById('v-header-btn').style.display = 'none';     
+             }
+    	    
     	       document.getElementById('v-uploader').innerHTML = '';  
          }) ;
          
@@ -899,16 +1056,16 @@ var Video = (function(){
        var Router = (function () {     
                     	     
      	     let that = this; 
-           let validUrl = ['create','archive'];
+           let validUrl = ['create','archive','show'];
            let events = {};
            
            for(let elem of validUrl)
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){	
-     	     	  if(validUrl.indexOf(url) == -1) return;
-     	     	  events[url].notify('')
+     	     function router(url){
+     	     	  if(validUrl.indexOf(url.split('/')[0]) == -1) return;
+     	     	  events[url.split('/')[0]].notify({id : url.split('/')[1]})
      	        window.history.pushState(null,null,'/video/' + url);    
      	     }     	     
      	     
@@ -934,6 +1091,22 @@ var Video = (function(){
       	 }
              
       })  
+      
+      socket.on('video',function(data){
+      	if(View.inited){
+      		 document.querySelector('#videoContainer').style.display = 'block';
+      	 View._showVideo(data.video)
+      	}else {
+      		View._init();
+      		View._showVideo(data.video);
+      	}
+      	 
+          
+      })       
+      
+      Router.event['show'].attach(function(sender,args){
+          socket.emit('video',{id : args.id})          
+      })
    
      
      View.upload.attach(function(sender,args){ 

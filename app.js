@@ -9,7 +9,7 @@ var video = require('./video.js')
 //var redis = require('redis')
 //var client = redis.createClient();
 var login = require('./login.js')
-   
+var index = require('./home.js')   
   /*--------------------------- Helper Functions -----------------------------------*/
 
   /*io.use((socket,next) =>{
@@ -38,7 +38,10 @@ var login = require('./login.js')
       
       socket.on('start',video.start.bind(socket));
       socket.on('upload',video.upload.bind(socket))
-      
+      socket.on('getloc',index.getloc.bind(socket))  
+      socket.on('video',video.video.bind(socket))
+      socket.on('article',editor.article.bind(socket));
+      socket.on('getgal',gallery.gallery.bind(socket));
    });
 
  

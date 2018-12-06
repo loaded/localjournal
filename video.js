@@ -51,6 +51,21 @@ var database = require('mongodb').MongoClient;
      })  
   }
   
+  function video(data){
+     let id = data.id;
+     let that = this;
+     database.connect(options.db,function (err,db) {
+     	  if(err) throw err;
+     	  
+     	  db.collection('video').findOne({_id : new require('mongodb').ObjectID(id)},function (err,model) {
+     	  	  if(err) throw err;    	  	  
+     	  	 
+     	  	  that.emit('video' ,{video : model})
+     	  	  db.close()
+     	  })
+     })  
+  }
+  
   
   function saveVideo(socket,name,image){
      database.connect(options.db,function(err,db){
@@ -59,6 +74,7 @@ var database = require('mongodb').MongoClient;
            date : Date.now() ,
            image : options.pathname + image,
            location :files[socket.id].args.location ,
+           getloc : files[socket.id].args.getloc,
            tags : files[socket.id].args.tags,
            title : files[socket.id].args.title,
            url : options.pathname + files[socket.id].name        
@@ -133,8 +149,9 @@ var database = require('mongodb').MongoClient;
 					inp.pipe( out);
 					inp.on('close',function(){
                   fs.unlink(options.temp + filename, function () { //This Deletes The Temporary File
-							exec("ffmpeg -i " + options.pathname + filename  + "  -vframes 1  " + options.pathname + imageName, function(err){
+							exec("ffmpeg -i " + options.pathname + filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + imageName, function(err){
 								//that.emit('done', {'url' : options.pathname + imageName});
+								if(err) throw err;
 								saveVideo(that,filename,imageName);
 							});
 						});					
@@ -164,4 +181,5 @@ var database = require('mongodb').MongoClient;
 module.exports.start = startUpload
 module.exports.upload = upload
 module.exports.router = router
+module.exports.video = video
 

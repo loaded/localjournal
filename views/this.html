@@ -74,8 +74,9 @@
         </div>                   
          
          <div id="arrow">
-             <div id="arrow-up"><img src="http://localhost:3000/public/arrow/arrow-up.png" class="up-down" id="up--gal"></div>
-             <div id="arrow-down"><img src="http://localhost:3000/public/arrow/arrow-down.png" class="up-down" id="down--gal"></div>
+             <div id="arrow-up"><img src="http://localhost:3000/public/arrow/a.png" class="up-down" id="up--gal"></div>
+             <!--<div id="arrow-down"><img src="http://localhost:3000/public/arrow/arrow-down.png" class="up-down" id="down--gal"></div> -->
+             <div id="arrow-down">#</div>
          </div>               
       </div>
        
@@ -108,36 +109,9 @@
         
 
         
-      <div id='e-dialog'>
-        <div id='e-dialog-container'>
-          <div id='e-dialog-header'>
-            <img id='e-dialog-back' src="" alt="">
-            <button id='e-dialog-headerbtn'>Select Position</button>          
-          </div>
-          <div id='mapSelect'>
-          
-          </div>
-        </div>           
-      </div>
+
       
-      
-       <div id='e-tags'>
-        <div id='e-tags-container'>
-          <div id='e-tags-header'>
-            <img id='e-tags-back' src="" alt="">
-            <button id='e-tags-headerbtn'>Add Tag</button>          
-          </div>
-          <div id='mytags'>
-             <div id='e-tags-current'></div>
-             <div id='e-tags-prev'>
-                <div id='e-tags-prevhead'>
-                   <div id='e-tags-mytags'>used tags</div>
-                   <div id='e-tags-trending'><span id='e-tags-trendspan'>trending</span></div>                
-                </div>
-             </div>
-          </div>
-        </div>           
-      </div>
+
         
     </div>
     
@@ -165,8 +139,48 @@
     
     <div id='showArticle'>
     </div>
+    
+    
+          <div id='e-dialog'>
+        <div id='e-dialog-container'>
+          <div id='e-dialog-header'>
+            <img id='e-dialog-back' src="" alt="">
+            <button id='e-dialog-headerbtn'>Select Position</button>          
+          </div>
+          <div id='mapSelect'>
+          
+          </div>
+        </div>           
+      </div>
+      
+      
+      
+            
+       <div id='e-tags'>
+        <div id='e-tags-container'>
+          <div id='e-tags-header'>
+            <img id='e-tags-back' src="" alt="">
+            <button id='e-tags-headerbtn'>Add Tag</button>          
+          </div>
+          <div id='mytags'>
+             <div id='e-tags-current'></div>
+             <div id='e-tags-prev'>
+                <div id='e-tags-prevhead'>
+                   <div id='e-tags-mytags'>used tags</div>
+                   <div id='e-tags-trending'><span id='e-tags-trendspan'>trending</span></div>                
+                </div>
+             </div>
+          </div>
+        </div>           
+      </div>
+    
+
+
+
+    <div id='home'></div>
      <script type="text/javascript">
      var socketId;
+     var app;
      	var socket = io("http://localhost:3000"); 
       socket.on("id",function(data){ 
          socketId = data.id; 
@@ -176,5 +190,6 @@
      <script type="text/javascript" src="http://localhost:3000/public/javascript/index.js"></script>
      <script type="text/javascript" src="http://localhost:3000/public/javascript/video.js"></script>
      <script type="text/javascript" src="http://localhost:3000/public/javascript/app.js"></script>
+     <script type="text/javascript" src="http://localhost:3000/public/javascript/home.js"></script>
   </body>
 </html>

@@ -18,7 +18,8 @@ let socket = null;
      },
      
      db : {
-          image : "mongodb://localhost:27017/cg"     
+          image : "mongodb://localhost:27017/cg" ,
+          hash : "mongodb://localhost:27017/hash"
      },
      
      extentions :   {
@@ -72,6 +73,9 @@ let socket = null;
        case 'text' :
          _text(req,res); 
         break;
+        case 'save':
+          _saveGallery(req,res);
+          break;
        default : 
          _index(req,res);
          break;
@@ -245,6 +249,23 @@ let socket = null;
      return;
   }
   
+  function _gallery(data){
+  	 let that = this;
+  	 let galname = data.gal;
+     database.connect(options.db.image,function(err,db){
+        if(err) throw err;
+        
+        db.collection('gallery').find({
+           gallery: galname       
+        }).toArray(function(err,arr){
+          if(err) throw err;
+          console.log(arr);
+           that.emit('gal',{images :arr })
+            db.close()
+        })     
+     })  
+  }
+  
   /*---------------------------     Socket      ------------------------------------*/
 
  /* function comunicate(server){
@@ -280,11 +301,33 @@ let socket = null;
             obj,{'upsert':true},function(err,result){
             if(err) throw err;           
             res.statusCode = 200;
-             res.setHeader('Content-Type','application/json');	
-            res.end('');
+            res.setHeader('Content-Type','application/json');	
+            res.end();
             db.close();        
         })     
      })
+  }
+  
+  function _saveGallery(req,res){
+     let json = '';
+     
+     req.on('data',function(data){
+         json +=data;     
+     })
+     
+     req.on('end',function(){
+        let gal = JSON.parse(json);
+        database.connect(options.db.image,function(err,db){
+           db.collection('hash').insert(gal,function(err,db){
+               if(err) throw err;
+               
+               res.statusCode = 200;
+               res.end('fuck you');           
+           })        
+        })     
+     })
+     
+          
   }
   
   function updateOne(obj,res){
@@ -343,4 +386,5 @@ let socket = null;
  
 module.exports.router = router;
 module.exports.to = io
+module.exports.gallery = _gallery
 

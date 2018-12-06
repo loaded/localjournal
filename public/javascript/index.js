@@ -85,8 +85,43 @@ var View = {
                this._setArticles(articles);
            },
            
-           _styleEditorArchive : function(){
-           	
+           
+    _isLoggedIn : function(){
+      return true;
+    },
+    
+    _profilePic : function () {
+    	  let container = document.createElement('div');
+    	  container.style.width = 200 + 'px';
+    	  container.style.height = 30 + 'px';
+    	  container.style.float = 'right';
+    	  container.id = 'pp'
+    	  let span = document.createElement('span');
+    	  span.innerHTML = 'neanthertal';
+    	  span.style.float = 'right';
+    	  
+    	  span.style.color = 'black';
+    	  span.style.cursor = 'pointer';
+    	  span.style.marginRight = 5 + 'px';
+    	  span.style.marginTop = 7 + 'px';
+    	  
+    	  span.style.fontSize = 12 + 'px';
+    	  let profile = new Image();
+    	  profile.src = makeUrl('public/arrow/me.png');
+    	  profile.style.width = 30 + 'px';
+    	  profile.style.height = 30 + 'px';
+    	  profile.style.float = 'right';
+    	  profile.style.borderRadius = '50%';
+    	  profile.style.objectFit = 'cover';
+    	  container.appendChild(profile);
+    	  container.appendChild(span);
+    	  
+    	  
+    	  return container;   	  
+    	  
+    },
+           
+    _styleEditorArchive : function(){         	
            	   
            	   let archive = document.getElementById('editor-archive');
            	   let viewPort = document.getElementById('a-archive-container');
@@ -99,6 +134,18 @@ var View = {
                
                let header = document.getElementById('e-header');
                let btn = document.getElementById('e-header-btn');
+               
+               if(!this._isLoggedIn()){
+                  btn.style.display = 'none';
+                  if(!header.hasOwnProperty('profile')){
+                    header.appendChild(this._profilePic()) ; 
+                    header.profile = '1'
+                  }
+                    
+                            
+               }else{
+               
+               }
                
                if(this._isMobile()){
                   archiveContainer.style.width = window.innerWidth + 'px';
@@ -150,6 +197,7 @@ var View = {
              	 let pic ,location,date ,tags,description,header,height,width , newHeight,newWidth;
              	 
              	 for (let obj in elem) {
+             	 	   if(elem[obj] == null ) continue;
                       switch(elem[obj]['type']){
                          case 'fit':
                          case 'full':
@@ -305,7 +353,7 @@ var View = {
                 headerContainer.style.fontWeight = 600;
                 headerContainer.style.fontSize = 14 + 'px';
                 descContainer.style.fontSize = 12 + 'px';
-               
+                descContainer.style.paddingRight = 10 + 'px';
                 if(width > height){
                     newHeight = (height/width) * 150; 
                     newWidth = 150;
@@ -418,10 +466,11 @@ var View = {
               return "http://localhost:3000" + url
            },
             
-           _showArticle : function(arti){ 
+           _showArticle : function(arti){  
               document.getElementById('indexContainer').style.display = 'none';
           
               let editor = document.getElementById('editor-article');
+              editor.innerHTML = '';
               let viewPort = document.createElement('div');
               viewPort.classList.add('editor-article-view');
               editor.style.display = 'block';
@@ -451,9 +500,9 @@ var View = {
               })
              
               arti = isorted;
-                           
+                          
               for (var i in arti)
-                {
+                { 
                    if(arti[i].hasOwnProperty('type')){
                          switch(arti[i]['type']) {
                               case "fit" : 
@@ -487,7 +536,7 @@ var View = {
                  viewPort.style.height = (window.innerHeight - 10 ) + 'px';                              
               }                  
              
-              
+             
               const ps = new PerfectScrollbar(viewPort,{
                  suppressScrollX:true	 
     	        });
@@ -502,7 +551,12 @@ var View = {
             	const newHeight = parseInt((height/width) * screenWidth);
                
                var image = new Image();
-               image.src = this._returnUrl(full.url);
+               if(this._isMobile()){
+                      image.src = this._returnUrl(full.url.replaceAt(full.url.lastIndexOf('/'),'/mobile'));
+               }else{
+                    image.src = this._returnUrl(full.url.replaceAt(full.url.lastIndexOf('/'),'/desktop'));  
+               }
+             
                image.width = screenWidth;
                image.height = newHeight;
                image.classList.add('full','fscreen');
@@ -516,7 +570,12 @@ var View = {
                
                if(medium.width < screenWidth){
                   var image = new Image();
-                  image.src = this._returnUrl(medium.url);
+                       if(this._isMobile()){
+                      image.src = this._returnUrl(medium.url.replaceAt(medium.url.lastIndexOf('/'),'/mobile'));
+               }else{
+                    image.src = this._returnUrl(medium.url.replaceAt(medium.url.lastIndexOf('/'),'/desktop'));  
+               }
+             
                   image.width = medium.width;
                   image.height = medium.width;
                   image.classList.add('medium','fscreen');
@@ -535,7 +594,13 @@ var View = {
                 }       
                 
                 let image = new Image();
-                image.src = this._returnUrl(fit.url);
+                     if(this._isMobile()){
+                      image.src = this._returnUrl(fit.url.replaceAt(fit.url.lastIndexOf('/'),'/mobile'));
+               }else{
+                    image.src = this._returnUrl(fit.url.replaceAt(fit.url.lastIndexOf('/'),'/desktop'));  
+               }
+             
+                
                 let width = fit.width;
                 let height = fit.height;
                    
@@ -1222,6 +1287,7 @@ var View = {
                  btn.addEventListener('click',function(){
                     if(location.hasOwnProperty('position')){
                        that.content.push({type : 'location', location : location.position})
+                       that.content.push({getloc :  [location.position.lng,location.position.lat]})
                                       
                     }                        
                    
@@ -1482,7 +1548,7 @@ var View = {
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){
+     	     function router(url){ 
      	     
      	        let backOrNext = false;
      	        
@@ -1631,7 +1697,10 @@ var View = {
       
       Router.event['show'].attach(function(sender,args){
       	   if(!args.bn){
-      	        View._showArticle(Collection.getModel(args.id)); 
+      	   	  if(Collection.getModel(args.id) === undefined)
+      	   	     getModel(args.id)
+      	   	   else 
+      	          View._showArticle(Collection.getModel(args.id)); 
       	        return;
       	   }
                    
@@ -1686,6 +1755,18 @@ var View = {
       	   return '';
       	
       }  
+      
+      
+      function getModel(id){
+         socket.emit('article',{id : id});
+     
+      }
+      
+      socket.on('article',function(data){
+         
+         View._showArticle(data.article);
+         
+      })
         
       function getModels(){
         let xhr = new XMLHttpRequest();
@@ -1728,20 +1809,19 @@ var View = {
               return;
           }
           
-          if(header){
-          	 
+          if(header){          	 
              View.content.push({type : 'header',html : header.innerHTML})
           }else {
           	alert('you have to insert header!')
           	return; //actually you must examine it before upload of pictures.
           }
            
-          console.log(View.content)
+          
           content.open('POST','/editor/save');
           content.onreadystatechange = function(data){
                if(this.readyState == 4){              
                  let result = JSON.parse(content.responseText);    
-                   View._closeDialog(); console.log(result.ops[0])
+                   View._closeDialog();
                    showArticle(result.ops[0]);                
                }              
           }

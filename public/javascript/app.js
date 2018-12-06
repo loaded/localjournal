@@ -1,6 +1,6 @@
 
 window.onload = function(){
-  (function(){
+ app =  (function(){
 	
 	var View = {
 		
@@ -27,6 +27,8 @@ window.onload = function(){
 		 	 this._init();         	 
 		 },
 		 
+		 
+		 
 		_addEvents : function(){
           for (let i = 0 ; i < this.config.menubar.length ; i++) {
        	    this.defineProp(this,this.config.menubar[i],new Event(this))
@@ -35,6 +37,8 @@ window.onload = function(){
           window.addEventListener('popstate',function(){
                Router.route('#' + document.location + '');          
           },false)
+          
+         // document.getElementsByClassName('m-profile').addEventListener('click',this._showProfileMenu.bind(this))
           
       },
 		 
@@ -67,6 +71,68 @@ window.onload = function(){
 	      canvas.addEventListener('click',this._showMenu.bind(this));
 	      
 	      document.body.appendChild(canvas);
+	   },
+	   
+	   
+	   _showProfileMenu : function(){
+	       
+          let left  ;
+          let top = 40;	       
+	       if(this._isMobile()){
+             left = window.innerWidth - 5;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 ;	   
+          }
+	       
+	       
+	            
+          
+    
+         
+ 	      let canvas = document.createElement('canvas');
+	      canvas.width = 2*200;
+	      canvas.height = 2*200;
+	   
+	      
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = 50;
+	
+	      
+	      canvas.style.position = 'fixed';
+	      
+	      canvas.style.top = top;
+	      canvas.style.left = left + 'px';
+	      
+	      canvas.style.zIndex = 1000;
+	      
+	     
+	      
+	      canvas.id = 'm-profile';
+	      document.body.appendChild(canvas);         
+	        
+          let id = window.setInterval(function(){ 
+            if(radius > 200){
+               clearInterval(id);               
+               
+             
+               canvas.setAttribute('radius',radius)
+               
+               return;            
+            }
+            
+         radius +=10;
+	      context.beginPath();
+	      context.arc(200,200,radius,0,2*Math.PI);
+	      context.closePath();
+	      context.fillStyle = 'lightblue';
+	      context.fill();
+	        
+
+         },10)	
+	       
+	       
 	   },
 	   
 	   
@@ -109,8 +175,7 @@ window.onload = function(){
 	     
 	      e.target.remove();
 	      canvas.id = 'm-menu';
-	      document.body.appendChild(canvas);    
-	      
+	      document.body.appendChild(canvas);         
 	        
           let id = window.setInterval(function(){ 
             if(radius > window.innerHeight){
@@ -510,9 +575,7 @@ window.onload = function(){
       let id = window.setInterval(function(){
           if(radius < 2){
              clearInterval(id);
-             canvas.remove();
-             
-             
+             canvas.remove();           
           }
                      
       context.beginPath();
@@ -607,12 +670,44 @@ window.onload = function(){
 	
 	
 	var Router = (function(){
-      const modules = ['gallery','video','editor'];
+      const modules = ['gallery','video','editor','home'];
+		function homePage(path){
+        route = path; 
+       
+        let routeSplited = path.split('/');
+      
+        let index = modules.indexOf(routeSplited[0]);   
+        if(index == -1) return;
+       
+        switch(index){
+           case 0:
+             Index.hide();
+             home.hide() ;
+             Video.hide();
+             Gallery.router( route.substring(routeSplited[0].length + 1))  ;
+             break;
+           case 1:
+             Index.hide();
+             home.hide()
+             Gallery.hide();
+             
+             Video.router(route.substring(routeSplited[0].length + 1))
+             break;
+           case 2:
+             Video.hide();
+             home.hide()
+             Gallery.hide();
+             Index.router(route.substring(routeSplited[0].length + 1)) ;
+             break;
+           default:
+            break;                         
+        }
+		}
 		
 		function router(path){   
 		  let backOrNext = false;
 		  let route ; 
-		  let inside  ;
+		  let inside  ; 
 		  
 		  if(path[0] == '#') {
            path = path.substring(1,path.length)
@@ -623,15 +718,16 @@ window.onload = function(){
         var protocol = pathArray[0];
         var host = pathArray[2];
         var url = protocol + '//' + host;
-        
+       
         if(url.length == path.length) return;    
        
-        route = path.slice(url.length + 1);
+        route = path.slice(url.length + 1); 
+        
         let routeSplited = route.split('/');
         
         let index = modules.indexOf(routeSplited[0]);        
         if(index == -1) return;
-        inside = backOrNext ? '#':'';
+        inside = backOrNext ? '#':''; 
         switch(index){
            case 0:
              Index.hide();
@@ -648,8 +744,16 @@ window.onload = function(){
              Gallery.hide();
              Index.router(inside + route.slice(routeSplited[0] + 1)) ;
              break;
+          
+           case 3:
+             Video.hide();
+             Gallery.hide();
+             Index.hide();
+             home.router(inside+route.slice(routeSplited[0]+1));
+            break;  
            default:
-            break;                         
+            break;  
+                               
         }
          
                        		
@@ -657,7 +761,8 @@ window.onload = function(){
 		
 		
       return {
-         route : router      
+         route : router ,
+         homePage : homePage     
       }      	
 	})()
    
@@ -665,10 +770,19 @@ window.onload = function(){
           
           View._start();
          // View._login()
+         
+         View.home.attach(function (sender,args) {
+         	sender._hideMenu();
+         	Video.hide();
+         	Gallery.hide();
+         	Index.hide();
+         	home.router('index')
+         })
           View.article.attach(function(sender,args){
           	 sender._hideMenu()
           	 Video.hide();
           	 Gallery.hide();
+          	 home.hide()
              Index.router('archive');
           })
           
@@ -676,6 +790,7 @@ window.onload = function(){
              sender._hideMenu();  
              Index.hide();
              Gallery.hide();     
+             home.hide()
              
              Video.router('archive');                  
           })
@@ -683,14 +798,23 @@ window.onload = function(){
           View.gallery.attach(function(sender,args){
              sender._hideMenu();             
              Video.hide();
-             Index.hide();      
+             Index.hide();    
+             home.hide()  
              
              Gallery.router('archive');
                        
           })
           
-         Video.router('archive');         
+         //Video.router('archive');   
+         home.router('index')      
    })()
+   
+     return {
+     	 
+        router : function(path){
+           Router.homePage(path)        
+        }
+     }
 
 })()
 

@@ -27,6 +27,11 @@ var Gallery = (function(){
    }	
 	
   var View = {
+  	
+  	config : {
+  	  mainWidth : 900,
+  	  mWidth : null
+  	},
     windowWidth : $(document).width(),    
 	 windowHeight :$(document).height(),
     index : 1,
@@ -99,6 +104,7 @@ var Gallery = (function(){
     	rowCount : 0
     },
     slideShow : 0,
+    outsider : [],
     events : ['createGallery','bckGallery','nxtGallery',
                  'arwUp','arwDown','upload','remove','showImage','gallery','loadImage'],    
     
@@ -116,13 +122,20 @@ var Gallery = (function(){
     isMobile : function(){ 
       return $(document).width()> this.mainWidth ? 0 : 1;
     },
+    
+    
     _setHeader : function(){
     	 var mobile = this.isMobile();
        this.header.el.style.height = this.header.height + 'px';
        var cgbtn = document.getElementById('cgbtn');
        var isChrome = /chrome/i.test( navigator.userAgent );
        var bnxt = document.getElementById('back-next');
-       
+       if(!this._isLoggedIn()){
+           this.header.el.appendChild(this._profilePic());
+           cgbtn.style.display = 'none'; 
+       }else{
+           
+       }
        if(this.index){
          document.getElementById('back-next').style.display = 'none';       
        }else {
@@ -135,6 +148,7 @@ var Gallery = (function(){
        
        if(mobile){         
        	 bnxt.classList.remove('dbnxt');
+       	 
           cgbtn.classList.add('mcgbtn');
           $(bnxt).css({'top' : '11px'})   
           if(isChrome){
@@ -188,6 +202,41 @@ var Gallery = (function(){
           this.uploader.view = this.uploader.desktop;
           this.uploader.el.style.width = 900 + 'px';
        }    
+    },
+    
+    _isLoggedIn : function(){
+      return true;
+    },
+    
+    _profilePic : function () {
+    	  let container = document.createElement('div');
+    	  container.style.width = 200 + 'px';
+    	  container.style.height = 30 + 'px';
+    	  container.style.float = 'right';
+    	  container.id = 'pp'
+    	  let span = document.createElement('span');
+    	  span.innerHTML = 'neanthertal';
+    	  span.style.float = 'right';
+    	  
+    	  span.style.color = 'black';
+    	  span.style.cursor = 'pointer';
+    	  span.style.marginRight = 5 + 'px';
+    	  span.style.marginTop = 7 + 'px';
+    	  
+    	  span.style.fontSize = 12 + 'px';
+    	  let profile = new Image();
+    	  profile.src = makeUrl('public/arrow/me.png');
+    	  profile.style.width = 30 + 'px';
+    	  profile.style.height = 30 + 'px';
+    	  profile.style.float = 'right';
+    	  profile.style.borderRadius = '50%';
+    	  profile.style.objectFit = 'cover';
+    	  container.appendChild(profile);
+    	  container.appendChild(span);
+    	  
+    	  
+    	  return container;   	  
+    	  
     },
     
  
@@ -263,6 +312,7 @@ var Gallery = (function(){
          $('#arrow-up').addClass('marup');
          $('#arrow-down').addClass('marup')
          $('#add-image').css({'width' : '12px','height':'12px'})
+         
        }else {
        	
          if(this.index){
@@ -288,6 +338,7 @@ var Gallery = (function(){
          $('#arrow-up').addClass('darup');
          $('#arrow-down').addClass('darup')
          $('#arrow').addClass('darrow')
+         //document.getElementById('arrow-down').style.right = 5 + 'px';
        }    
     },
     
@@ -327,6 +378,8 @@ var Gallery = (function(){
       	     this.events.push(this.btns[t])
     	  for(let i= 0 ; i< this.events.length ; i++)
        	     this.defineProp(this,this.events[i],new Event(this))
+       	     
+       	 this.config.mWidth = window.innerWidth -5;
     },
     _init: function(){ 
        this.inited = true;
@@ -340,9 +393,9 @@ var Gallery = (function(){
        document.getElementById('cgbtn').addEventListener(
                           'click',this._createGallery.bind(this),false);
        document.getElementById('arrow-up').addEventListener(
-                          'click',this._arwUp.bind(this),false);
+                          'click',this._arwUp.bind(this));
        document.getElementById('arrow-down').addEventListener(
-                          'click',this._arwDown.bind(this),false);
+                          'click',this._arwDown.bind(this));
        document.getElementById('gback').addEventListener(
                                'click',this._bckGallery.bind(this),false);
        document.getElementById('back-img').addEventListener(
@@ -400,17 +453,17 @@ var Gallery = (function(){
       }else {
       document.getElementById('pool').innerHTML = '';
       $('#tiler').css('z-index',-200)  ; // I am not sure this is necessary
-      
+     
       this._setPoolView();
       if(this.windowWidth < this.mainWidth )             
-        $('#tiler').animate({top : '-=155'},400,function(){
+        $('#tiler').animate({top : '-=155'},10,function(){
            document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
            tile['up'] = 1; 
                
            that._showGalleries();
         })  
       else 
-         $('#tiler').animate({top : '-=224'},400,function(){
+         $('#tiler').animate({top : '-=224'},10,function(){
            document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
            tile['up'] = 1; 
            
@@ -555,6 +608,7 @@ var Gallery = (function(){
     _constructImage : function(index,gallery,upOdown){
     	 var that = this;
     	 that.busy = 1;
+    	 var url = '';
     	 var currentMaxZIndex ;
        var div = document.createElement('div');
        div.classList.add('image-view');
@@ -585,7 +639,7 @@ var Gallery = (function(){
        
        var height = this.galleries[gallery][index].height;
        var width = this.galleries[gallery][index].width;
-       var url = 'image/' + gallery + '/' + this.galleries[gallery][index].src;            
+                
        var prevUrl = 'preview/'+gallery + '/' + this.galleries[gallery][index].src;
        
        var image = document.createElement('img');
@@ -597,6 +651,7 @@ var Gallery = (function(){
        var longWidth = this.uploader.view;
        
        if(this.isMobile()){
+       	  url = 'image/' + gallery + '/mobile/' + this.galleries[gallery][index].src;  
          if(width > height){
             if(width > this.uploader.view){
                image.width = this.uploader.view;
@@ -621,6 +676,7 @@ var Gallery = (function(){
             }
          }       
        }else {
+       	 url = 'image/' + gallery + '/desktop/' + this.galleries[gallery][index].src;  
           if(width > height){
             if(width > this.uploader.view){
                image.width = this.uploader.view;
@@ -1142,6 +1198,12 @@ var Gallery = (function(){
     	 }else{
     	  gallery = gal; 
     	 }*/
+    	 
+    	 if(!this._isLoggedIn()){
+         document.getElementById('pp').style.display = 'none';    	 
+    	 }else{
+    	 
+    	 }
        var that = this; 
        if(document.getElementById('thumbview'))
        document.getElementsByClassName('thumbview')[0].remove();
@@ -1178,6 +1240,8 @@ var Gallery = (function(){
        
        backSign.addEventListener('click',this._backToIndex.bind(this),false)       
        
+      
+       
       if(mobile){
         backSign.classList.add('mback-sign');
         span.style.fontSize = 12 + 'px';
@@ -1209,7 +1273,13 @@ var Gallery = (function(){
        document.getElementById('back-sign').remove();
        document.getElementById('g-gallery-title').remove()
        document.getElementById('homeback').style.display = 'block';
-       document.getElementById('cgbtn').style.display = 'block';
+       
+       if(!this._isLoggedIn()){
+           document.getElementById('pp').style.display = 'block';      
+       }else{
+            document.getElementById('cgbtn').style.display = 'block'; 
+       }
+      
           
        $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
        window.history.pushState(null,null,'/gallery/archive')
@@ -1425,11 +1495,236 @@ var Gallery = (function(){
        this.nxtGallery.notify("next gallery has been clicked");    
     },
     
-    _arwUp : function(){
+    _arwUp : function(){ 
+    	let that = this;
+               let contentArticle =  document.getElementById('main');
+               let iheader =  document.getElementById('iheader');
+               let  tags=  document.getElementById('e-tags');
+               
+                  if(this.isMobile()){
+                  tags.style.width = this.config.mWidth + 'px';               
+               }else{
+                 tags.style.width = this.config.mainWidth + 'px';
+               }
+               
+               tags.style.marginLeft = 'auto';
+               tags.style.marginRight = 'auto';
+               
+               if(contentArticle.hasOwnProperty('hidden')){              
+                 contentArticle.style.display = 'none';
+                 iheader.style.display = 'none';     
+                 tags.style.display = 'block';     
+                 return;            
+               }       	       
+                
+                             
+               contentArticle.style.display = 'none';
+               iheader.style.display = 'none'; 
+               tags.style.display = 'block';
+               
+               tags.style.width = window.innerWidth + 'px';
+               tags.style.height = window.innerHeight + 'px';   
+                        
+               let tagsContainer = document.getElementById('e-tags-container');
+               let header = document.getElementById('e-tags-header');
+               let btn = document.getElementById('e-tags-headerbtn');
+               let mytags = document.getElementById('mytags');
+               let back = document.getElementById('e-tags-back');
+               back.src = makeUrl('public/arrow/close.png') ;
+               let location = document.createElement('div');
+               let input = document.createElement('input');
+               input.type = 'text';
+               input.placeholder = 'tag'
+               input.classList.add('e-tags-input')
+               
+               let hash = document.createElement('span');
+               hash.innerHTML='#'
+               hash.classList.add('e-tags-hash')
+               location.appendChild(hash)
+               location.appendChild(input)
+               
+               let current = document.getElementById('e-tags-current')
+               let prev = document.getElementById('e-tags-prev')
+               let prevhead = document.getElementById('e-tags-prevhead');
+               
+               if(this.isMobile()){
+                 tagsContainer.style.width = this.config.mWidth + 'px';
+                 header.style.height = 30 + 'px';
+                 mytags.style.width = this.config.mWidth + 'px';
+                 mytags.style.height = (window.innerHeight -60) + 'px';
+                 mytags.style.position = 'relative';
+                 mytags.style.top = 20 + 'px';
+             
+                 btn.classList.add('de-tags-headerbtn');
+                 back.classList.add('e-tags-back');
+                 location.classList.add('e-tags-location');
+                 location.style.left = ((this.config.mWidth)/2 -100) + 'px';
+                 
+                 current.style.height = 50 + 'px';
+                 current.style.width = this.config.mWidth + 'px';
+                 
+                 prev.style.height = (window.innerHeight - 110) + 'px';
+                 prevhead.style.height = 30 + 'px'               
+               }else{
+                 tagsContainer.style.width = this.config.mainWidth + 'px';
+                 header.style.height = 30 + 'px';
+                 mytags.style.width = this.config.mainWidth + 'px';
+                 mytags.style.height = (window.innerHeight -60) + 'px';
+                 mytags.style.position = 'relative';
+                 mytags.style.top = 20 + 'px';
+             
+                 btn.classList.add('de-tags-headerbtn');
+                 back.classList.add('e-tags-back');
+                 location.classList.add('e-tags-location');
+                 location.style.left = ((this.config.mainWidth)/2 -100) + 'px';
+                 
+                 current.style.height = 50 + 'px';
+                 current.style.width = this.config.mainWidth + 'px';
+                 
+                 prev.style.height = (window.innerHeight - 110) + 'px';
+                 prevhead.style.height = 30 + 'px'
+                                             
+               } 
+               
+               btn.addEventListener('click',function(){
+               	 if(input.value =='') return;
+                   let span = document.createElement('span');
+                   span.innerHTML = input.value;
+                   span.classList.add('e-tags-tagspan')
+                   current.appendChild(span);               
+               })
+               
+               back.addEventListener('click',function(){
+                  let tags = [];                 
+                
+                  if(document.getElementsByClassName('e-tags-tagspan'))  {
+                    for(let tag of document.getElementsByClassName('e-tags-tagspan')){
+                        tags.push(tag.innerHTML)                    
+                    }
+                    that.tags = tags;
+                   // that.tags.push({type : 'tag', tag : tags});
+                  }                  
+                   
+                  document.getElementById('e-tags').style.display = 'none';      
+                  contentArticle.style.display = 'block';
+                  iheader.style.display = 'block';     
+               })
+              
+               header.appendChild(location)
+              
        this.arwUp.notify("arw Up gallery is clicked")    
     },
     
-    _arwDown : function(){
+    _arwDown : function(){ 
+    let that = this; 
+               let contentArticle =  document.getElementById('main');
+               let iheader =  document.getElementById('iheader');
+               let  dialog=  document.getElementById('e-dialog');
+               
+               if(this.isMobile()){
+                  dialog.style.width = this.config.mWidth + 'px';               
+               }else{
+                 dialog.style.width = this.config.mainWidth + 'px';
+               }
+               
+               dialog.style.marginLeft = 'auto';
+               dialog.style.marginRight = 'auto';
+               
+               if(contentArticle.hasOwnProperty('hidden')){              
+                 contentArticle.style.display = 'none';
+                 iheader.style.display = 'none';     
+                 dialog.style.display = 'block';     
+                 return;            
+               }       	       
+                
+                             
+               contentArticle.style.display = 'none';
+               iheader.style.display = 'none'; 
+               dialog.style.display = 'block';
+               
+               dialog.style.width = window.innerWidth + 'px';
+               dialog.style.height = window.innerHeight + 'px';   
+                        
+               let dialogContainer = document.getElementById('e-dialog-container');
+               let header = document.getElementById('e-dialog-header');
+               let btn = document.getElementById('e-dialog-headerbtn');
+               let mymap = document.getElementById('mapSelect');
+               let back = document.getElementById('e-dialog-back');
+               back.src = makeUrl('public/arrow/close.png') ;
+               let location = document.createElement('div');
+               let marker;
+               
+               
+               if(this.isMobile()){
+                 dialogContainer.style.width = this.config.mWidth + 'px';
+                 header.style.height = 30 + 'px';
+                 mymap.style.width = this.config.mWidth + 'px';
+                 mymap.style.height = (window.innerHeight -60) + 'px';
+                 mymap.style.position = 'relative';
+                 mymap.style.top = 20 + 'px';
+                 mymap.style.backgroundColor = 'lightblue'
+                 btn.classList.add('de-dialog-headerbtn');
+                 back.classList.add('e-dialog-back')  
+                 location.classList.add('e-dialog-location')
+                 location.style.left = ((this.config.mWidth)/2 -100) + 'px';                  
+               }else{
+                 dialogContainer.style.width = this.config.mainWidth + 'px';
+                 header.style.height = 30 + 'px';
+                 mymap.style.width = this.config.mainWidth + 'px';
+                 mymap.style.height = (window.innerHeight -60) + 'px';
+                 mymap.style.position = 'relative';
+                 mymap.style.top = 20 + 'px';
+                 mymap.style.backgroundColor = 'lightblue'
+                 btn.classList.add('de-dialog-headerbtn');
+                 back.classList.add('e-dialog-back')  
+                 location.classList.add('e-dialog-location')
+                 location.style.left = ((this.config.mainWidth)/2 -100) + 'px';                            
+               } 
+               
+              // header.appendChild(back) 
+               header.appendChild(location)
+               
+                 let map=L.map('mapSelect').setView([51.505, -0.09], 13);
+                 L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
+                    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
+                    maxZoom: 18,
+                    id: 'mapbox.streets',
+                    accessToken: 'pk.eyJ1IjoiMWlvMWwiLCJhIjoiY2psNThyd3luMGVsMjN4bnR3bXc4MXV2cyJ9.ks2qVsrV6d1rXu54-CyqIw'
+                   }).addTo(map);   
+                   
+                
+                 map.on('click',function(e){
+                   location.innerHTML = e.latlng.toString()
+                   location.position = e.latlng;
+                   if(marker){ 
+                     map.removeLayer(marker);
+                      marker = new L.Marker(e.latlng);
+                       marker.addTo(map)
+                   }else{ 
+                   	  marker = new L.Marker(e.latlng);
+                       marker.addTo(map)
+                   } 
+                  
+                 })  
+                 
+                 back.addEventListener('click',function(){
+                 	  dialog.style.display = 'none';  
+                    contentArticle.style.display = 'block';
+                    iheader.style.display = 'block';                        
+                 })     
+                 
+                 btn.addEventListener('click',function(){
+                    if(location.hasOwnProperty('position')){
+                       that.location = location.position;
+                       that.getloc =   [location.position.lng,location.position.lat];
+                                      
+                    }                        
+                   
+                 	  dialog.style.display = 'none';  
+                    contentArticle.style.display = 'block';
+                    iheader.style.display = 'block';         
+                                     
+                 })    
        this.arwDown.notify("arw Down has been clicked");    
     },
     
@@ -2451,6 +2746,18 @@ var Gallery = (function(){
      //this.view = new View(View,this);     
      View._start();
      
+     socket.on('gal',function(data){
+     	     View.outsider.length = 0;
+     	     if(!View.inited){	
+            View._init()
+     	       View._upTile(null);
+     	     
+     	     } 
+     	     
+     	     View.outsider = data.images;
+           View._showImages(data.images,data.images[0].gallery);  
+     })
+     
      Router.event['gallery'].attach(function (sender,args) {
      	  let style = window.getComputedStyle(document.getElementById('main'));
      	  
@@ -2469,7 +2776,7 @@ var Gallery = (function(){
      })
      
      Router.event['images'].attach(function(sender,args){ 
-         let style = window.getComputedStyle(document.getElementById('main'));
+         let style = window.getComputedStyle(document.getElementById('main')); 
          
          if(style.getPropertyValue('display')== 'block'){
             let st = state()            
@@ -2485,11 +2792,25 @@ var Gallery = (function(){
          
          }
          
-         View._showImages(Collection.getGallery(args),args);  
+         console.log(Collection.getGallery(args) )
+         if(Collection.getGallery(args).length == 0)
+           getGal(args)
+         else 
+          View._showImages(Collection.getGallery(args),args);  
      })
      
+     
+     function getGal(gallery) {
+        socket.emit('getgal',{gal : gallery});
+     }
+     
      Router.event['show'].attach(function(sender,args){
-     	   let model = Collection.getModel(args)
+     	   let model;
+     	    model = Collection.getModel(args)
+     	   
+     	   if(model === undefined)
+     	      model = View.outsider.find(function (elem) {
+          	  return elem._id == args;})
      	   let style = window.getComputedStyle(document.getElementById('main'));
          let st = state();
          if(style.getPropertyValue('display') == 'block'){
@@ -2528,12 +2849,19 @@ var Gallery = (function(){
       
       //that.id = socketId;
      
-     
+      let uploaded = 0;
       socket.on('thumb',function(data){
+      
       	 Collection.addModel(data);     
       	 let child = document.getElementById('pool').children; 
       	 that.addedToCollection(data,child)
       	 View._recalculateMargin()
+      	 console.log(uploaded)
+      	 if(uploaded == View.files.length ){
+      	 	View.files.length = 0;
+      	   saveGallery(data);
+      	 }else
+      	   ++uploaded;
       })
       
       socket.on('progress',function(data){
@@ -2562,6 +2890,7 @@ var Gallery = (function(){
       }
      
       function Upload(sender,queue) {    
+         uploaded = 0;
      	  for(var i= 0 ; i < sender.files.length ; i++){
      	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;  
           var file = new FormData(); 
@@ -2572,14 +2901,45 @@ var Gallery = (function(){
           xhr.setRequestHeader('imageName',sender.files[i].name);
           xhr.setRequestHeader('gallery',sender.galleryName )
           xhr.send(file);    
-          xhr.onreadystatechange = function () {
+          xhr.onreadystatechange = function (data) {
           	 if(this.readyState == 4){
-                       	 
+                 	 
           	 }
           } 	  
      	  }
      }
-   
+     
+     function copy(obj1,obj2){
+        for (var k in obj2) {
+        	  obj1[k] = obj2[k];
+        }     
+        
+        return obj1;
+     }
+     
+     
+     function saveGallery(data){
+     	 let container;  
+     	 container = Object.assign({},data);
+     	 container.tag = View.tags;
+     	 container.location = View.location;
+     	 container.getloc = View.getloc;
+     	 container.date = Date.now()
+     	 container.gallery = View.galleryName;
+     	 container.type = 'gallery';
+     	 console.log(container); 
+     	   
+     	   
+         var xhr = new XMLHttpRequest();
+         xhr.open('POST','/gallery/save');
+         xhr.send(JSON.stringify(container));
+         
+         xhr.onreadystatechange = function(data){
+            if(this.readyState == 4){
+              alert(data);            
+            }         
+         } 
+     }
     
      function Remove(sender,queue){
          var delThumb = new XMLHttpRequest();
