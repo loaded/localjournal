@@ -1199,10 +1199,17 @@ var Gallery = (function(){
     	  gallery = gal; 
     	 }*/
     	 
+    	 try {
+    	 	document.getElementById('g-gallery-title').remove();
+    	 	document.getElementById('back-sign').remove();
+    	 }catch(e){
+    	 
+    	 }
+    	 
     	 if(!this._isLoggedIn()){
          document.getElementById('pp').style.display = 'none';    	 
     	 }else{
-    	 
+    	  
     	 }
        var that = this; 
        if(document.getElementById('thumbview'))
@@ -1270,9 +1277,14 @@ var Gallery = (function(){
     },
     
     _backToIndex : function(){
-       document.getElementById('back-sign').remove();
-       document.getElementById('g-gallery-title').remove()
-       document.getElementById('homeback').style.display = 'block';
+    	try{
+           document.getElementById('back-sign').remove();
+          document.getElementById('g-gallery-title').remove()
+         document.getElementById('homeback').style.display = 'block';	
+    	}catch(e){
+    	
+    	}
+    
        
        if(!this._isLoggedIn()){
            document.getElementById('pp').style.display = 'block';      
@@ -2753,7 +2765,7 @@ var Gallery = (function(){
      	       View._upTile(null);
      	     
      	     } 
-     	     
+     	     document.getElementById('main').style.display = 'block';
      	     View.outsider = data.images;
            View._showImages(data.images,data.images[0].gallery);  
      })
@@ -2787,9 +2799,9 @@ var Gallery = (function(){
                
             }
          }else if(View.inited){
-          
+           document.getElementById('main').style.display = 'block'
          }else {
-         
+           document.getElementById('main').style.display = 'block';
          }
          
          console.log(Collection.getGallery(args) )
