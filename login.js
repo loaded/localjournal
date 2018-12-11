@@ -5,18 +5,17 @@ let fs = require('fs')
 let redis = require('redis');
 let client = redis.createClient();
 const {promisify} = require('util');
+var path = require('path');
 const getAsync = promisify(client.get).bind(client);
   
    const options = {
      db : 'mongodb://localhost:27017/users',
-     route : '/login'
+     route : '/login',
+     dir : '/uploads'
    }  
   
-  function router(req,res,next){
-  	 
-  	  middleware(req,res,next)
-
-     
+  function router(req,res,next){  	 
+  	  middleware(req,res,next)     
   }
   
   
@@ -24,11 +23,11 @@ const getAsync = promisify(client.get).bind(client);
   	   let cookies = parseCookies(req);
   	   
   	   if(cookies['cook'] === undefined || cookies['cook'] == null) return route(req,res);
-      let cook = await getAsync(cookies['cook']);
-    
+      let cook = await getAsync(cookies['cook']);    
       
       if(cook === undefined || cook == null) return route(req,res)  
-      
+      req.username = cook;
+    
       return next(req,res);
   } 
 
@@ -87,6 +86,7 @@ function loginPath(req,res) {
                       if(err) throw err;
                        
                       if(data.password.hash == drivedkey.toString('hex')){
+                      	  req.username = obj.user;
                          _sendIndex(req,res);
                       }else {
                          _loginHtml(req,res);                          
@@ -119,8 +119,7 @@ function registerPath(req,res){
      let password = obj.pass;
      let email = obj.mail;
      
-     register(username,password,email,req,res)
-      
+     register(username,password,email,req,res)   
         
   })
 }
@@ -135,7 +134,15 @@ function register(user,pass,mail,req,res){
            
            let hashObject = {salt : salt,iterations : iterations,hash : key.toString('hex')}
            let saveObject = {username : user,email : mail,password : hashObject,date : Date.now()}; 
-
+           let userDir = path.join(__dirname + '/uploads/' + user);
+           if(!fs.existsSync(userDir)){
+             fs.mkdirSync(userDir);
+             fs.mkdirSync(userDir + '/video');
+             fs.mkdirSync(userDir + '/gallery');
+             fs.mkdirSync(userDir + '/article');
+           }
+           
+           req.username = user;
            saveUser(saveObject,req,res);            
         })                
             
@@ -186,9 +193,7 @@ function existsUser(user){
 
 
 function validCookie(req,res){
-    let cookie = parseCookies(req); 
-    
-   
+    let cookie = parseCookies(req);   
     
     if(validToken(cookie['cook']))
       return true;
@@ -222,14 +227,14 @@ function _loginHtml(req,res){
    })
 }
 
-async function createCookie(req,res){
+async function createCookie(req,res){ 
     let now = (new Date()).valueOf().toString();
     let rand = Math.random().toString();
     let cook = crypto.createHash('sha256').update(now + rand).digest('hex');      
-    await client.set(cook,"adnan");
+    await client.set(cook,req.username);
     
-    res.setHeader('Set-Cookie','cook='+cook + ';Expires='+new Date(new Date().getTime() + 60 * 60 * 1000).toUTCString());   
-    
+    res.setHeader('Set-Cookie','cook='+cook +';user='+req.username+';Expires='+new Date(new Date().getTime() + 12*60 * 60 * 1000).toUTCString());   
+   //res.setHeader('Set-Cookie','user='+req.username + ';Expires='+new Date(new Date().getTime() + 12*60 * 60 * 1000).toUTCString())
     res.setHeader('Content-Type','text/html');
     
     res.end('')

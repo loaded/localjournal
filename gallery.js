@@ -162,8 +162,8 @@ let socket = null;
      req.on('end',function(){
        var arr = JSON.parse(jsonString);
        for(var i = 0 ; i < arr.length ; i++){
-          fs.unlinkSync(path.join(__dirname + '/uploads/'+gallery + '/',arr[i].src));
-          fs.unlinkSync(path.join(__dirname + '/uploads/'+gallery + '/thumb/',arr[i].src));                 
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/galelry/'+gallery + '/',arr[i].src));
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/thumb/',arr[i].src));                 
        }
        
        remove(arr,gallery,res)     
@@ -173,6 +173,7 @@ let socket = null;
   }
   
   function _upload(req,res){
+  	    let username = req.username ;
        var form = new formidable.IncomingForm()
        
        var socketId = req.headers.id;
@@ -180,7 +181,7 @@ let socket = null;
        var galleryName = req.headers.gallery;
        form.multiple = true;
        form.keepExtension = true;
-       var gallery = path.join(__dirname + "/uploads/",galleryName);
+       var gallery = path.join(__dirname + "/uploads/"+ username +'/gallery/'+galleryName);
        if(!fs.existsSync(gallery)){ 
              fs.mkdirSync(gallery)       	
        }
@@ -205,10 +206,11 @@ let socket = null;
                         socket.to(socketId).emit('thumb' , {
           	                 src : file.name,
           	                 height : im_height,
-          	                 width : im_width
+          	                 width : im_width,
+          	                 username : req.username
                          })                            
                                                  
-              insert({gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
+              insert({username : req.username,gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
                                                                                               
          })
                           
@@ -234,19 +236,22 @@ let socket = null;
   }
   
   function _galleries(req,res){
- 
-     database.connect(options.db.image,function(err,db){
+      let username = req.headers.username;
+  
+        database.connect(options.db.image,function(err,db){
          if(err) throw err ;
          
-         db.collection('gallery').find({}).toArray(function(err,data){                  
+         db.collection('gallery').find({username : username}).toArray(function(err,data){                  
             res.statusCode = 200;
             res.setHeader('Content-Type','application/json');	
              res.write(JSON.stringify(data));             
              res.end();
              db.close();         
          })    
-     })  
-     return;
+      
+     
+     })
+
   }
   
   function _gallery(data){
@@ -256,10 +261,10 @@ let socket = null;
         if(err) throw err;
         
         db.collection('gallery').find({
-           gallery: galname       
+           gallery: galname , username : data.username      
         }).toArray(function(err,arr){
           if(err) throw err;
-          console.log(arr);
+        
            that.emit('gal',{images :arr })
             db.close()
         })     
@@ -297,7 +302,7 @@ let socket = null;
         if(err) throw err;
         
         db.collection('gallery').update(
-            {gallery : obj.gallery,src : obj.src},       
+            {gallery : obj.gallery,src : obj.src,username : obj.username},       
             obj,{'upsert':true},function(err,result){
             if(err) throw err;           
             res.statusCode = 200;
@@ -317,6 +322,7 @@ let socket = null;
      
      req.on('end',function(){
         let gal = JSON.parse(json);
+        gal.username = req.username;
         database.connect(options.db.image,function(err,db){
            db.collection('hash').insert(gal,function(err,db){
                if(err) throw err;

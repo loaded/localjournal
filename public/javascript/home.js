@@ -64,7 +64,7 @@ var home = (function(){
           let header = document.createElement('div');
           header.style.height = this.config.header.height + 'px';
           header.style.position = 'fixed';
-          header.style.borderBottom = '1px solid gray'
+         // header.style.borderBottom = '1px solid gray'
           header.style.top = this.config.header.top + 'px';          
           header.style.backgroundColor = 'white';
           
@@ -452,7 +452,7 @@ var home = (function(){
            
            
            videoTitle.addEventListener('click',function(){ 
-              app.router('video/show/' + model._id );          
+              app.router(model.username,'video/show/' + model._id );          
            })
        
            videoContent.classList.add('v-archive-content');
@@ -502,7 +502,7 @@ var home = (function(){
            
            let thumbContainer = document.createElement('div');
            let thumbPoster = document.createElement('img');
-           thumbPoster.src = makeUrl("uploads/"+video.gallery+'/thumb/'+video.src);
+           thumbPoster.src = makeUrl("uploads/"+video.username +'/gallery/'+video.gallery+'/thumb/'+video.src);
            thumbContainer.id = 'v-archive-thumb';
            thumbPoster.id = 'v-archive-poster';
            thumbContainer.appendChild(thumbPoster);
@@ -510,7 +510,6 @@ var home = (function(){
            let videoContent = document.createElement('div');
            let videoTitle = document.createElement('div');
            let videoTags = document.createElement('div');
-           
 
            
            videoTitle.innerHTML = ' ';
@@ -576,7 +575,7 @@ var home = (function(){
             
                 if(video.width > video.height){
                    thumbPoster.style.width = 120 + 'px';
-                   thumbPoster.style.height = (120/vidoe.width) * video.height + 'px';       
+                   thumbPoster.style.height = (120/video.width) * video.height + 'px';       
                 
                 }else {
                 	thumbPoster.style.width = (100/video.height) * video.width + 'px';
@@ -624,7 +623,7 @@ var home = (function(){
                 
                 if(video.width > video.height){
                    thumbPoster.style.width = 150 + 'px';
-                   thumbPoster.style.height = (150/vidoe.width) * video.height + 'px';       
+                   thumbPoster.style.height = (150/video.width) * video.height + 'px';       
                 
                 }else {
                 	thumbPoster.style.width = (120/video.height) * video.width + 'px';
@@ -665,7 +664,7 @@ var home = (function(){
            
            thumbPoster.style.cursor  = 'pointer';
            thumbPoster.addEventListener('click',function(){ 
-              app.router('gallery/images/' + video.gallery );          
+              app.router(video.username,'gallery/images/' + video.gallery );          
            })
        
            videoContent.classList.add('v-archive-content');
@@ -778,7 +777,7 @@ var home = (function(){
             
                 //document.getElementById('a-archive-container').innerHTML = '';
                 //document.getElementById('editor-archive').style.display = 'none';  
-                app.router('editor/show/' + elem._id);
+                app.router(elem.username,'editor/show/' + elem._id);
               })
               
               let tagsContainer = document.createElement('div');
@@ -946,6 +945,8 @@ var home = (function(){
                       View._popUp(e,models[i]);    
                    });
            	      }else*/
+           	      // It should be removed
+           	      if(models[i].hasOwnProperty('username'))
                  new L.Marker(models[i].location).addTo(View.map).on('click',function(e){
                       View._popUp(e,models[i]);    
                    });                      	   

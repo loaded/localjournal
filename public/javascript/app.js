@@ -83,11 +83,7 @@ window.onload = function(){
                 
 	       }else{
              left = 900 + (window.innerWidth - 900)/2 ;	   
-          }
-	       
-	       
-	            
-          
+          }       
     
          
  	      let canvas = document.createElement('canvas');
@@ -251,7 +247,7 @@ window.onload = function(){
 	      input.type = 'text';
 	      
 	      if(this._isMobile()){
-                        search.style.width = this.config.mainWidth + 'px';
+            search.style.width = this.config.mainWidth + 'px';
             search.style.minHeight = window.innerHeight + 'px';
             search.id = 'm-search';
             input.style.width = this.config.mainWidth + 'px';
@@ -671,7 +667,7 @@ window.onload = function(){
 	
 	var Router = (function(){
       const modules = ['gallery','video','editor','home'];
-		function homePage(path){
+		function homePage(username,path){
         route = path; 
        
         let routeSplited = path.split('/');
@@ -684,20 +680,20 @@ window.onload = function(){
              Index.hide();
              home.hide() ;
              Video.hide();
-             Gallery.router( route.substring(routeSplited[0].length + 1))  ;
+             Gallery.router(username, route.substring(routeSplited[0].length + 1))  ;
              break;
            case 1:
              Index.hide();
              home.hide()
              Gallery.hide();
              
-             Video.router(route.substring(routeSplited[0].length + 1))
+             Video.router(username ,route.substring(routeSplited[0].length + 1))
              break;
            case 2:
              Video.hide();
              home.hide()
              Gallery.hide();
-             Index.router(route.substring(routeSplited[0].length + 1)) ;
+             Index.router(username,route.substring(routeSplited[0].length + 1)) ;
              break;
            default:
             break;                         
@@ -732,17 +728,17 @@ window.onload = function(){
            case 0:
              Index.hide();
              Video.hide();
-             Gallery.router(inside + route.slice(routeSplited[0] + 1))  ;
+             Gallery.router(username, inside + route.slice(routeSplited[0] + 1))  ;
              break;
            case 1:
              Index.hide();
              Gallery.hide()
-             Video.router('archive')
+             Video.router(username,'archive')
              break;
            case 2:
              Video.hide();
              Gallery.hide();
-             Index.router(inside + route.slice(routeSplited[0] + 1)) ;
+             Index.router(username,inside + route.slice(routeSplited[0] + 1)) ;
              break;
           
            case 3:
@@ -752,13 +748,10 @@ window.onload = function(){
              home.router(inside+route.slice(routeSplited[0]+1));
             break;  
            default:
-            break;  
-                               
-        }
-         
+            break;                                
+        }         
                        		
-		}
-		
+		}		
 		
       return {
          route : router ,
@@ -768,8 +761,7 @@ window.onload = function(){
    
    var Controller = (function(){   
           
-          View._start();
-         // View._login()
+         View._start();          
          
          View.home.attach(function (sender,args) {
          	sender._hideMenu();
@@ -783,7 +775,7 @@ window.onload = function(){
           	 Video.hide();
           	 Gallery.hide();
           	 home.hide()
-             Index.router('archive');
+             Index.router(username,'archive');
           })
           
           View.video.attach(function(sender,args){          	
@@ -792,16 +784,16 @@ window.onload = function(){
              Gallery.hide();     
              home.hide()
              
-             Video.router('archive');                  
+             Video.router(username,'archive');                  
           })
           
           View.gallery.attach(function(sender,args){
              sender._hideMenu();             
              Video.hide();
              Index.hide();    
-             home.hide()  
+             home.hide();  
              
-             Gallery.router('archive');
+             Gallery.router(username,'archive');
                        
           })
           
@@ -811,8 +803,8 @@ window.onload = function(){
    
      return {
      	 
-        router : function(path){
-           Router.homePage(path)        
+        router : function(username,path){
+           Router.homePage(username,path)        
         }
      }
 

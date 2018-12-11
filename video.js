@@ -11,7 +11,7 @@ var database = require('mongodb').MongoClient;
    route : '/video',
    db : 'mongodb://localhost:27017/cg',
    temp : 'Temp/',
-   pathname : 'uploads/video/',
+   pathname : 'uploads/',
    regex :  /(?:\.([^.]+))?$/,
    ext : 'webm'
  }
@@ -41,7 +41,7 @@ var database = require('mongodb').MongoClient;
      database.connect(options.db,function(err,db){
          if(err) throw err;
          
-         db.collection('video').find({}).toArray(function(err,data){
+         db.collection('video').find({username : req.headers.username}).toArray(function(err,data){
          	if(err) throw err;
             res.statusCode = 200;
             res.setHeader('Content-Type','application/json');
@@ -72,12 +72,13 @@ var database = require('mongodb').MongoClient;
         if(err) throw err;          
         let video = {
            date : Date.now() ,
-           image : options.pathname + image,
+           image : options.pathname + socket.username + '/video/' + image,
            location :files[socket.id].args.location ,
            getloc : files[socket.id].args.getloc,
            tags : files[socket.id].args.tags,
            title : files[socket.id].args.title,
-           url : options.pathname + files[socket.id].name        
+           url : options.pathname +socket.username +'/video/'+ files[socket.id].name ,
+           username : socket.username      
         }
         
         
@@ -145,11 +146,11 @@ var database = require('mongodb').MongoClient;
 			{
 				fs.write(files[that.id]['handler'],files[that.id]['uploaded'], null, 'Binary', function(err, w){
 					var inp = fs.createReadStream(options.temp + filename);
-					var out = fs.createWriteStream(options.pathname + filename);
+					var out = fs.createWriteStream(options.pathname + that.username + '/video/' + filename);
 					inp.pipe( out);
 					inp.on('close',function(){
                   fs.unlink(options.temp + filename, function () { //This Deletes The Temporary File
-							exec("ffmpeg -i " + options.pathname + filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + imageName, function(err){
+							exec("ffmpeg -i " + options.pathname  + that.username + '/video/'+ filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + that.username + '/video/'+ imageName, function(err){
 								//that.emit('done', {'url' : options.pathname + imageName});
 								if(err) throw err;
 								saveVideo(that,filename,imageName);

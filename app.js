@@ -10,44 +10,53 @@ var video = require('./video.js')
 //var client = redis.createClient();
 var login = require('./login.js')
 var index = require('./home.js')   
+
+let redis = require('redis');
+let client = redis.createClient();
+const {promisify} = require('util');
+
+const getAsync = promisify(client.get).bind(client);
   /*--------------------------- Helper Functions -----------------------------------*/
 
-  /*io.use((socket,next) =>{
+  io.use((socket,next) =>{	  	
        let token = socket.handshake.query.token;
-       if(login.isValidToken(token)){
-        return next();
-       }
-         
-      return next(new Error('authentication error'));
-  })*/
-  
-   
- gallery.to(io);
- editor.to(io)  
-  
-    
-  io.on('connection',function(socket){  
-
-      socket.emit('id',{id:socket.id});
+       
+        checkUser(token,function(username){
+            if(username){
+              socket.username = username ;
+              return next()            
+            }else 
+              return ;
+        })
+  }).on('connection',function(socket){
+        socket.emit('id',{id:socket.id,username :  socket.username});
       //sockets.add(socket);
       
       socket.on('disconnect',function(socket){
       	                  
-      });
-      
+      });    
       
       socket.on('start',video.start.bind(socket));
       socket.on('upload',video.upload.bind(socket))
       socket.on('getloc',index.getloc.bind(socket))  
       socket.on('video',video.video.bind(socket))
       socket.on('article',editor.article.bind(socket));
-      socket.on('getgal',gallery.gallery.bind(socket));
-   });
-
- 
+      socket.on('getgal',gallery.gallery.bind(socket)); 
+  });
+  
+   
+ gallery.to(io);
+ editor.to(io)  
+  
+    
+  async function checkUser(token,callback){
+  	   let username = await getAsync(token);
+  	  callback(username)
+      
+  }
+   
  server.listen(3000);
-
-
+ 
  function myApp(req,res){
  	
    login.router(req,res,findRoute);

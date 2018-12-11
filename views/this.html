@@ -2,18 +2,18 @@
 <html>
   <head> 
     <meta charset="utf-8">
-    <link rel='stylesheet' href='http://localhost:3000/public/css/gal.css'>   
+    <link rel='stylesheet' href='http://<%host%>/public/css/gal.css'>   
     <link rel='stylesheet prefetch' href='http://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css'>
 
-     <link rel="stylesheet" href="http://localhost:3000/public/css/perfect-scrollbar.css">
+     <link rel="stylesheet" href="http://<%host%>/public/css/perfect-scrollbar.css">
      <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.4/dist/leaflet.css"
    integrity="sha512-puBpdR0798OZvTTbP4A8Ix/l+A4dHDD0DGqYW6RQ+9jxkRFclaxxQb/SJAWZfWAkuyeQUytO7+7N4QKrDh+drA=="  crossorigin=""/>
    
-    <script type="text/javascript" src="http://localhost:3000/socket.io/socket.io.js"></script>
-    <script type="text/javascript" src="http://localhost:3000/public/javascript/jquery-2.2.0.min.js"></script>    
-    <script type="text/javascript" src="http://localhost:3000/public/javascript/editor.js"></script>
-    <script type="text/javascript" src="http://localhost:3000/public/javascript/sortable.js"></script>
-    <script type="text/javascript" src="http://localhost:3000/public/javascript/perfect-scrollbar.min.js"></script>
+    <script type="text/javascript" src="http://<%host%>/socket.io/socket.io.js"></script>
+    <script type="text/javascript" src="http://<%host%>/public/javascript/jquery-2.2.0.min.js"></script>    
+    <script type="text/javascript" src="http://<%host%>/public/javascript/editor.js"></script>
+    <script type="text/javascript" src="http://<%host%>/public/javascript/sortable.js"></script>
+    <script type="text/javascript" src="http://<%host%>/public/javascript/perfect-scrollbar.min.js"></script>
      <script src="https://unpkg.com/leaflet@1.3.4/dist/leaflet.js"
    integrity="sha512-nMMmRyTVoLYqjP9hrbed9S+FzjZHW5gY1TWCHA5ckwXZBadntCNs8kEqAWdrb9O7rxbCaA4lKTIWjDXZxflOcA=="
    crossorigin=""></script>
@@ -32,15 +32,15 @@
          <div id="back-reset">galleries</div>   
           <div id='back-next'>
             <div id='back'>
-               <img id='back-img' src='http://localhost:3000/public/arrow/left.png'>
+               <img id='back-img' src='http://<%host%>/public/arrow/left.png'>
             </div>
             <div id='next'>
-               <img id='next-img' src='http://localhost:3000/public/arrow/right.png'>            
+               <img id='next-img' src='http://<%host%>/public/arrow/right.png'>            
             </div>         
          </div>       
       <div class='indt' id='homeback'>
 
-         <img src="http://localhost:3000/public/arrow/tile.png" alt=""  id ='tile' >      
+         <img src="http://<%host%>/public/arrow/tile.png" alt=""  id ='tile' >      
       </div>
       </div>
       <div id='tiler'>
@@ -59,23 +59,23 @@
                <span class="space--upload-text sz txt lft edt" id='upload'>upload</span>
              <div class="space--default sp indx"></div>
                <span class="space--default-text sc txt lft indx" id='set-cover'>set cover</span>     
-             <img src="http://localhost:3000/public/arrow/add.png" class="edt" id='add-image'>
+             <img src="http://<%host%>/public/arrow/add.png" class="edt" id='add-image'>
                <span class="space--add-text sz txt edt" id="browse">Browse</span>    
                <input id='files' type="file" name='files[]' multiple >
         </div>  
          
         <div id='galback' class='indxt'>
             <div id='gback'>
-               <img id='backimg' src='http://localhost:3000/public/arrow/left.png'>
+               <img id='backimg' src='http://<%host%>/public/arrow/left.png'>
             </div>
             <div id='gnext'>
-               <img id='nextimg' src='http://localhost:3000/public/arrow/right.png'>            
+               <img id='nextimg' src='http://<%host%>/public/arrow/right.png'>            
             </div>         
         </div>                   
          
          <div id="arrow">
-             <div id="arrow-up"><img src="http://localhost:3000/public/arrow/a.png" class="up-down" id="up--gal"></div>
-             <!--<div id="arrow-down"><img src="http://localhost:3000/public/arrow/arrow-down.png" class="up-down" id="down--gal"></div> -->
+             <div id="arrow-up"><img src="http://<%host%>/public/arrow/a.png" class="up-down" id="up--gal"></div>
+             <!--<div id="arrow-down"><img src="http://<%host%>/public/arrow/arrow-down.png" class="up-down" id="down--gal"></div> -->
              <div id="arrow-down">#</div>
          </div>               
       </div>
@@ -181,15 +181,18 @@
      <script type="text/javascript">
      var socketId;
      var app;
-     	var socket = io("http://localhost:3000"); 
-      socket.on("id",function(data){ 
-         socketId = data.id; 
-      });
+     var username = '<%username%>';
+     var socket = io("http://<%host%>",{query : {token : "<%token%>"}}); 
+     
+     socket.on("id",function(data){ 
+        socketId = data.id;      
+     });     
+   
      </script>    
-     <script type="text/javascript" src="http://localhost:3000/public/javascript/test.js"></script>
-     <script type="text/javascript" src="http://localhost:3000/public/javascript/index.js"></script>
-     <script type="text/javascript" src="http://localhost:3000/public/javascript/video.js"></script>
-     <script type="text/javascript" src="http://localhost:3000/public/javascript/app.js"></script>
-     <script type="text/javascript" src="http://localhost:3000/public/javascript/home.js"></script>
+     <script type="text/javascript" src="http://<%host%>/public/javascript/test.js"></script>
+     <script type="text/javascript" src="http://<%host%>/public/javascript/index.js"></script>
+     <script type="text/javascript" src="http://<%host%>/public/javascript/video.js"></script>
+     <script type="text/javascript" src="http://<%host%>/public/javascript/app.js"></script>
+     <script type="text/javascript" src="http://<%host%>/public/javascript/home.js"></script>
   </body>
 </html>

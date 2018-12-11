@@ -70,9 +70,10 @@ var Video = (function(){
        
        if(!this._isLoggedIn()){
           btn.style.display = 'none';
+          if(!document.getElementById('pp'))
           vheader.appendChild(this._profilePic());       
        }else{
-       
+          btn.style.display = 'block';       
        }
        if(this._isMobile()){
           vheader.style.height = this.config.m.headerHeight + 'px';
@@ -198,9 +199,7 @@ var Video = (function(){
 	      canvas.id = 'v-profile-menu'
 	      let context = canvas.getContext('2d');
 	      
-	      let radius = 1;
-	
-	      
+	      let radius = 1;      
 	      canvas.style.position = 'fixed';
 	      
 	      canvas.style.top = top;
@@ -235,7 +234,7 @@ var Video = (function(){
 	   },
 	       
     _isLoggedIn : function(){
-      return false;
+      return username == this.username;
     },
    
    _profilePic : function () {
@@ -246,9 +245,8 @@ var Video = (function(){
     	  container.id = 'pp'
     	  container.classList.add('m-profile')
     	  let span = document.createElement('span');
-    	  span.innerHTML = 'neanthertal';
-    	  span.style.float = 'right';
-    	  
+    	  span.innerHTML = this.username;
+    	  span.style.float = 'right';    	  
     	  span.style.color = 'black';
     	  span.style.cursor = 'pointer';
     	  span.style.marginRight = 5 + 'px';
@@ -526,6 +524,7 @@ var Video = (function(){
     _showVideos : function(videos){
     	let that = this;
     	let mainContainer = document.getElementById('v-video-archive');
+    	mainContainer.innerHTML = '';
     	let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     	let video;
     	
@@ -616,8 +615,7 @@ var Video = (function(){
            topContainer.appendChild(videoContent);
            
            container.appendChild(topContainer);
-           container.appendChild(videoTitle);
-           
+           container.appendChild(videoTitle);   
            
         
            if(this._isMobile()){
@@ -696,13 +694,15 @@ var Video = (function(){
            videoTitle.setAttribute('vid',i);
            videoTitle.addEventListener('click',function(){
               that._showVideo(videos[this.getAttribute('vid')]);
-              that._slideContainer();             
+              //that._slideContainer();             
            })
            mainContainer.appendChild(container);
-      }
+           
+      }    
+       
     },
     
-    _showVideo : function(model){console.log(model)
+    _showVideo : function(model){
        // this.file = e.target.files[0];
        
         try {
@@ -737,7 +737,9 @@ var Video = (function(){
     	  back.id = 'v-video-back';
     	  
     	  vheader.appendChild(back);
-    	    	  
+    	  if(!this._isLoggedIn() && !document.getElementById('pp')){
+    	     vheader.appendChild(this._profilePic()); 
+    	  }
     	 // let vUploader = document.getElementById('v-uploader');
     	     	  
     	  let title = document.createElement('div')
@@ -906,7 +908,11 @@ var Video = (function(){
         video.style.marginTop = 5 + 'px';
         video.style.display = 'block';       
         
-        back.addEventListener('click',this._slideLeft.bind(this))
+        back.addEventListener('click',function () {
+        	  Router.route(model.username,'archive');
+        	  that._slideLeft.call(View);
+        	  
+        })
         if(this.slide != 1)
          this._slideContainer();
     },
@@ -975,7 +981,9 @@ var Video = (function(){
     	}catch(e){
     	}
     	
-        this._slideContainer();
+    	
+    	this.slide = 1;
+      this._slideContainer();
     },
     
     _hide : function(){
@@ -993,10 +1001,9 @@ var Video = (function(){
       let vContentContainer = document.getElementById('v-content-container');
       let that = this;
       if(this._isMobile()){
-      	       if(this.slide == 0 || this.slide === undefined)	{
+       if(this.slide == 0 || this.slide === undefined)	{
          $(vContentContainer).animate({left: '-=' + sliderWidth},400,function(){
-            that.slide = 1;
-            
+            that.slide = 1;            
          }) 
         
        } else{
@@ -1020,11 +1027,14 @@ var Video = (function(){
          }) 
         
        } else{
+       	that.slide = 0;
          $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){
-           that.slide = 0;
+           
              document.getElementById('v-video-back').remove()
              if(!that._isLoggedIn()){
                    document.getElementById('v-header-btn').style.display = 'none';     
+             }else{
+                 document.getElementById('v-header-btn').style.display = 'block';  
              }
     	    
     	       document.getElementById('v-uploader').innerHTML = '';  
@@ -1040,16 +1050,24 @@ var Video = (function(){
               
        var Collection = (function(){
           let videos ;
+          let user;
           function videoCount() {
           	return videos.length
           }
           
           function setVideos(arr) {
           	videos = arr;
+            if(arr.length != 0) 
+              user = arr[0].username;
+          }
+          
+          function getUser(){
+           return user ;         
           }
           return {
              total : videoCount,
-             setVideos : setVideos          
+             setVideos : setVideos,
+             getUser : getUser          
           }
        })()        
   
@@ -1060,13 +1078,12 @@ var Video = (function(){
            let events = {};
            
            for(let elem of validUrl)
-             events[elem] = new Event(this);
-          
+             events[elem] = new Event(this);          
      	    
-     	     function router(url){
+     	     function router(username,url){
      	     	  if(validUrl.indexOf(url.split('/')[0]) == -1) return;
-     	     	  events[url.split('/')[0]].notify({id : url.split('/')[1]})
-     	        window.history.pushState(null,null,'/video/' + url);    
+     	     	  events[url.split('/')[0]].notify({id : url.split('/')[1],username: username})
+     	        window.history.pushState(null,null,'/'+username+'/video/' + url);    
      	     }     	     
      	     
      	     return {
@@ -1078,36 +1095,39 @@ var Video = (function(){
   
   var Controller = (function(){ 
       let reader = new FileReader();  	 
-  	   //var socket = io('http://localhost:3000');     
-      
+  	         
       View._addEvents()
-      Router.event['archive'].attach(function(sender,args){
-      	 if(!View.inited){                    	   
-      	  
-      	   getModels();       	 
-      	 }     	 
+      Router.event['archive'].attach(function(sender,args){ 
+      	 setUsername(args.username); 
+      	 if(!View.inited){     
+      	   getModels(args.username);       	 
+      	 }else if( Collection.getUser() != args.username) 
+      	   getModels(args.username)    	 
       	 else {
       	 	 document.querySelector('#videoContainer').style.display = 'block';
       	 }
              
       })  
       
-      socket.on('video',function(data){
+      socket.on('video',function(data){ 
+      	setUsername(data.video.username)
       	if(View.inited){
-      		 document.querySelector('#videoContainer').style.display = 'block';
-      	 View._showVideo(data.video)
+      		document.querySelector('#videoContainer').style.display = 'block';
+      	   View._showVideo(data.video)
       	}else {
       		View._init();
       		View._showVideo(data.video);
-      	}
-      	 
-          
+      	}         
       })       
       
       Router.event['show'].attach(function(sender,args){
+      	setUsername(args.username)
           socket.emit('video',{id : args.id})          
-      })
-   
+      }) 
+      
+      function setUsername(username){
+         View.username = username;      
+      }  
      
      View.upload.attach(function(sender,args){ 
       
@@ -1125,7 +1145,7 @@ var Video = (function(){
 			
 			  newFile = View.file.slice(place, place + Math.min(524288, (View.file.size-place)));
 				reader.readAsBinaryString(newFile);
-			});
+	   });
 			
 	   socket.on('done',function (data) {	   	 
 	       document.getElementById('v-video-progress').style.display = 'none';
@@ -1136,18 +1156,29 @@ var Video = (function(){
           	   
 	   })
 	   
-	  function getModels(){
+	  function getModels(username){
         let xhr = new XMLHttpRequest();
         xhr.open('POST','/video/index');
         xhr.onreadystatechange = function (data) {
         	 if(this.readyState == 4){
              let result = JSON.parse(xhr.responseText);
              Collection.setVideos(result)
-              View._init(); 
-             View._showVideos(result);        	 
+              if(!View.inited)
+               View._init(); 
+               
+             
+            View._showVideos(result); 
+           if(View.slide == 1) 
+               View._slideContainer(); 
+            if(View._isLoggedIn() && document.getElementById('pp')){
+                document.getElementById('pp').remove(); 
+                let btn = document.getElementById('v-header-btn');
+                btn.classList.add('v-header-btn');     
+                btn.style.display = 'block'      
+            }     	 
         	 }
         }	  
-        
+        xhr.setRequestHeader('username',username);
         xhr.send();
 	  }  
 	   
@@ -1156,8 +1187,8 @@ var Video = (function(){
   
   return {
   	 hide : View._hide,
-    router : function(path){
-        Router.route(path)    
+    router : function(username,path){
+        Router.route(username,path)    
     }
   }
   

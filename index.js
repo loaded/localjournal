@@ -8,7 +8,7 @@ var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 
-
+let host = 'localhost';
 var index = (function(){
 	
 const extentions =   {
@@ -67,19 +67,39 @@ function _public(req,res){
    }    
  }
 
+var TemplateEngine = function(tpl, data) {
+    var re = /<%([^%>]+)?%>/g, match;
+    while(match = re.exec(tpl)) {
+        tpl = tpl.replace(match[0], data[match[1]])
+    }
+    return tpl;
+}
 
 function _index(req,res){
-   fs.readFile(__dirname + "/views/this.html",function(err,data){
+   fs.readFile(__dirname + "/views/this.html",'utf8',function(err,data){
        if(err){
          console.log('\nindex can not be loaded!' + err);
          }
        else {
        	res.setHeader("Content-Type","text/html");
-       	res.end(data);
+       	let cookie = parseCookies(req);       
+       	
+       	res.end(	TemplateEngine(data,{host : host,token: cookie['cook'],username : req.username}));
        }   
    })
 }
 
+function parseCookies (req) {
+    var list = {},
+        rc = req.headers.cookie;
+
+    rc && rc.split(';').forEach(function( cookie ) {
+        var parts = cookie.split('=');
+        list[parts.shift().trim()] = decodeURI(parts.join('='));
+    });
+
+    return list;
+}
 
 return {
   public : _public,

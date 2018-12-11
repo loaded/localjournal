@@ -30,9 +30,9 @@ var database = require('mongodb').MongoClient;
            	      getloc: { $geoWithin: { $box:  [ [ coor.bottom.lng, coor.bottom.lat ], [ coor.upper.lng, coor.upper.lat ] ] } }
            	    }).toArray(function(err,gal){
            	       if(err) throw err;
-           	       console.log(gal)
+           	       
            	       that.emit('home',JSON.stringify(arr.concat(gal)));
-           	        db.close();
+           	       db.close();
            	    })
            	    
                

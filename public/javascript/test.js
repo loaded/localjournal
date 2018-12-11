@@ -477,7 +477,7 @@ var Gallery = (function(){
     
     _showGalleries : function(){
       var container = document.getElementById('g-archive-view')
-      console.log(container)
+    
        //document.getElementById('pool').appendChild(container);
        var t = 1;
        for (var i in this.galleries) {
@@ -528,15 +528,15 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src = makeUrl("image/"+thumb.gallery+"/thumb/"+thumb.src);
+       image.src = makeUrl("image/"+thumb.username+'/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
       // $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
            $(templateDownload).animate({opacity: 1},400);           
        })       
              
-       templateDownload.addEventListener('click',function(e){             
-         Router.route('images/' + e.target.parentElement.getAttribute('name'))
+       templateDownload.addEventListener('click',function(e){  
+         Router.route(thumb.username,'images/' + e.target.parentElement.getAttribute('name'))
        },false)
        templateDownload.appendChild(image);       
        container.appendChild(templateDownload)     
@@ -545,7 +545,7 @@ var Gallery = (function(){
     /*-------------------------------------- View Port ---------------------------------------*/
   
     
-    _galleryShow : function(thumb,index,mypool,gallery){  
+    _galleryShow : function(thumb,index,mypool,gallery){ 
        var that = this;
     	 var mobile = this.isMobile();
        var templateDownload = document.createElement('div');
@@ -589,7 +589,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src = makeUrl("image/"+thumb.gallery+"/thumb/"+thumb.src);
+       image.src = makeUrl("image/"+thumb.username + '/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
       // $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -600,7 +600,7 @@ var Gallery = (function(){
        templateDownload.addEventListener('click',function(e){
           // that.showImage.notify(e);
           //alert(e.target.parentElement.getAttribute('name'))
-          Router.route('show/' + thumb._id)
+          Router.route(thumb.username,'show/' + thumb._id)
        },false);       
        
        mypool.appendChild(templateDownload)            
@@ -651,7 +651,7 @@ var Gallery = (function(){
        var longWidth = this.uploader.view;
        
        if(this.isMobile()){
-       	  url = 'image/' + gallery + '/mobile/' + this.galleries[gallery][index].src;  
+       	  url = 'image/' +this.galleries[gallery][index].username +'/gallery/'+ gallery + '/mobile/' + this.galleries[gallery][index].src;  
          if(width > height){
             if(width > this.uploader.view){
                image.width = this.uploader.view;
@@ -676,7 +676,7 @@ var Gallery = (function(){
             }
          }       
        }else {
-       	 url = 'image/' + gallery + '/desktop/' + this.galleries[gallery][index].src;  
+       	 url = 'image/'+ this.galleries[gallery][index].username +'/gallery/'+ gallery + '/desktop/' + this.galleries[gallery][index].src;  
           if(width > height){
             if(width > this.uploader.view){
                image.width = this.uploader.view;
@@ -1263,12 +1263,12 @@ var Gallery = (function(){
       this.header.el.append(backSign); 
       this.header.el.appendChild(span)
        
-      //var arr = this.galleries[gallery];
+     //var arr = this.galleries[gallery];
       for(var i = 0 ; i < arr.length ; i++){
          this._galleryShow(arr[i],i+1,div,gallery);      
       }       
       
-      pool.appendChild(div);
+      pool.appendChild(div); 
       const ps = new PerfectScrollbar(div,{
            suppressScrollX:true	 
     	});
@@ -1291,7 +1291,9 @@ var Gallery = (function(){
        }else{
             document.getElementById('cgbtn').style.display = 'block'; 
        }
+       
       
+       //this.loadGalleries(Collection.get)
           
        $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
        window.history.pushState(null,null,'/gallery/archive')
@@ -1919,7 +1921,7 @@ var Gallery = (function(){
        }
        
        label.innerHTML = img.gallery;  
-       image.src = makeUrl('image/' + img.gallery + '/thumb/'+img.src);
+       image.src = makeUrl('image/' + img.username + '/gallery/'+img.gallery + '/thumb/'+img.src);
        
        preview.appendChild(image) ; 
        templateGallery.setAttribute('name',img.gallery); 
@@ -1933,7 +1935,7 @@ var Gallery = (function(){
        that._uploader(true);
        that.uploader.el.appendChild(templateGallery);
         templateGallery.addEventListener('click',function(){ 
-           that._fullPool(img.gallery);       
+           //that._fullPool(img.gallery);       
        },false)
       
     },
@@ -2247,7 +2249,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src =makeUrl("image/"+thumb.gallery+"/thumb/"+thumb.src);
+       image.src =makeUrl("image/"+thumb.username + '/gallery/' +thumb.gallery+"/thumb/"+thumb.src);
       // $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -2274,13 +2276,13 @@ var Gallery = (function(){
       if(tile['up']){
         if(this.windowWidth < this.mainWidth)
          
-        $('#tiler').animate({top : '+=155'},400,function(){
+        $('#tiler').animate({top : '+=155'},1,function(){
             document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
         })
        else 
-        $('#tiler').animate({top : '+=224'},400,function(){
+        $('#tiler').animate({top : '+=224'},1,function(){
             document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
@@ -2290,7 +2292,7 @@ var Gallery = (function(){
       document.getElementById('pool').innerHTML = '';
       $('#tiler').css('z-index',-200)  ; // I am not sure this is necessary
       if(this.windowWidth < this.mainWidth )             
-        $('#tiler').animate({top : '-=155'},400,function(){
+        $('#tiler').animate({top : '-=155'},1,function(){
            document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
            tile['up'] = 1; 
            if(e != null)
@@ -2299,7 +2301,7 @@ var Gallery = (function(){
            that._showImage(e); 
         })  
       else 
-         $('#tiler').animate({top : '-=224'},400,function(){
+         $('#tiler').animate({top : '-=224'},1,function(){
            document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
            tile['up'] = 1;
            if(e != null) 
@@ -2340,7 +2342,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src = makeUrl("image/"+that.galleryName+"/thumb/"+thumb.src);
+       image.src = makeUrl("image/" + thumb.username + '/gallery/'+that.galleryName+"/thumb/"+thumb.src);
        $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -2503,14 +2505,18 @@ var Gallery = (function(){
     },
     
     loadGalleries : function(data){
-        var result = JSON.parse(data);
+    	var result = null;
+    	  if(Array.isArray(data.images))
+    	    result = data.images;
+    	   else 
+          result = JSON.parse(data);
         var galleries = {};
         for(var i = 0 ; i < result.length ; i++){
            var gallery = result[i].gallery;
            if(!galleries[gallery])
              galleries[gallery] = [];
             
-           galleries[gallery].push({text : result[i].text,gallery : gallery,src : result[i].src,width : result[i].width,height: result[i].height});        
+           galleries[gallery].push({username : result[i].username,text : result[i].text,gallery : gallery,src : result[i].src,width : result[i].width,height: result[i].height});        
         }       
         this.galleries = Object.assign({},galleries);
         
@@ -2660,7 +2666,7 @@ var Gallery = (function(){
        let models = [];
        
        function setModels(data){ 
-       
+         models.length = 0;
          models = data;         
        }       
        
@@ -2705,7 +2711,7 @@ var Gallery = (function(){
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){
+     	     function router(username ,url){ alert(username + ' ' + url)
      	     	  let backOrNext = false; 
      	        if(url[0] == '#'){
      	           url = url.substring(1,url.length);
@@ -2716,20 +2722,20 @@ var Gallery = (function(){
      	        let splited = url.split('/');
      	        let length = splited.length;
      	        if(length == 1){
-     	          process(splited[0])
+     	          process(username,splited[0])
      	        }
      	        else if(length == 2){
-     	          process(splited[0],splited[1],backOrNext)
+     	          process(username,splited[0],splited[1],backOrNext)
      	        }else if(length == 3){
-                 process(splited[1],splited[2],backOrNext)     	        
+                 process(username,splited[1],splited[2],backOrNext)     	        
      	        };   
      	     }     	
      	     
-     	     function process(arg1,arg2,arg3){     	     
+     	     function process(username,arg1,arg2,arg3){     	     
               let url;              
               
               if(validUrl.indexOf(arg1) == -1) return;
-     	     	  events[arg1].notify(arg2)
+     	     	  events[arg1].notify({username : username,data : arg2})
      	     	  
      	     	  if(arg2 == null){
      	     	     url = arg1 ;
@@ -2741,7 +2747,7 @@ var Gallery = (function(){
      	     	    url = 'archive'
      	     	  
      	     	  if(!arg3)
-     	          window.history.pushState(null,null,'/gallery/' + url);     	     
+     	          window.history.pushState(null,null,'/'+username +'/gallery/' + url);     	     
      	     }     
      	     
      	     return {
@@ -2759,6 +2765,8 @@ var Gallery = (function(){
      View._start();
      
      socket.on('gal',function(data){
+     	     View.loadGalleries(data)
+     	     Collection.setArchive(data.images);
      	     View.outsider.length = 0;
      	     if(!View.inited){	
             View._init()
@@ -2783,7 +2791,8 @@ var Gallery = (function(){
           document.getElementById('main').style.display = 'block';     	  
      	  }else{
      	    View._init();
-         galleries();
+     	    args.archive = true;
+          galleries(args,View._showTile);
      	  }     	   
      })
      
@@ -2803,26 +2812,32 @@ var Gallery = (function(){
          }else {
            document.getElementById('main').style.display = 'block';
          }
+      
          
-         console.log(Collection.getGallery(args) )
-         if(Collection.getGallery(args).length == 0)
-           getGal(args)
-         else 
-          View._showImages(Collection.getGallery(args),args);  
+         if(Collection.getGallery(args.data).length == 0){ 
+            //getGal(args)
+           args.archive = false;
+           galleries(args,showImage)   
+         }else 
+           View._showImages(Collection.getGallery(args.data),args.data);  
      })
      
      
-     function getGal(gallery) {
-        socket.emit('getgal',{gal : gallery});
+     function showImage(args){ 
+       View._showImages(Collection.getGallery(args.data),args.data);  
+     }
+     
+     function getGal(args) {
+        socket.emit('getgal',{gal : args.data,username : args.username});
      }
      
      Router.event['show'].attach(function(sender,args){
      	   let model;
-     	    model = Collection.getModel(args)
+     	    model = Collection.getModel(args.data)
      	   
      	   if(model === undefined)
      	      model = View.outsider.find(function (elem) {
-          	  return elem._id == args;})
+          	  return elem._id == args.data;})
      	   let style = window.getComputedStyle(document.getElementById('main'));
          let st = state();
          if(style.getPropertyValue('display') == 'block'){
@@ -2868,7 +2883,7 @@ var Gallery = (function(){
       	 let child = document.getElementById('pool').children; 
       	 that.addedToCollection(data,child)
       	 View._recalculateMargin()
-      	 console.log(uploaded)
+      	
       	 if(uploaded == View.files.length ){
       	 	View.files.length = 0;
       	   saveGallery(data);
@@ -2886,18 +2901,36 @@ var Gallery = (function(){
      })
       
       
-      function galleries () {
+      function galleries (args,callback) {
       	var xhr = new XMLHttpRequest();
-      	xhr.open('GET','/gallery/index');
+      	xhr.open('POST','/gallery/index');
       	//window.history.pushState(null,null,'/gallery/archive')
       	xhr.onreadystatechange = function(){
             if(this.readyState == 4){ 
-               View.loadGalleries(xhr.responseText);  
-               Collection.setArchive(JSON.parse(xhr.responseText));               
-               View._showTile();   
+               Collection.setArchive(JSON.parse(xhr.responseText));     
+              
+               if(args.archive){
+                     
+                  View.loadGalleries(xhr.responseText); 
+                  View._showTile();
+                              
+               }
+                  
+                else {
+                   //View.loadGalleries(xhr.responseText); 
+                  //View._showTile();
+                  if(!View.inited);
+                  View._init();
+                  View._showTile();
+                   View.loadGalleries(xhr.responseText); 
+                  document.getElementById('main').style.display = 'block';
+                  
+                   callback.call(View,args);
+                }       
+                 
             }      	
       	}
-      	
+      	xhr.setRequestHeader('username',args.username);
       	xhr.send();
       }
      
@@ -3010,8 +3043,8 @@ var Gallery = (function(){
   
   return {
      hide : View._hide.bind(View),
-     router : function(path){
-        Router.route(path);     
+     router : function(username,path){
+        Router.route(username,path);     
      }  
   }  
   

@@ -10,7 +10,7 @@ let socket = null;
    const options = {
      route : "/editor",
      db:"mongodb://localhost:27017/cg",
-     dir : "/uploads/article"
+     dir : "/uploads"
    }
    
    function router(req,res){ 
@@ -77,10 +77,11 @@ let socket = null;
     }
    
    function _articles(req,res){
+   	    let username = req.headers.username;
           database.connect(options.db,function(err,db){
          if(err) throw err ;
          
-         db.collection('article').find({}).toArray(function(err,data){                  
+         db.collection('article').find({username : username}).toArray(function(err,data){                  
             res.statusCode = 200;
             res.setHeader('Content-Type','application/json');	
              res.write(JSON.stringify(data));             
@@ -109,7 +110,8 @@ let socket = null;
              article['location'] = art[i].location;
      }
      
-     article['type'] = 'article';    
+     article['type'] = 'article';   
+     article['username'] = req.username; 
 
      database.connect(options.db,function(err,db){
           if(err) throw err;
@@ -132,7 +134,7 @@ let socket = null;
        form.multiple = true;
        form.keepExtension = true;
        var date = Date.now()
-       var uploadPath = path.join(__dirname +"/"+options.dir, date.toString() ); 
+       var uploadPath = path.join(__dirname +"/"+options.dir+'/' + req.username + '/article' , date.toString() ); 
        form.uploadDir = uploadPath;
        
        if(!fs.existsSync(uploadPath))

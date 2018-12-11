@@ -280,7 +280,7 @@ var View = {
                           
                 document.getElementById('a-archive-container').innerHTML = '';
                 document.getElementById('editor-archive').style.display = 'none';  
-                Router.route('show/' + elem._id);
+                Router.route(elem.username,'show/' + elem._id);
               })
               
               let tagsContainer = document.createElement('div');
@@ -374,7 +374,7 @@ var View = {
            
            _createArticle : function(){
                document.getElementById('editor-archive').style.display = 'none';
-               Router.route('create'); 
+               Router.route(username,'create'); 
            },
            
            _createEditor : function(){
@@ -1548,7 +1548,7 @@ var View = {
              events[elem] = new Event(this);
           
      	    
-     	     function router(url){ 
+     	     function router(username,url){ 
      	     
      	        let backOrNext = false;
      	        
@@ -1559,29 +1559,29 @@ var View = {
      	     
      	        let splited = url.split('/');
      	        if(splited.length == 1  ){
-     	            process(url,null,backOrNext)      	 
+     	            process(username,url,null,backOrNext)      	 
      	        }else if(splited.length == 2){
-     	            process(splited[0],splited[1],backOrNext)
+     	            process(username,splited[0],splited[1],backOrNext)
      	        }else return;   	        
      	    
      	     }     	    
      	     
-     	     function process (action,id,bn){
+     	     function process (username,action,id,bn){
      	     	  
               let url ;     	
               if(bn){
                 if(action == 'editor') action = 'archive';              
               }
      	        if(validUrl.indexOf(action) == -1) return; 
-     	     	  events[action].notify({id : id,bn : bn});
+     	     	  events[action].notify({id : id,bn : bn,username:username});
      	     	  if(id){
                  url = action + '/' + id;     	     	  
      	     	  }else{
                  url = action;     	     	  
      	     	  }
-     	     	  
-     	     	  if(!bn)
-     	         window.history.pushState(null,null,'/editor/' + url);  
+     	     	   
+     	     	  if(!bn) 
+     	         window.history.pushState(null,null,'/' + username + '/editor/' + url);  
      	     } 
      	     
      	     return {
@@ -1620,12 +1620,9 @@ var View = {
      /*   Main Controller */
        
      var Controller = (function(){
-      var uploaded = 0;
+      var uploaded = 0;    
+     	View._init();      
      	
-     
-     	 View._init() 
-
-      
       socket.on("eduprog",function(data){         
           ++uploaded;
           for(let i = 0 ; i < View.content.length ; i++){
@@ -1663,7 +1660,7 @@ var View = {
       
       Router.event['archive'].attach(function(sender,args){    
           if(View.currentContainer == null) 	{
-              	   getModels();
+              	   getModels(args.username);
               	   return;    
           }
       
@@ -1768,7 +1765,7 @@ var View = {
          
       })
         
-      function getModels(){
+      function getModels(username){
         let xhr = new XMLHttpRequest();
         xhr.open('POST','/editor/articles');
         xhr.onreadystatechange = function(data){
@@ -1778,7 +1775,7 @@ var View = {
               View._archiveEditor(result)             
            }
         }       
-        
+        xhr.setRequestHeader('username',username)
         xhr.send()  
       } 
        
@@ -1854,8 +1851,8 @@ var View = {
      return {
      	  hide : View._hide.bind(View),
         connect : connector  ,
-        router : function(path){
-           Router.route(path)        
+        router : function(username,path){
+           Router.route(username,path)        
         }
      }
       
