@@ -29,8 +29,7 @@ const getAsync = promisify(client.get).bind(client);
               return ;
         })
   }).on('connection',function(socket){
-        socket.emit('id',{id:socket.id,username :  socket.username});
-      //sockets.add(socket);
+       socket.emit('id',{id:socket.id,username :  socket.username});    
       
       socket.on('disconnect',function(socket){
       	                  
@@ -50,17 +49,15 @@ const getAsync = promisify(client.get).bind(client);
   
     
   async function checkUser(token,callback){
-  	   let username = await getAsync(token);
+  	  let username = await getAsync(token);
   	  callback(username)
       
   }
    
  server.listen(3000);
  
- function myApp(req,res){
- 	
-   login.router(req,res,findRoute);
-   //findRoute(req,res);
+ function myApp(req,res){ 	
+   login.router(req,res,findRoute); 
  }
 
 

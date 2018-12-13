@@ -204,25 +204,26 @@ var Gallery = (function(){
        }    
     },
     
+    	       
     _isLoggedIn : function(){
-      return true;
+      return username == this.username;
     },
-    
-    _profilePic : function () {
+   
+   _profilePic : function () {
     	  let container = document.createElement('div');
     	  container.style.width = 200 + 'px';
     	  container.style.height = 30 + 'px';
     	  container.style.float = 'right';
     	  container.id = 'pp'
+    	  container.classList.add('m-profile')
     	  let span = document.createElement('span');
-    	  span.innerHTML = 'neanthertal';
-    	  span.style.float = 'right';
-    	  
+    	  span.innerHTML = this.username;
+    	  span.style.float = 'right';    	  
     	  span.style.color = 'black';
     	  span.style.cursor = 'pointer';
     	  span.style.marginRight = 5 + 'px';
     	  span.style.marginTop = 7 + 'px';
-    	  
+    	  span.state = 'hide';
     	  span.style.fontSize = 12 + 'px';
     	  let profile = new Image();
     	  profile.src = makeUrl('public/arrow/me.png');
@@ -233,12 +234,108 @@ var Gallery = (function(){
     	  profile.style.objectFit = 'cover';
     	  container.appendChild(profile);
     	  container.appendChild(span);
-    	  
+    	  span.addEventListener('click',this._hideOrShowMenu.bind(this))     	  
     	  
     	  return container;   	  
     	  
     },
     
+    _hideOrShowMenu : function(e){
+      let elem = e.target;
+      
+      if(elem.state == 'show'){
+      	this._hideProfileMenu();
+          elem.state = 'hide';      
+      }        
+      else {
+        
+          this._showProfileMenu();   
+           elem.state = 'show';
+              
+       }       
+    
+    },
+    
+    _hideProfileMenu : function(){
+          
+      let canvas = document.getElementById('g-profile-menu')
+    
+      let radius = canvas.getAttribute('radius');
+        radius -=1
+      let context = canvas.getContext('2d');
+      let x = canvas.width/2;
+      let y = canvas.height/2;
+      let id = window.setInterval(function(){
+          if(radius < 10){
+             clearInterval(id);
+             canvas.remove();
+          
+          }
+                     
+      context.beginPath();
+      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+      context.lineWidth = 21;
+      radius -= 15;      
+
+      // line color
+      context.strokeStyle = 'white';
+      context.stroke();  
+          
+                
+      },2)   
+        },
+    
+    	   _showProfileMenu : function(){
+	       
+          let left  ;
+          let top = 40;	       
+	       if(this.isMobile()){
+             left = window.innerWidth - 200;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 -200;	   
+          }
+	       
+	      let canvas = document.createElement('canvas');
+	      canvas.width = 300;
+	      canvas.height = 300;
+	   
+	      canvas.id = 'g-profile-menu'
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = 1;      
+	      canvas.style.position = 'fixed';
+	      
+	      canvas.style.top = top;
+	      canvas.style.left = left + 'px';
+	      
+	      canvas.style.zIndex = 100;
+	      
+	     
+	      
+	      canvas.id = 'g-profile-menu';
+	      document.body.appendChild(canvas);         
+	        
+          let id = window.setInterval(function(){ 
+            if(radius > 200){
+               clearInterval(id);               
+               
+             
+               canvas.setAttribute('radius',radius)
+               
+               return;            
+            }
+            
+         radius +=2;
+	      context.beginPath();
+	      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+	      context.closePath();
+	      context.fillStyle = 'lightblue';
+	      context.fill();    
+
+         },1)	  
+	       
+	   },
  
     _galSpace : function(){ return;
       var mobile = this.isMobile();
@@ -433,8 +530,10 @@ var Gallery = (function(){
     },
     
     _showTile : function(){
+    	
       var that = this;      
       var tile = document.getElementById('tile');
+      if(tile['up']) return;
       if(tile['up']){
         if(this.windowWidth < this.mainWidth)
          
@@ -476,7 +575,12 @@ var Gallery = (function(){
     
     
     _showGalleries : function(){
-      var container = document.getElementById('g-archive-view')
+      var container = document.getElementById('g-archive-view');
+      container.innerHTML = '';
+      
+      if(this._isLoggedIn())
+           document.getElementById('cgbtn').style.display = 'block';
+        
     
        //document.getElementById('pool').appendChild(container);
        var t = 1;
@@ -1206,10 +1310,13 @@ var Gallery = (function(){
     	 
     	 }
     	 
+    	 
+    	 if(document.getElementById('pp'))
+    	   document.getElementById('pp').style.display = 'none'
     	 if(!this._isLoggedIn()){
          document.getElementById('pp').style.display = 'none';    	 
     	 }else{
-    	  
+    	   
     	 }
        var that = this; 
        if(document.getElementById('thumbview'))
@@ -2504,7 +2611,10 @@ var Gallery = (function(){
        return -1;
     },
     
-    loadGalleries : function(data){
+    loadGalleries : function(data){    	
+    	if(document.getElementById('g-archive-view'))
+    	  document.getElementById('g-archive-view').innerHTML = '';   
+    	  
     	var result = null;
     	  if(Array.isArray(data.images))
     	    result = data.images;
@@ -2520,9 +2630,12 @@ var Gallery = (function(){
         }       
         this.galleries = Object.assign({},galleries);
         
-        for(var i in galleries ){
+        this._setPoolView();
+        this._showGalleries()
+        
+       /* for(var i in galleries ){
             this._renderGallery(galleries[i][0]);
-        }           
+        }   */        
     },   
     
     _galleryTemplate : function(obj){
@@ -2670,6 +2783,11 @@ var Gallery = (function(){
          models = data;         
        }       
        
+       function getUser() {
+       	if(models.length != 0)
+       	  return models[0].username;
+       }
+       
        function getModel(id){
           return models.find(function (elem) {
           	  return elem._id == id;
@@ -2697,7 +2815,8 @@ var Gallery = (function(){
            getModel : getModel,
            getGallery : getGallery,
            getModelTwo : getModelTwo,
-           addModel : addModel
+           addModel : addModel,
+           getUser : getUser
        }
      })()
       
@@ -2763,7 +2882,9 @@ var Gallery = (function(){
     // this.collection = new Collection(this);
      //this.view = new View(View,this);     
      View._start();
-     
+     function setUsername(username){
+       View.username = username;     
+     }     
      socket.on('gal',function(data){
      	     View.loadGalleries(data)
      	     Collection.setArchive(data.images);
@@ -2779,27 +2900,99 @@ var Gallery = (function(){
      })
      
      Router.event['gallery'].attach(function (sender,args) {
-     	  let style = window.getComputedStyle(document.getElementById('main'));
+     	  setUsername(args.username);
      	  
+     	  let style = window.getComputedStyle(document.getElementById('main'));
+     	  alert(args.data)
      	  if(style.getPropertyValue('display') == 'block'){
      	      View._backToIndex(View);
      	  }
      })
      
      Router.event['archive'].attach(function(sender,args){ 
+        setUsername(args.username);
+        
+        if(!View.inited){
+        	  View._init();  
+            
+        }
+        
+        document.getElementById('main').style.display = 'block';
+                
+             
+       
+         if(Collection.getUser() != args.username){ 
+           if(document.getElementById('pp'))
+              document.getElementById('pp').remove()
+            let st = state();
+            
+            if(st == 'gallery')
+               if(document.getElementById('thumbview'))
+                 document.getElementsByClassName('thumbview')[0].remove();
+            if(st== 'show')
+                View._closeShowImage.call(View) ; 
+            
+            args.archive = true;
+            galleries(args,null);
+         }else {
+          
+         	let st = state();
+            
+            if(st == 'gallery')
+               if(document.getElementById('thumbview'))
+                 document.getElementsByClassName('thumbview')[0].remove();
+            if(st== 'show')
+                View._closeShowImage.call(View) ;                   
+          
+     	    args.archive = true;
+          galleries(args,View._showTile);  
+         }
+          
+        /*
      	  if(View.inited){
           document.getElementById('main').style.display = 'block';     	  
      	  }else{
      	    View._init();
      	    args.archive = true;
           galleries(args,View._showTile);
-     	  }     	   
+     	  } */    	  
      })
      
-     Router.event['images'].attach(function(sender,args){ 
-         let style = window.getComputedStyle(document.getElementById('main')); 
+     Router.event['images'].attach(function(sender,args){
+     	   setUsername(args.username);   
          
-         if(style.getPropertyValue('display')== 'block'){
+      
+         
+      
+        if(Collection.getUser() != args.username){ alert('nug')
+            let st = state();
+            
+            if(st == 'gallery')
+               if(document.getElementById('thumbview'))
+                 document.getElementsByClassName('thumbview')[0].remove();
+            if(st== 'show')
+                View._closeShowImage.call(View) ; 
+            
+            args.archive = false;
+            galleries(args,showImage);
+         }else { alert('shock')
+         	args.archive = false;
+         	 let st = state();
+            
+            if(st == 'gallery')
+               if(document.getElementById('thumbview'))
+                 document.getElementsByClassName('thumbview')[0].remove();
+            if(st== 'show')
+                View._closeShowImage.call(View) ; 
+         	View._showImages(Collection.getGallery(args.data),args.data);  
+         }
+          
+     })
+     
+     function Incoming(){
+        let style = window.getComputedStyle(document.getElementById('main')); 
+         
+         if(style.getPropertyValue('display')== 'block'){ 
             let st = state()            
             if(st == 'show'){ 
                View._closeShowImage.call(View) ;                
@@ -2807,20 +3000,12 @@ var Gallery = (function(){
             }else if(st == 'index'){
                
             }
-         }else if(View.inited){
+         }else if(View.inited){ 
            document.getElementById('main').style.display = 'block'
-         }else {
+         }else { 
            document.getElementById('main').style.display = 'block';
          }
-      
-         
-         if(Collection.getGallery(args.data).length == 0){ 
-            //getGal(args)
-           args.archive = false;
-           galleries(args,showImage)   
-         }else 
-           View._showImages(Collection.getGallery(args.data),args.data);  
-     })
+     }
      
      
      function showImage(args){ 
@@ -2840,8 +3025,7 @@ var Gallery = (function(){
           	  return elem._id == args.data;})
      	   let style = window.getComputedStyle(document.getElementById('main'));
          let st = state();
-         if(style.getPropertyValue('display') == 'block'){
-         	
+         if(style.getPropertyValue('display') == 'block'){         	
          	if(st == 'show')
          	    View._browserConstruct.call(View,model.gallery,model.src)               
              else 
@@ -2907,25 +3091,21 @@ var Gallery = (function(){
       	//window.history.pushState(null,null,'/gallery/archive')
       	xhr.onreadystatechange = function(){
             if(this.readyState == 4){ 
-               Collection.setArchive(JSON.parse(xhr.responseText));     
-              
-               if(args.archive){
-                     
+               Collection.setArchive(JSON.parse(xhr.responseText));                
+               if(args.archive){                     
                   View.loadGalleries(xhr.responseText); 
-                  View._showTile();
-                              
-               }
-                  
-                else {
+                  View._showTile();                             
+               }                 
+                else { 
                    //View.loadGalleries(xhr.responseText); 
                   //View._showTile();
                   if(!View.inited);
                   View._init();
                   View._showTile();
-                   View.loadGalleries(xhr.responseText); 
+                  View.loadGalleries(xhr.responseText); 
                   document.getElementById('main').style.display = 'block';
                   
-                   callback.call(View,args);
+                  callback.call(View,args);
                 }       
                  
             }      	
@@ -2972,16 +3152,14 @@ var Gallery = (function(){
      	 container.date = Date.now()
      	 container.gallery = View.galleryName;
      	 container.type = 'gallery';
-     	 console.log(container); 
-     	   
-     	   
+     	 container.username = username;   	   
          var xhr = new XMLHttpRequest();
          xhr.open('POST','/gallery/save');
          xhr.send(JSON.stringify(container));
          
          xhr.onreadystatechange = function(data){
             if(this.readyState == 4){
-              alert(data);            
+                      
             }         
          } 
      }

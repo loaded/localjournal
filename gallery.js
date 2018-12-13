@@ -322,7 +322,9 @@ let socket = null;
      
      req.on('end',function(){
         let gal = JSON.parse(json);
+        
         gal.username = req.username;
+      
         database.connect(options.db.image,function(err,db){
            db.collection('hash').insert(gal,function(err,db){
                if(err) throw err;
