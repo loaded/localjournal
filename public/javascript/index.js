@@ -463,7 +463,7 @@ var View = {
            },
            
            _returnUrl : function(url){
-              return "http://localhost:3000" + url
+              return "http://46.100.63.117" + url
            },
             
            _showArticle : function(arti){  

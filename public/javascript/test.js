@@ -3,7 +3,7 @@
 
     
    function makeUrl(url){
-       return "http://localhost:3000/"+url;   
+       return "http://46.100.63.117/"+url;   
     }
 /*=========================================== View =============================================== */  
 var Gallery = (function(){
