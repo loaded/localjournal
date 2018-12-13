@@ -3122,6 +3122,7 @@ var Gallery = (function(){
           file.append(sender.files[i].name,sender.files[i]);
           var xhr = new XMLHttpRequest();
           xhr.open('POST','/gallery/upload'); 
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
           xhr.setRequestHeader('id',socketId);
           xhr.setRequestHeader('imageName',sender.files[i].name);
           xhr.setRequestHeader('gallery',sender.galleryName )
@@ -3155,6 +3156,7 @@ var Gallery = (function(){
      	 container.username = username;   	   
          var xhr = new XMLHttpRequest();
          xhr.open('POST','/gallery/save');
+         xhr.setRequestHeader('Content-Type','application/json')
          xhr.send(JSON.stringify(container));
          
          xhr.onreadystatechange = function(data){

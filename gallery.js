@@ -307,7 +307,7 @@ let socket = null;
             if(err) throw err;           
             res.statusCode = 200;
             res.setHeader('Content-Type','application/json');	
-            res.end();
+            res.end('');
             db.close();        
         })     
      })
