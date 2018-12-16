@@ -24,7 +24,7 @@
         div.style.top = e.clientY + 'px';
          div.style.left = e.clientX + 'px';   
    }
-var View = {
+let View = {
            config : {
               m : {
                 archive : {height : null}
@@ -463,7 +463,7 @@ var View = {
            },
            
            _returnUrl : function(url){
-              return "http://46.100.63.117" + url
+              return "http://localhost" + url
            },
             
            _showArticle : function(arti){  
@@ -1410,7 +1410,7 @@ var View = {
            },
            
            _progress : function(progress){
-           	  this.recieved = progress.recieved;
+           	  this.recieved += progress.percent;
               let canvas = document.getElementById('prgeditor');
               let x = Math.floor(canvas.width/2);
               let y = Math.floor(canvas.height/2);
@@ -1831,21 +1831,45 @@ var View = {
            View._showArticle(article);                 
         }
         
-        function uploadFiles(sender){
-           let files = new FormData();       
+        
           
-           for(let i = 0 ; i < sender.files.length ; i++){
+      socket.on('a-continue', function (data){ 
+            let reader = new FileReader(); 
+             
+		      View._progress({percent : data['percent']});
+				var place = data['place'] * 524288; //The Next Blocks Starting Position
+				var newFile; //The Variable that will hold the new Block of Data
+			
+			 let index =  View.files.findIndex(function(elem){
+			   return elem.name == data['name']
+			 })
+			 
+			 
+			 
+			 reader.onload = function(e){ 
+            socket.emit('a-upload',{'name' : data['name'], data : e.target.result})          
+          }
+			 
+			 newFile = View.files[index].file.slice(place, place + Math.min(524288, (View.files[index].size-place)));
+			 reader.readAsBinaryString(newFile);
+	   });
+     
+      function uploadFiles(sender) {  
+        for(let i = 0 ; i < sender.files.length ; i++){
               sender.totalSize += sender.files[i].size;
-              files.append(sender.files[i].name,sender.files[i].file);                               
-           }
-           
-           var xhr = new XMLHttpRequest();
-           xhr.open('POST','/editor/upload');
-           xhr.setRequestHeader('id',socketId);      
-          
-           xhr.send(files); 
-           sender._dialog();
-        }
+                                        
+         }  
+         sender._dialog();
+         uploaded = 0;
+     	  for(var i= 0 ; i < sender.files.length ; i++){    	  	
+     	  	  socket.emit('a-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})     	  
+     	  }     	  
+     	
+     }
+        
+ 
+        
+        
      })()
          
      return {

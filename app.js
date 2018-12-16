@@ -41,6 +41,12 @@ const getAsync = promisify(client.get).bind(client);
       socket.on('video',video.video.bind(socket))
       socket.on('article',editor.article.bind(socket));
       socket.on('getgal',gallery.gallery.bind(socket)); 
+      
+      socket.on('g-start',gallery.start.bind(socket));
+      socket.on('g-upload',gallery.upload.bind(socket))
+      
+      socket.on('a-start',editor.start.bind(socket))
+      socket.on('a-upload',editor.upload.bind(socket))
   });
   
    

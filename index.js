@@ -8,7 +8,7 @@ var formidable = require('formidable')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 
-let host = '46.100.63.117';
+let host = 'localhost';
 var index = (function(){
 	
 const extentions =   {

@@ -7,11 +7,14 @@ var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 //var sockets = require('./sockets.js')
 let socket = null;
+ var files  = {}
   //this socket should be removed
   
 // var sockets ;  
   var clients = [];  
   var options = {
+  	 pathname: 'uploads/',
+  	  temp : 'Temp/',
      route : {    
           base : '/gallery',
           regex : '^\/[a-z]+\/?'
@@ -53,7 +56,7 @@ let socket = null;
      if(route == null) 
        route = '';
      else route = route[0].replace(new RegExp('/','g'),'')
-     console.log(route)
+     
      switch(route){
        case 'public' :
          _public(req,res); 
@@ -199,7 +202,7 @@ let socket = null;
        })
        
       form.on('file',function(name,file){
-       	       	
+       	       	console.log('doen')
        	imagePath = path.join(gallery,file.name);             
               addon.process(file.path,imagePath,function(im_width,im_height){
                        //var client = sockets.find(socketId);   
@@ -222,6 +225,107 @@ let socket = null;
        form.parse(req);
   }
   
+  
+  /*  ////////////////////////////////////// Upload Images /////////////////////////////////// */  
+  
+  function startUpload(data){ 
+  	let that = this;
+   let filename = data['name'];
+   
+     // check the extensiton
+    //let extension = options.regex.exec(filename)[1];
+    /*if(extension != options.ext) {
+      that.emit('error',{error : 'invalid extension'})
+    }*/
+    
+			files[that.id+filename] = { 
+			   size : data['size'],
+				uploaded : "",
+				downloaded : 0,
+				name : filename 
+			}
+
+			var place = 0;
+			try{
+				var stat = fs.statSync(options.temp +  filename);
+				if(stat.isFile())
+				{
+					files[that.id+filename]['downloaded'] = stat.size;
+					place = stat.size / 524288;
+				}
+			}
+	  		catch(er){} 
+			fs.open(options.temp + filename, 'a', 0755, function(err, fd){
+				if(err)
+				{
+					console.log(err);
+				}
+				else
+				{
+					files[that.id+filename]['handler'] = fd; 
+					that.emit('g-continue', { 'place' : place, percent : 0 ,name : filename});
+				}
+			});
+  }
+   
+  
+  function upload(data){ 
+  	 let that = this;
+    let filename = data['name'];
+    let galleryName = data['gallery'];
+    //let imageName = filename.replace(options.regex,'.png')
+			files[that.id+filename]['downloaded'] += data['data'].length;
+			files[that.id+filename]['uploaded'] += data['data'];
+			if(files[that.id+filename]['downloaded'] == files[that.id+filename]['size'])
+			{ 
+				fs.write(files[that.id+filename]['handler'],files[that.id+filename]['uploaded'], null, 'Binary', function(err, w){
+					var inp = fs.createReadStream(options.temp + filename);
+			
+					
+					 var gallery = path.join(__dirname + "/uploads/"+ that.username +'/gallery/'+galleryName);
+				 
+                if(!fs.existsSync(gallery)){ 
+                   fs.mkdirSync(gallery)       	
+                }
+       
+       
+               var imagePath = path.join(gallery,filename); 
+					var out = fs.createWriteStream(imagePath);
+					inp.pipe( out);
+					inp.on('close',function(){                
+					   addon.process(options.temp + filename,imagePath,function(im_width,im_height){                 
+                     that.emit('thumb' , {
+          	             src : filename,
+          	             height : im_height,
+          	             width : im_width,
+          	             username : that.username
+                      })                            
+                                                 
+                    insert({username : that.username,gallery : galleryName,src : data['name'],width : im_width,height : im_height});                          
+                                                                                              
+        
+				  });// end of addon
+						});				//end of close	
+					}) //end of fs
+			
+				
+			}
+			else if(files[that.id+filename]['uploaded'].length > 10485760){ 
+				fs.write(files[that.id+filename]['handler'], files[that.id+filename]['uploaded'], null, 'Binary', function(err, w){
+					files[that.id]['uploaded'] = ""; 
+					var place = files[that.id+filename]['downloaded'] / 524288;
+					var percent = (files[that.id+filename]['downloaded'] / files[that.id+filename]['size']) ;
+					that.emit('g-continue', { 'place' : place, name : filename ,'percent' :  percent});
+				});
+			}
+			else
+			{
+				var place = files[that.id+filename]['downloaded'] / 524288;
+				var percent = (files[that.id+filename]['downloaded'] / files[that.id+filename]['size']) ;
+				that.emit('g-continue', { 'place' : place, name : filename,'percent' :  percent});
+			}
+   	
+  }
 
   
   function _index(req,res){
@@ -297,7 +401,7 @@ let socket = null;
   
   
   //insert many element with the same name
-  function insert(obj,res) {
+  function insert(obj) {
      database.connect(options.db.image,function(err,db){
         if(err) throw err;
         
@@ -305,9 +409,7 @@ let socket = null;
             {gallery : obj.gallery,src : obj.src,username : obj.username},       
             obj,{'upsert':true},function(err,result){
             if(err) throw err;           
-            res.statusCode = 200;
-            res.setHeader('Content-Type','application/json');	
-            res.end('');
+           
             db.close();        
         })     
      })
@@ -386,8 +488,6 @@ let socket = null;
      return path.parse(req.url).ext.toLowerCase();  
   }
   
-
-
  function io(io){
     socket = io; 
  }
@@ -395,4 +495,6 @@ let socket = null;
 module.exports.router = router;
 module.exports.to = io
 module.exports.gallery = _gallery
+module.exports.upload = upload
+module.exports.start = startUpload
 

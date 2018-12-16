@@ -150,11 +150,11 @@ var Video = (function(){
     },
     
     _returnUrl : function(url){
-      return "http://46.100.63.117" + url
+      return "http://localhost:3000" + url
     },  
-        _hideProfileMenu : function(){
+   _hideProfileMenu : function(){
           
-                let canvas = document.getElementById('v-profile-menu')
+      let canvas = document.getElementById('v-profile-menu')
     
       let radius = canvas.getAttribute('radius');
         radius -=1

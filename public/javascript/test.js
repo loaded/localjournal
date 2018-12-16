@@ -3,7 +3,7 @@
 
     
    function makeUrl(url){
-       return "http://46.100.63.117/"+url;   
+       return "http://localhost:3000/"+url;   
     }
 /*=========================================== View =============================================== */  
 var Gallery = (function(){
@@ -578,8 +578,8 @@ var Gallery = (function(){
       var container = document.getElementById('g-archive-view');
       container.innerHTML = '';
       
-      if(this._isLoggedIn())
-           document.getElementById('cgbtn').style.display = 'block';
+     /* if(this._isLoggedIn())
+           document.getElementById('cgbtn').style.display = 'block';*/
         
     
        //document.getElementById('pool').appendChild(container);
@@ -1318,6 +1318,8 @@ var Gallery = (function(){
     	 }else{
     	   
     	 }
+    	 
+ 
        var that = this; 
        if(document.getElementById('thumbview'))
        document.getElementsByClassName('thumbview')[0].remove();
@@ -2233,7 +2235,8 @@ var Gallery = (function(){
               canvas = $(".mtemplate-upload[name='" + progress.name + "']").find('.progressbar')[0];
            else 
                canvas = $(".template-upload[name='" + progress.name + "']").find('.progressbar')[0];
-           var prog = progress.recived/progress.expected; 
+          // var prog = progress.recived/progress.expected; 
+           var prog = progress.percent;
            var x = Math.floor(canvas.width/2);
            var y = Math.floor(canvas.height/2); 
            var context = canvas.getContext('2d');  
@@ -2356,7 +2359,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src =makeUrl("image/"+thumb.username + '/gallery/' +thumb.gallery+"/thumb/"+thumb.src);
+       image.src =makeUrl("uploads/"+thumb.username + '/gallery/' +thumb.gallery+"/thumb/"+thumb.src);
       // $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -2878,7 +2881,7 @@ var Gallery = (function(){
   /*========================================= Controller ============================================*/
   
   var Controller = (function(){ 
-     
+      
     // this.collection = new Collection(this);
      //this.view = new View(View,this);     
      View._start();
@@ -2913,24 +2916,33 @@ var Gallery = (function(){
         setUsername(args.username);
         
         if(!View.inited){
-        	  View._init();  
-            
+        	  View._init();              
         }
         
-        document.getElementById('main').style.display = 'block';
-                
-             
+        document.getElementById('main').style.display = 'block';             
        
          if(Collection.getUser() != args.username){ 
            if(document.getElementById('pp'))
               document.getElementById('pp').remove()
             let st = state();
-            
-            if(st == 'gallery')
-               if(document.getElementById('thumbview'))
+            if(View._isLoggedIn()){
+               document.getElementById('cgbtn').style.display = 'block';           
+            }
+            if(st == 'gallery'){
+                if(document.getElementById('thumbview'))
                  document.getElementsByClassName('thumbview')[0].remove();
-            if(st== 'show')
-                View._closeShowImage.call(View) ; 
+                 document.getElementById('g-gallery-title').remove();
+                 document.getElementById('back-sign').remove();
+            }
+             
+            if(st== 'show'){ 
+            	
+            	document.getElementById('g-gallery-title').remove();
+               document.getElementById('back-sign').remove();
+               View._closeShowImage.call(View) ; 
+            
+            }
+              
             
             args.archive = true;
             galleries(args,null);
@@ -2938,11 +2950,22 @@ var Gallery = (function(){
           
          	let st = state();
             
-            if(st == 'gallery')
+            if(st == 'gallery'){
                if(document.getElementById('thumbview'))
-                 document.getElementsByClassName('thumbview')[0].remove();
-            if(st== 'show')
-                View._closeShowImage.call(View) ;                   
+                 document.getElementsByClassName('thumbview')[0].remove()
+                   document.getElementById('g-gallery-title').remove();
+                 document.getElementById('back-sign').remove();
+            }
+             ;
+            if(st== 'show'){
+               document.getElementById('g-gallery-title').remove();
+               document.getElementById('back-sign').remove();
+                document.getElementsByClassName('thumbview')[0].remove()
+               View._closeShowImage.call(View) ;
+            }
+                  
+                
+            document.getElementById('cgbtn').style.display = 'block'                
           
      	    args.archive = true;
           galleries(args,View._showTile);  
@@ -2959,12 +2982,9 @@ var Gallery = (function(){
      })
      
      Router.event['images'].attach(function(sender,args){
-     	   setUsername(args.username);   
-         
+     	   setUsername(args.username);        
       
-         
-      
-        if(Collection.getUser() != args.username){ alert('nug')
+        if(Collection.getUser() != args.username){ 
             let st = state();
             
             if(st == 'gallery')
@@ -2975,7 +2995,7 @@ var Gallery = (function(){
             
             args.archive = false;
             galleries(args,showImage);
-         }else { alert('shock')
+         }else { 
          	args.archive = false;
          	 let st = state();
             
@@ -3051,18 +3071,10 @@ var Gallery = (function(){
      }
 
      var that =  this;     
-      /*
-      var socket = io("http://localhost:3000");
-      socket.on("id",function(data){
-         that.id = data.id;         
-      });
-      */
-      
-      //that.id = socketId;
+ 
      
       let uploaded = 0;
-      socket.on('thumb',function(data){
-      
+      socket.on('thumb',function(data){      
       	 Collection.addModel(data);     
       	 let child = document.getElementById('pool').children; 
       	 that.addedToCollection(data,child)
@@ -3075,8 +3087,7 @@ var Gallery = (function(){
       	   ++uploaded;
       })
       
-      socket.on('progress',function(data){
-          //that.view.progress.notify(data);
+      socket.on('progress',function(data){          
           View._progress(data)      
       })
     
@@ -3085,7 +3096,7 @@ var Gallery = (function(){
      })
       
       
-      function galleries (args,callback) {
+     function galleries (args,callback) {
       	var xhr = new XMLHttpRequest();
       	xhr.open('POST','/gallery/index');
       	//window.history.pushState(null,null,'/gallery/archive')
@@ -3104,34 +3115,43 @@ var Gallery = (function(){
                   View._showTile();
                   View.loadGalleries(xhr.responseText); 
                   document.getElementById('main').style.display = 'block';
-                  
-                  callback.call(View,args);
-                }       
-                 
+                  Router.route(args.username,'/images/'+args.data)
+                  //callback.call(View,args);
+                }                        
             }      	
       	}
       	xhr.setRequestHeader('username',args.username);
       	xhr.send();
       }
+      
+      
+      socket.on('g-continue', function (data){ 
+            let reader = new FileReader(); 
+		      View._progress({percent : data['percent'],name : data['name']});
+				var place = data['place'] * 524288; //The Next Blocks Starting Position
+				var newFile; //The Variable that will hold the new Block of Data
+			 let index =  View.files.findIndex(function(elem){
+			   return elem.name == data['name']
+			 })
+			 
+			 reader.onload = function(e){ 
+            socket.emit('g-upload',{'name' : data['name'], data : e.target.result,gallery : View.galleryName})          
+          }
+			 
+			 newFile = View.files[index].slice(place, place + Math.min(524288, (View.files[index].size-place)));
+			 reader.readAsBinaryString(newFile);
+	   });
      
       function Upload(sender,queue) {    
+       
          uploaded = 0;
      	  for(var i= 0 ; i < sender.files.length ; i++){
-     	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;  
-          var file = new FormData(); 
-          file.append(sender.files[i].name,sender.files[i]);
-          var xhr = new XMLHttpRequest();
-          xhr.open('POST','/gallery/upload'); 
-          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
-          xhr.setRequestHeader('id',socketId);
-          xhr.setRequestHeader('imageName',sender.files[i].name);
-          xhr.setRequestHeader('gallery',sender.galleryName )
-          xhr.send(file);    
-          xhr.onreadystatechange = function (data) {
-          	 if(this.readyState == 4){
-                 	 
-          	 }
-          } 	  
+     	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;   
+     	  	
+     	  	  socket.emit('g-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})  
+     	  
+            	  	 
+    	  
      	  }
      }
      
