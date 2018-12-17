@@ -2,7 +2,7 @@
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
-var formidable = require('formidable')
+
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 //var sockets = require('./sockets.js')
@@ -175,7 +175,7 @@ let socket = null;
      return;
   }
   
-  function _upload(req,res){
+  function _upload(req,res){/*
   	    let username = req.username ;
        var form = new formidable.IncomingForm()
        
@@ -222,7 +222,7 @@ let socket = null;
            console.log("\n this is fucking error " + err);       
        })     
        
-       form.parse(req);
+       form.parse(req);*/
   }
   
   

@@ -2,7 +2,7 @@
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
-var formidable = require('formidable')
+
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 //var sockets = require('./sockets.js')
@@ -129,7 +129,7 @@ let socket = null;
        }) 
    }
    
-   function _upload(req,res){ 
+   function _upload(req,res){ /*
        var form = new formidable.IncomingForm();
        var socketId = req.headers.id;     
        let calculatedByte = 0;
@@ -160,7 +160,7 @@ let socket = null;
            console.log('\n upload error' + '  ' + err);       
        })
        
-       form.parse(req)
+       form.parse(req)*/
    }
    
    function saveImages(images){
