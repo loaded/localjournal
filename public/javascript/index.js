@@ -46,7 +46,8 @@ let View = {
               documentWidth : window.innerWidth, // i changed it if it didn't work i should change to previous value
               documentHeight : window.innerHeight,
               events : ['insertImage'],
-              btns : ['location','reorder','caption','text','tags','description','save']
+              btns : ['location','reorder','caption','text','tags','description','save'],
+              menubar : ['article','video','gallery','about']
            },         
            
            currentContainer : null,           
@@ -87,19 +88,18 @@ let View = {
            
            
     _isLoggedIn : function(){
-      return true;
+       return View.username == username;
     },
     
-    _profilePic : function () {
+    _profilePic : function () { 
     	  let container = document.createElement('div');
     	  container.style.width = 200 + 'px';
     	  container.style.height = 30 + 'px';
     	  container.style.float = 'right';
-    	  container.id = 'pp'
+    	  container.id = 'e-pp' 
     	  let span = document.createElement('span');
-    	  span.innerHTML = 'neanthertal';
-    	  span.style.float = 'right';
-    	  
+    	  span.innerHTML = this.username ; 
+    	  span.style.float = 'right';   	  
     	  span.style.color = 'black';
     	  span.style.cursor = 'pointer';
     	  span.style.marginRight = 5 + 'px';
@@ -115,20 +115,168 @@ let View = {
     	  profile.style.objectFit = 'cover';
     	  container.appendChild(profile);
     	  container.appendChild(span);
+    	  span.state = 'hide';
+    	  span.addEventListener('click',this._hideOrShowMenu.bind(this))  
     	  
     	  
     	  return container;   	  
     	  
     },
+    
+      
+    _hideOrShowMenu : function(e){ 
+      let elem = e.target;
+      
+      if(elem.state == 'show'){ 
+      	this._hideProfileMenu();
+          elem.state = 'hide';      
+      }        
+      else { 
+        
+          this._showProfileMenu();   
+           elem.state = 'show';
+              
+       }
+         
+        
+    
+    },
+    _hideProfileMenu : function(){  
+      document.getElementById('e-menubar').remove()
+      let canvas = document.getElementById('e-profile-menu')
+    
+      let radius = canvas.getAttribute('radius');
+        radius -=1
+      let context = canvas.getContext('2d');
+      let x = canvas.width/2;
+      let y = canvas.height/2;
+      let id = window.setInterval(function(){
+          if(radius < 10){
+             clearInterval(id);
+             canvas.remove();
+          
+          }
+                     
+      context.beginPath();
+      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+      context.lineWidth = 21;
+      radius -= 15;      
+
+      // line color
+      context.strokeStyle = 'white';
+      context.stroke();  
+          
+                
+      },2)   
+        },
+    
+    	   _showProfileMenu : function(){
+	       let that = this;
+          let left  ;
+          let top = 40;	       
+	       if(this._isMobile()){
+             left = window.innerWidth - 200;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 - 197;	   
+          }
+	       
+	      let canvas = document.createElement('canvas');
+	      canvas.width = 200;
+	      canvas.height = 200;
+	   
+	      canvas.id = 'e-profile-menu'
+	      let context = canvas.getContext('2d');
+	      
+	      let radius = 1;      
+	      canvas.style.position = 'fixed';
+	      
+	      canvas.style.top = top;
+	      canvas.style.left = left + 'px';
+	      
+	      canvas.style.zIndex = 100;     
+	      
+	      document.body.appendChild(canvas);         
+	        
+          let id = window.setInterval(function(){ 
+            if(radius > 150){
+               clearInterval(id);               
+                  
+               that._menubar()
+               canvas.setAttribute('radius',radius)
+               
+               return;            
+            }
+            
+         radius +=2;
+	      context.beginPath();
+	      context.arc(200,0,radius,0.5*Math.PI,Math.PI);
+	      context.closePath();
+	      context.fillStyle = 'lightblue';
+	      context.fill();    
+
+         },1)	  
+	       
+	   },   
+    
+    	_menubar : function () {    	    
+          let left  ;
+          let top = 60;	       
+	       if(this._isMobile()){
+             left = window.innerWidth - 10;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 ;
+          }
+	   	let that = this;
+	      let menubar = document.createElement('div');
+	      for(let i = 0 ; i < this.config.menubar.length ; i++){
+            let menu = document.createElement('div');
+            menu.innerHTML = this.config.menubar[i];
+            menu.classList.add('menubar-m');	    
+            menu.style.height = 20 + 'px';
+            menu.style.color = 'white';
+            menu.addEventListener('click',function () { 
+               that._hideProfileMenu();
+               if(that.config.menubar[i] == 'article')
+            	 app.router(that.username,'editor/archive')
+            	else 
+            	  app.router(that.username,that.config.menubar[i] + '/archive');
+            })
+            
+            $(menu).hover(function(){
+               this.innerHTML = that.config.menubar[i].toUpperCase() 
+            },function(){
+               this.innerHTML = that.config.menubar[i].toLowerCase()
+            })
+            menubar.appendChild(menu);  
+	      }
+	      
+	      
+	      menubar.classList.add('menubar-a');
+	      menubar.id = 'e-menubar'
+	      
+	      menubar.style.top = top  + 'px';
+	      menubar.style.left = (left -60) + 'px';
+	      menubar.style.fontSize = 10 + 'px';
+	      
+	      
+	      menubar.style.height = this.config.menubar.length * 20 + 'px';
+	      document.body.appendChild(menubar) ;
+	      
+	      $(menubar).animate({opacity:1},300);
+	      
+	   },
            
     _styleEditorArchive : function(){         	
            	   
            	   let archive = document.getElementById('editor-archive');
            	   let viewPort = document.getElementById('a-archive-container');
            	   
+           	            	   
            	   this.currentContainer = archive; 
                archive.style.display = 'block';
-               archive.style.width = window.innerWidth + 'px';
+                archive.style.width = window.innerWidth + 'px';
                archive.style.height = window.innerHeight + 'px';                 
                let archiveContainer = document.getElementById('archive-container');
                
@@ -136,15 +284,20 @@ let View = {
                let btn = document.getElementById('e-header-btn');
                
                if(!this._isLoggedIn()){
-                  btn.style.display = 'none';
-                  if(!header.hasOwnProperty('profile')){
+               	if(document.getElementById('e-pp'))
+               	  document.getElementById('e-pp').remove();
+               	  header.profile = 0; 
+               	  btn.style.display = 'none';
+                  if(header.profile != '1'){ 
                     header.appendChild(this._profilePic()) ; 
                     header.profile = '1'
                   }
                     
                             
                }else{
-               
+                 if(document.getElementById('e-pp')) 
+                   document.getElementById('e-pp').remove();
+                   btn.style.display = 'block';
                }
                
                if(this._isMobile()){
@@ -467,10 +620,33 @@ let View = {
            },
             
            _showArticle : function(arti){  
+             let left  ;
+             let top = 60;	       
+	          if(this._isMobile()){
+               left = window.innerWidth - 10;
+                
+	          }else{
+               left = 900 + (window.innerWidth - 900)/2 ;
+             
+             }
+             
+              let editor = document.getElementById('editor-article');
+             let profile = this._profilePic();
+             
+             profile.style.position = 'absolute';
+             profile.style.zIndex = 1000;
+             
+             profile.style.top = 10 + 'px';
+             profile.style.left = (left -200) + 'px';
+             
+           
+             
+             
               document.getElementById('indexContainer').style.display = 'none';
           
-              let editor = document.getElementById('editor-article');
+             
               editor.innerHTML = '';
+                editor.appendChild(profile);
               let viewPort = document.createElement('div');
               viewPort.classList.add('editor-article-view');
               editor.style.display = 'block';
@@ -1595,6 +1771,7 @@ let View = {
        let models = [];
        
        function setModels(data){
+       	models.length =0;
          models = data;
        }
        
@@ -1610,10 +1787,17 @@ let View = {
            return models;        
        }
        
+       function getUser(){
+           if(models.length != 0)
+             return models[0].username;
+           return '';       
+       }
+       
        return {
            setArchive : setModels,
            getModel : getModel,
-           getArchive : getArchive        
+           getArchive : getArchive ,
+           getUser : getUser 
        }
      })()
      
@@ -1640,6 +1824,7 @@ let View = {
       })          
       
       Router.event['create'].attach(function(sender,args){ 
+         if(!View._isLoggedIn()) return;
       	 switch(state()){
              case 'create':
                break;
@@ -1658,8 +1843,35 @@ let View = {
           View._createEditor();     
       })
       
-      Router.event['archive'].attach(function(sender,args){    
-          if(View.currentContainer == null) 	{
+      Router.event['archive'].attach(function(sender,args){  
+       setUsername(args.username);
+       
+            switch(state()){
+             case 'create':
+               document.getElementById('contentArticle').innerHTML = '';
+               document.getElementById('iheader').innerHTML = '';
+               document.getElementById('indexContainer').style.display = 'none';
+               break;
+             case 'show':
+               document.getElementById('editor-article').innerHTML = ''
+               document.getElementById('editor-article').style.display = 'none';
+               break;
+             case 'archive':
+               document.getElementById('a-archive-container').innerHTML = '';
+               //document.getElementById('editor-archive').style.display = 'none';
+               break;
+             default:
+               break;      	 
+      	} 
+      	  
+     
+        if(Collection.getUser() !=args.username)
+          getModels(args.username)
+        else 
+          View._archiveEditor(Collection.getArchive());  
+        
+         
+         /* if(View.currentContainer == null) 	{
               	   getModels(args.username);
               	   return;    
           }
@@ -1686,13 +1898,14 @@ let View = {
              default:
                break;      	 
       	  }             	 
-      	 } 
+      	 } */
       	 
-      	 View._archiveEditor(Collection.getArchive());    
+      	  
       	                
       })
       
-      Router.event['show'].attach(function(sender,args){
+      Router.event['show'].attach(function(sender,args){ 
+            setUsername(args.username);
       	   if(!args.bn){
       	   	  if(Collection.getModel(args.id) === undefined)
       	   	     getModel(args.id)
@@ -1712,7 +1925,7 @@ let View = {
                //document.getElementById('editor-article').style.display = 'none';
                break;
              case 'archive':
-               document.getElementById('a-archive-container').innerHTML = '';
+              document.getElementById('a-archive-container').innerHTML = '';
                document.getElementById('editor-archive').style.display = 'none';
                break;
              default:
@@ -1722,6 +1935,12 @@ let View = {
       })
           
      	  
+     	  
+     	function setUsername(username){
+         
+           View.username = username;
+             	
+     	}
      // Router.route('archive')     
       
       View.insertImage.attach(function(sender,args){
@@ -1842,8 +2061,7 @@ let View = {
 			
 			 let index =  View.files.findIndex(function(elem){
 			   return elem.name == data['name']
-			 })
-			 
+			 }) 
 			 
 			 
 			 reader.onload = function(e){ 

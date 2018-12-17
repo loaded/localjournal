@@ -13,7 +13,8 @@ var Video = (function(){
           headerHeight : 30
        },
        
-       events : ['upload']
+       events : ['upload'],
+       menubar : ['article','video','gallery','about']
     },    
     
     defineProp : function(obj,key,value){  
@@ -70,7 +71,7 @@ var Video = (function(){
        
        if(!this._isLoggedIn()){
           btn.style.display = 'none';
-          if(!document.getElementById('pp'))
+          if(!document.getElementById('v-pp'))
           vheader.appendChild(this._profilePic());       
        }else{
           btn.style.display = 'block';       
@@ -153,7 +154,7 @@ var Video = (function(){
       return "http://localhost:3000" + url
     },  
    _hideProfileMenu : function(){
-          
+      document.getElementById('v-menubar').remove()
       let canvas = document.getElementById('v-profile-menu')
     
       let radius = canvas.getAttribute('radius');
@@ -182,19 +183,19 @@ var Video = (function(){
         },
     
     	   _showProfileMenu : function(){
-	       
+	       let that = this;
           let left  ;
           let top = 40;	       
 	       if(this._isMobile()){
              left = window.innerWidth - 200;
                 
 	       }else{
-             left = 900 + (window.innerWidth - 900)/2 -200;	   
+             left = 900 + (window.innerWidth - 900)/2 - 197;	   
           }
 	       
 	      let canvas = document.createElement('canvas');
-	      canvas.width = 300;
-	      canvas.height = 300;
+	      canvas.width = 200;
+	      canvas.height = 200;
 	   
 	      canvas.id = 'v-profile-menu'
 	      let context = canvas.getContext('2d');
@@ -213,10 +214,10 @@ var Video = (function(){
 	      document.body.appendChild(canvas);         
 	        
           let id = window.setInterval(function(){ 
-            if(radius > 200){
+            if(radius > 150){
                clearInterval(id);               
-               
-             
+                  
+               that._menubar()
                canvas.setAttribute('radius',radius)
                
                return;            
@@ -242,7 +243,7 @@ var Video = (function(){
     	  container.style.width = 200 + 'px';
     	  container.style.height = 30 + 'px';
     	  container.style.float = 'right';
-    	  container.id = 'pp'
+    	  container.id = 'v-pp'
     	  container.classList.add('m-profile')
     	  let span = document.createElement('span');
     	  span.innerHTML = this.username;
@@ -285,6 +286,59 @@ var Video = (function(){
         
     
     },
+    
+    
+    	    _menubar : function () {
+	    	
+	    	
+	    	    
+          let left  ;
+          let top = 60;	       
+	       if(this._isMobile()){
+             left = window.innerWidth - 10;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2 ;
+          }
+	   	let that = this;
+	      let menubar = document.createElement('div');
+	      for(let i = 0 ; i < this.config.menubar.length ; i++){
+            let menu = document.createElement('div');
+            menu.innerHTML = this.config.menubar[i];
+            menu.classList.add('menubar-m');	    
+            menu.style.height = 20 + 'px';
+            menu.style.color = 'white';
+            menu.addEventListener('click',function () { 
+            	that._hideProfileMenu();
+               if(that.config.menubar[i] == 'article')
+            		 app.router(that.username,'editor/archive')
+            	else 
+            	  app.router(that.username,that.config.menubar[i] + '/archive');
+            })
+            
+            $(menu).hover(function(){
+               this.innerHTML = that.config.menubar[i].toUpperCase() 
+            },function(){
+               this.innerHTML = that.config.menubar[i].toLowerCase()
+            })
+            menubar.appendChild(menu);  
+	      }
+	      
+	      
+	      menubar.classList.add('menubar-a');
+	      menubar.id = 'v-menubar'
+	      
+	      menubar.style.top = top  + 'px';
+	      menubar.style.left = (left -60) + 'px';
+	      menubar.style.fontSize = 10 + 'px';
+	      
+	      
+	      menubar.style.height = this.config.menubar.length * 20 + 'px';
+	      document.body.appendChild(menubar) ;
+	      
+	      $(menubar).animate({opacity:1},300);
+	      
+	   },
     
     _addVideoFiles : function(e){    	    
         this.file = e.target.files[0];
@@ -737,7 +791,7 @@ var Video = (function(){
     	  back.id = 'v-video-back';
     	  
     	  vheader.appendChild(back);
-    	  if(!this._isLoggedIn() && !document.getElementById('pp')){
+    	  if(!this._isLoggedIn() && !document.getElementById('v-pp')){
     	     vheader.appendChild(this._profilePic()); 
     	  }
     	 // let vUploader = document.getElementById('v-uploader');

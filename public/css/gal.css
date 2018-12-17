@@ -1780,7 +1780,7 @@ box-sizing:border-box;
 .menubar-a{
   width:60px;
   position: fixed;
-  z-index:1001;
+  z-index:1050;
   opacity:0; 
 }
 

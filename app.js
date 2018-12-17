@@ -71,6 +71,9 @@ const getAsync = promisify(client.get).bind(client);
  	let reqUrl = request.url;
  	 let pathname = url.parse(reqUrl).pathname;
  	 
+ 	 
+ 	 
+ 	 
  	 let route = pathname.match(/^\/[a-z]+\/?/);
  	 
  	 if(route == null)
@@ -79,7 +82,7 @@ const getAsync = promisify(client.get).bind(client);
  	   route = route[0].replace(new RegExp('/','g'),'');
  	  
  	 switch (route){
-        case 'editor' : 
+        case 'editor' :          
           editor.router(request,response);
           break;
         case 'video':

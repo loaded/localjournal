@@ -30,7 +30,8 @@ var Gallery = (function(){
   	
   	config : {
   	  mainWidth : 900,
-  	  mWidth : null
+  	  mWidth : null,
+  	  menubar : ['article','video','gallery','about']
   	},
     windowWidth : $(document).width(),    
 	 windowHeight :$(document).height(),
@@ -259,7 +260,7 @@ var Gallery = (function(){
     _hideProfileMenu : function(){
           
       let canvas = document.getElementById('g-profile-menu')
-    
+      document.getElementById('g-menubar').remove()
       let radius = canvas.getAttribute('radius');
         radius -=1
       let context = canvas.getContext('2d');
@@ -286,19 +287,19 @@ var Gallery = (function(){
         },
     
     	   _showProfileMenu : function(){
-	       
+	       let that = this;
           let left  ;
           let top = 40;	       
 	       if(this.isMobile()){
              left = window.innerWidth - 200;
                 
 	       }else{
-             left = 900 + (window.innerWidth - 900)/2 -200;	   
+             left = 900 + (window.innerWidth - 900)/2 -194;	   
           }
 	       
 	      let canvas = document.createElement('canvas');
-	      canvas.width = 300;
-	      canvas.height = 300;
+	      canvas.width = 200;
+	      canvas.height = 200;
 	   
 	      canvas.id = 'g-profile-menu'
 	      let context = canvas.getContext('2d');
@@ -317,9 +318,9 @@ var Gallery = (function(){
 	      document.body.appendChild(canvas);         
 	        
           let id = window.setInterval(function(){ 
-            if(radius > 200){
+            if(radius > 150){
                clearInterval(id);               
-               
+               that._menubar()
              
                canvas.setAttribute('radius',radius)
                
@@ -335,6 +336,59 @@ var Gallery = (function(){
 
          },1)	  
 	       
+	   },
+	   
+	   
+	    _menubar : function () {
+	    	
+	    	
+	    	    
+          let left  ;
+          let top = 60;	       
+	       if(this.isMobile()){
+             left = window.innerWidth - 10;
+                
+	       }else{
+             left = 900 + (window.innerWidth - 900)/2;	   
+          }
+	   	let that = this;
+	      let menubar = document.createElement('div');
+	      for(let i = 0 ; i < this.config.menubar.length ; i++){
+            let menu = document.createElement('div');
+            menu.innerHTML = this.config.menubar[i];
+            menu.classList.add('menubar-m');	    
+            menu.style.height = 20 + 'px';
+            menu.style.color = 'white';
+            menu.addEventListener('click',function () { 
+            	       that._hideProfileMenu();
+               if(that.config.menubar[i] == 'article')
+            	 app.router(that.username,'editor/archive')
+            	else 
+            	  app.router(that.username,that.config.menubar[i] + '/archive');
+            })
+            
+            $(menu).hover(function(){
+               this.innerHTML = that.config.menubar[i].toUpperCase() 
+            },function(){
+               this.innerHTML = that.config.menubar[i].toLowerCase()
+            })
+            menubar.appendChild(menu);  
+	      }
+	      
+	      
+	      menubar.classList.add('menubar-a');
+	      menubar.id = 'g-menubar'
+	      
+	      menubar.style.top = top  + 'px';
+	      menubar.style.left = (left -60) + 'px';
+	      menubar.style.fontSize = 10 + 'px';
+	      
+	      
+	      menubar.style.height = this.config.menubar.length * 20 + 'px';
+	      document.body.appendChild(menubar)
+	      
+	      $(menubar).animate({opacity:1},300);
+	      
 	   },
  
     _galSpace : function(){ return;
@@ -1314,9 +1368,14 @@ var Gallery = (function(){
     	 if(document.getElementById('pp'))
     	   document.getElementById('pp').style.display = 'none'
     	 if(!this._isLoggedIn()){
-         document.getElementById('pp').style.display = 'none';    	 
+         try {
+             document.getElementById('pp').remove()         	
+         }	catch(e){
+         
+         } 
     	 }else{
-    	   
+    	       /*  this.header.el.appendChild(this._profilePic());
+           document.getElementById('cgbtn').style.display = 'none'; */
     	 }
     	 
  
@@ -1389,14 +1448,17 @@ var Gallery = (function(){
     	try{
            document.getElementById('back-sign').remove();
           document.getElementById('g-gallery-title').remove()
-         document.getElementById('homeback').style.display = 'block';	
+        // document.getElementById('homeback').style.display = 'block';	
     	}catch(e){
     	
     	}
     
        
-       if(!this._isLoggedIn()){
-           document.getElementById('pp').style.display = 'block';      
+       if(!this._isLoggedIn()){      	
+       	  if(document.getElementById('pp'))
+       	    document.getElementById('pp').remove();
+       	   this.header.el.appendChild(this._profilePic())       	
+              
        }else{
             document.getElementById('cgbtn').style.display = 'block'; 
        }
@@ -2927,11 +2989,17 @@ var Gallery = (function(){
             let st = state();
             if(View._isLoggedIn()){
                document.getElementById('cgbtn').style.display = 'block';           
+            }else{
+               View.header.el.appendChild(View._profilePic());
+               document.getElementById('cgbtn').style.display = 'none';             
             }
+            
+            
             if(st == 'gallery'){
                 if(document.getElementById('thumbview'))
                  document.getElementsByClassName('thumbview')[0].remove();
-                 document.getElementById('g-gallery-title').remove();
+                 if(document.getElementById('g-gallery-title'))
+                  document.getElementById('g-gallery-title').remove();
                  document.getElementById('back-sign').remove();
             }
              
@@ -2939,9 +3007,13 @@ var Gallery = (function(){
             	
             	document.getElementById('g-gallery-title').remove();
                document.getElementById('back-sign').remove();
+               if(document.getElementById('thumbview'))
+                 document.getElementsByClassName('thumbview')[0].remove();
                View._closeShowImage.call(View) ; 
             
             }
+            
+           
               
             
             args.archive = true;
@@ -2953,7 +3025,10 @@ var Gallery = (function(){
             if(st == 'gallery'){
                if(document.getElementById('thumbview'))
                  document.getElementsByClassName('thumbview')[0].remove()
-                   document.getElementById('g-gallery-title').remove();
+                  if(document.getElementById('g-gallery-title'))
+                     document.getElementById('g-gallery-title').remove();
+                 
+                 
                  document.getElementById('back-sign').remove();
             }
              ;
@@ -2982,8 +3057,8 @@ var Gallery = (function(){
      })
      
      Router.event['images'].attach(function(sender,args){
-     	   setUsername(args.username);        
-      
+     	   setUsername(args.username); 
+        document.getElementById('main').style.display = 'block';
         if(Collection.getUser() != args.username){ 
             let st = state();
             
