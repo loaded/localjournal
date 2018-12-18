@@ -153,7 +153,7 @@ var Video = (function(){
     _returnUrl : function(url){
       return "http://localhost:3000" + url
     },  
-   _hideProfileMenu : function(){
+   _hideProfileMenu : function(){ 
       document.getElementById('v-menubar').remove()
       let canvas = document.getElementById('v-profile-menu')
     
@@ -271,27 +271,24 @@ var Video = (function(){
     
     _hideOrShowMenu : function(e){
       let elem = e.target;
-      
+      if(document.getElementById('v-menubar'))
+        this._hideProfileMenu();
+      else 
+        this._showProfileMenu()
+      /*
       if(elem.state == 'show'){
       	this._hideProfileMenu();
           elem.state = 'hide';      
       }        
-      else {
-        
-          this._showProfileMenu();   
-           elem.state = 'show';
-              
-       }
-         
-        
+      else {        
+           this._showProfileMenu();   
+           elem.state = 'show';             
+       } 
+       */   
     
-    },
-    
-    
-    	    _menubar : function () {
-	    	
-	    	
-	    	    
+    },   
+    	   
+    _menubar : function () {    	    
           let left  ;
           let top = 60;	       
 	       if(this._isMobile()){
@@ -1160,7 +1157,8 @@ var Video = (function(){
       	 else {
       	 	 document.querySelector('#videoContainer').style.display = 'block';
       	 }
-             
+      	 
+      	  document.querySelector('#videoContainer').style.display = 'block';             
       })  
       
       socket.on('video',function(data){ 
@@ -1217,18 +1215,18 @@ var Video = (function(){
         	 if(this.readyState == 4){
              let result = JSON.parse(xhr.responseText);
              Collection.setVideos(result)
-              if(!View.inited)
-               View._init(); 
+             if(!View.inited)
+              View._init(); 
                
              
-            View._showVideos(result); 
+           View._showVideos(result); 
            if(View.slide == 1) 
-               View._slideContainer(); 
-            if(View._isLoggedIn() && document.getElementById('pp')){
-                document.getElementById('pp').remove(); 
-                let btn = document.getElementById('v-header-btn');
-                btn.classList.add('v-header-btn');     
-                btn.style.display = 'block'      
+              View._slideContainer(); 
+           if(View._isLoggedIn() && document.getElementById('v-pp')){
+              document.getElementById('v-pp').remove(); 
+              let btn = document.getElementById('v-header-btn');
+              btn.classList.add('v-header-btn');     
+              btn.style.display = 'block'      
             }     	 
         	 }
         }	  

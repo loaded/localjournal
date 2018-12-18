@@ -136,9 +136,7 @@ let View = {
           this._showProfileMenu();   
            elem.state = 'show';
               
-       }
-         
-        
+       }      
     
     },
     _hideProfileMenu : function(){  
@@ -258,8 +256,7 @@ let View = {
 	      
 	      menubar.style.top = top  + 'px';
 	      menubar.style.left = (left -60) + 'px';
-	      menubar.style.fontSize = 10 + 'px';
-	      
+	      menubar.style.fontSize = 10 + 'px';   
 	      
 	      menubar.style.height = this.config.menubar.length * 20 + 'px';
 	      document.body.appendChild(menubar) ;
@@ -268,8 +265,7 @@ let View = {
 	      
 	   },
            
-    _styleEditorArchive : function(){         	
-           	   
+    _styleEditorArchive : function(){                 	   
            	   let archive = document.getElementById('editor-archive');
            	   let viewPort = document.getElementById('a-archive-container');
            	   
@@ -338,6 +334,7 @@ let View = {
            _setArticles : function(articles){ 
            	 let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
            	 let archiveContainer = document.getElementById('a-archive-container')
+           	 archiveContainer.innerHTML = '';
            	 
            	 String.prototype.replaceAt=function(index, replacement) {
                    return this.substr(0, index) + replacement+ this.substr(index ,this.length);
@@ -1978,10 +1975,8 @@ let View = {
      
       }
       
-      socket.on('article',function(data){
-         
-         View._showArticle(data.article);
-         
+      socket.on('article',function(data){         
+         View._showArticle(data.article);         
       })
         
       function getModels(username){

@@ -219,9 +219,7 @@ let socket = null;
 			if(files[that.id+filename]['downloaded'] == files[that.id+filename]['size'])
 			{ 
 				fs.write(files[that.id+filename]['handler'],files[that.id+filename]['uploaded'], null, 'Binary', function(err, w){
-					var inp = fs.createReadStream(options.temp + filename);
-			
-					
+					var inp = fs.createReadStream(options.temp + filename);				
 					 var gallery = path.join(__dirname + "/uploads/"+ that.username +'/article/'+date.toString());
 				 
                 if(!fs.existsSync(gallery)){ 

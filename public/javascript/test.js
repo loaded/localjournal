@@ -243,8 +243,11 @@ var Gallery = (function(){
     
     _hideOrShowMenu : function(e){
       let elem = e.target;
-      
-      if(elem.state == 'show'){
+      if(document.getElementById('g-menubar'))
+        this._hideProfileMenu();
+      else 
+       this._showProfileMenu();
+       /*      if(elem.state == 'show'){
       	this._hideProfileMenu();
           elem.state = 'hide';      
       }        
@@ -253,7 +256,7 @@ var Gallery = (function(){
           this._showProfileMenu();   
            elem.state = 'show';
               
-       }       
+       }       */
     
     },
     
@@ -1411,12 +1414,15 @@ var Gallery = (function(){
        span.classList.add('g-gallery-title');
        
        backSign.style.float = 'left'
-         span.innerHTML = gallery;       
+         span.innerHTML = gallery;   
+         
+       if(this._isLoggedIn()){ 
+          span.style.color = 'lightgrey';
+          span.style.cursor = 'pointer';
+          span.addEventListener('click',this._editGallery.bind(this,gallery));       
+       }    
        
        backSign.addEventListener('click',this._backToIndex.bind(this),false)       
-       
-      
-       
       if(mobile){
         backSign.classList.add('mback-sign');
         span.style.fontSize = 12 + 'px';
@@ -1444,6 +1450,30 @@ var Gallery = (function(){
       $(div).animate({left : '+=' + this.uploader.view},400)     
     },
     
+    _editGallery : function(gallery){
+    	 document.getElementById('g-gallery-title').remove();
+    	 document.getElementById('back-sign').remove();    	 
+    	 let images = Collection.getGallery(gallery);   
+       document.getElementById('pool').innerHTML = '';
+       let that = this;
+    	 this._prepareEditGallery(gallery,function(){
+    	    that._setUpload();
+    	     for(let i = 0 ; i < images.length ; i++){
+          let child = document.getElementById('pool').children; 
+          //this.addedToCollection(images[i],child)
+          //this._removeFromPool(images[i]);
+          
+          that._addModel(images[i],child.length);  
+          that._recalculateMargin()    
+       }
+    	 });
+       
+   
+       
+     
+   
+    },
+    
     _backToIndex : function(){
     	try{
            document.getElementById('back-sign').remove();
@@ -1465,9 +1495,9 @@ var Gallery = (function(){
        
       
        //this.loadGalleries(Collection.get)
-          
-       $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
-       window.history.pushState(null,null,'/gallery/archive')
+         Router.route(this.username,'archive');
+      /* $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
+       window.history.pushState(null,null,'/gallery/archive')*/
     },
     
     
@@ -1592,6 +1622,94 @@ var Gallery = (function(){
      
       // this.createGallery.notify("I have been clicked");    
     }, 
+    
+    
+    _prepareEditGallery : function(gallery,callback){
+        	 var isChrome = /chrome/i.test( navigator.userAgent );
+    	 this.uploader.position = 0;
+    	 $('#uploader').css('left',0)
+       var input = document.getElementById('input');
+       var label = document.getElementById('input-label');
+       document.getElementById('input-name').value = "";
+       if( $(label).css('left') === '-100px')          
+          $(label).css('left',0).css('opacity',0.25) ;     
+       document.getElementById('homeback').style.display = 'none'
+       document.getElementById('arrow').style.display = 'none';
+       document.getElementById('cgbtn').style.display = 'none';
+       document.getElementById('back-next').style.display = 'none';
+       document.getElementById('back-reset').style.display = "block";    
+       document.getElementById('galback').style.display = 'none';
+       
+       document.getElementById('back-reset').innerHTML = gallery;
+       
+       
+       
+       var tile = document.getElementById('tile');
+       if(tile && tile['up']){
+                  if(this.windowWidth < this.mainWidth)
+         
+        $('#tiler').animate({top : '+=155'},400,function(){
+            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+         tile['up'] = 0; 
+         document.getElementById('pool').innerHTML = '';
+         callback();
+        })
+       else 
+        $('#tiler').animate({top : '+=224'},400,function(){
+            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+         tile['up'] = 0; 
+         document.getElementById('pool').innerHTML = '';
+         callback()
+        }) 
+       }       
+       
+       $('.dtemplate-gallery').remove()
+       $('.template-download').remove();
+       $('.dtemplate-download').remove();
+       $('.mtemplate-download').remove();
+       $('.mtemplate-gallery').remove();
+       if($(document).width()> 900){
+       	$('#back-reset').removeClass('mbreset');
+         $('#back-reset').addClass('dbreset');
+         $('#input-label').addClass('dinlabel');
+         $('#input-name').addClass('dinname');
+         $('#input-create').addClass('dincreate')
+         input.style.width = '216px';
+         if(isChrome){
+          $('#input-create').css({'padding-top' : '4px','font-stretch' : 'expanded','letter-spacing' : '1px'})
+              
+         }else { 
+               
+         }
+         input.style.top = "70px";    
+         input.style.left ='410px'
+       }else {
+       	
+       	$('#back-reset').removeClass('dbreset');
+       	$('#back-reset').addClass('mbreset');
+       	$('#input-label').addClass('minlabel');
+         $('#input-name').addClass('minname');
+         $('#input-create').addClass('mincreate')
+         var winsize = $(document).width();       
+         
+         input.style.top = '60px';
+         input.style.width = '175px';
+          
+           
+         if(isChrome){
+            $('#back-reset').css({'font-size':'14px','padding-top':'2px'})   
+            $('#back-next').css({'top':'12px'})        
+            $('#input-create').css({'font-size' : '14px' ,'padding-top' : '4px','font-stretch' : 'expanded','letter-spacing' : '1px'})
+            $('#input-label').css({'font-size' : '14px'})
+         }
+           
+         var lft = parseInt((this.windowWidth -275)/2);
+         input.style.left = lft + 100+ 'px';
+       }       
+       
+       input.style.display = 'none';       
+       label.style.display = 'none';
+    },
    
     
     _bckGallery : function(){
@@ -1919,7 +2037,7 @@ var Gallery = (function(){
       document.getElementById('back-next').style.display = 'none';       // TODO add class to do this all
       document.getElementById('cgbtn').style.display = 'block';    
       document.getElementById('arrow').style.display = 'block'; 
-      document.getElementById('homeback').style.display = 'block';
+    
       $('.template-upload').remove();
       $('.mtemplate-upload').remove();
       $('.mtemplate-gallery').remove();
@@ -1933,9 +2051,14 @@ var Gallery = (function(){
       }
       document.getElementById('space-wrapper').style.display = 'none';
       document.getElementById('galback').style.display = 'block';
-      this._galleries();
+      
+      document.getElementById('back-reset').style.textAlign = 'right';
+      View._upTile();
+      Router.route(this.username,'/images/'+document.getElementById('back-reset').innerHTML);
       
     },
+    
+    
     
      _galleries () {
      	var that = this;
@@ -2514,7 +2637,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src = makeUrl("image/" + thumb.username + '/gallery/'+that.galleryName+"/thumb/"+thumb.src);
+       image.src = makeUrl("image/" + thumb.username + '/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
        $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -2562,7 +2685,9 @@ var Gallery = (function(){
        templateDownload.appendChild(image); 
       
        var pool =  document.getElementById('pool');
-       pool.appendChild(templateDownload)            
+       pool.appendChild(templateDownload);
+       
+      
     },  
     
     _removeModel : function(thumb){
@@ -2895,7 +3020,7 @@ var Gallery = (function(){
              events[elem] = new Event(this);
           
      	    
-     	     function router(username ,url){ alert(username + ' ' + url)
+     	     function router(username ,url){
      	     	  let backOrNext = false; 
      	        if(url[0] == '#'){
      	           url = url.substring(1,url.length);
@@ -3029,7 +3154,8 @@ var Gallery = (function(){
                      document.getElementById('g-gallery-title').remove();
                  
                  
-                 document.getElementById('back-sign').remove();
+                 if(document.getElementById('back-sign')) 
+                   document.getElementById('back-sign').remove();
             }
              ;
             if(st== 'show'){
@@ -3039,8 +3165,8 @@ var Gallery = (function(){
                View._closeShowImage.call(View) ;
             }
                   
-                
-            document.getElementById('cgbtn').style.display = 'block'                
+            if(View._isLoggedIn())    
+             document.getElementById('cgbtn').style.display = 'block'                
           
      	    args.archive = true;
           galleries(args,View._showTile);  
