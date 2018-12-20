@@ -782,6 +782,8 @@ int process_it(char* name){
             makeMobile(name);
             makeThumbnail(name);
             
+            return 1;
+            
             
   }else  return 0; 
 }

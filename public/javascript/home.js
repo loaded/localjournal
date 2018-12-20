@@ -215,7 +215,7 @@ var home = (function(){
           mapContainer.id = 'h-map';
           document.getElementById('h-main').appendChild(mainContainer);
           mainContainer.appendChild(mapContainer)
-        	   let map=L.map('h-map',{zoomControl : false}).setView([51.505, -0.09], 13);
+        	   let map=L.map('h-map',{zoomControl : false}).setView([34.811548, 46.493454], 7);
             L.tileLayer('https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}', {
               attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/">OpenStreetMap</a> contributors, <a href="https://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>',
               maxZoom: 18,
@@ -876,10 +876,7 @@ var home = (function(){
             _returnUrl : function(url){
               return "http://"+ localhost + url
            }
-     }
-     
-     
-     
+     }     
      
        
        var Router = (function () {     

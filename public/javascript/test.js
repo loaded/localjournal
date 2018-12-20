@@ -3373,14 +3373,14 @@ var Gallery = (function(){
      }
      
      
-     function saveGallery(data){
+     function saveGallery(data){ 
      	 let container;  
      	 container = Object.assign({},data);
      	 container.tag = View.tags;
      	 container.location = View.location;
      	 container.getloc = View.getloc;
      	 container.date = Date.now()
-     	 container.gallery = View.galleryName;
+     	 container.gallery = data.galelry
      	 container.type = 'gallery';
      	 container.username = username;   	   
          var xhr = new XMLHttpRequest();

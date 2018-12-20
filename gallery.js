@@ -252,7 +252,8 @@ let socket = null;
           	             src : filename,
           	             height : im_height,
           	             width : im_width,
-          	             username : that.username
+          	             username : that.username,
+          	             gallery : galleryName
                       })                            
                                                  
                     insert({username : that.username,gallery : galleryName,src : data['name'],width : im_width,height : im_height});                          
