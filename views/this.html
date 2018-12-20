@@ -182,6 +182,7 @@
      var socketId;
      var app;
      var username = '<%username%>';
+     var localhost = '<%host%>';
      var socket = io("http://<%host%>",{query : {token : "<%token%>"}}); 
      
      socket.on("id",function(data){ 

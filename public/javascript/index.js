@@ -613,7 +613,7 @@ let View = {
            },
            
            _returnUrl : function(url){
-              return "http://localhost" + url
+              return "http://"+localhost + url
            },
             
            _showArticle : function(arti){  

@@ -151,7 +151,7 @@ var Video = (function(){
     },
     
     _returnUrl : function(url){
-      return "http://localhost:3000" + url
+      return "http://"+localhost + url
     },  
    _hideProfileMenu : function(){ 
       document.getElementById('v-menubar').remove()
