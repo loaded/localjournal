@@ -4,11 +4,11 @@ var http = require('http');
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
-var formidable = require('formidable')
+
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 
-let host = 'localhost';
+let host = '46.100.63.117';
 var index = (function(){
 	
 const extentions =   {
