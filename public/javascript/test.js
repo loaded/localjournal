@@ -3,7 +3,7 @@
 
     
    function makeUrl(url){
-       return "http://"localhost + '/'+url;   
+       return "http://" + localhost + '/'+url;   
     }
 /*=========================================== View =============================================== */  
 var Gallery = (function(){
@@ -1270,7 +1270,7 @@ var Gallery = (function(){
        var xhr = new XMLHttpRequest();
       	xhr.open('post','/gallery/text');
       	xhr.onreadystatechange = function(){
-            if(this.readyState == 4){ alert(xhr.responseText)
+            if(this.readyState == 4){ 
                //do something to show it has saved      
             }      	
       	}
@@ -2642,7 +2642,7 @@ var Gallery = (function(){
        image.style.position = 'relative';
        image.style.left = left; 
        
-       image.src = makeUrl("image/" + thumb.username + '/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
+       image.src = makeUrl("uploads/" + thumb.username + '/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
        $(image).addClass('template-green');
        
        image.addEventListener('load',function(){          
@@ -3059,7 +3059,7 @@ var Gallery = (function(){
      	     	  
      	     	  if(arg1 == 'gallery')
      	     	    url = 'archive'
-     	     	  alert(arg3)
+     	     	  
      	     	  if(!arg3)
      	          window.history.pushState(null,null,'/'+username +'/gallery/' + url);     	     
      	     }     
@@ -3098,7 +3098,7 @@ var Gallery = (function(){
      	  setUsername(args.username);
      	  
      	  let style = window.getComputedStyle(document.getElementById('main'));
-     	  alert(args.data)
+     	 
      	  if(style.getPropertyValue('display') == 'block'){
      	      View._backToIndex(View);
      	  }

@@ -175,54 +175,8 @@ let socket = null;
      return;
   }
   
-  function _upload(req,res){/*
-  	    let username = req.username ;
-       var form = new formidable.IncomingForm()
-       
-       var socketId = req.headers.id;
-       var fileName = req.headers.imagename;
-       var galleryName = req.headers.gallery;
-       form.multiple = true;
-       form.keepExtension = true;
-       var gallery = path.join(__dirname + "/uploads/"+ username +'/gallery/'+galleryName);
-       if(!fs.existsSync(gallery)){ 
-             fs.mkdirSync(gallery)       	
-       }
-       
-       
-       form.uploadDir = gallery;
-         
-       form.on('progress',function(byteRecived,byteExpected){      
-          //var client = sockets.find(socketId);       
-          socket.to(socketId).emit('progress' , {
-          	 recived : byteRecived,
-             expected : byteExpected,
-             name : fileName    
-          })        
-       })
-       
-      form.on('file',function(name,file){
-       	       	console.log('doen')
-       	imagePath = path.join(gallery,file.name);             
-              addon.process(file.path,imagePath,function(im_width,im_height){
-                       //var client = sockets.find(socketId);   
-                        socket.to(socketId).emit('thumb' , {
-          	                 src : file.name,
-          	                 height : im_height,
-          	                 width : im_width,
-          	                 username : req.username
-                         })                            
-                                                 
-              insert({username : req.username,gallery : galleryName,src : file.name,width : im_width,height : im_height},res);                          
-                                                                                              
-         })
-                          
-       })
-       form.on('error',function(err){
-           console.log("\n this is fucking error " + err);       
-       })     
-       
-       form.parse(req);*/
+  function _upload(req,res){
+
   }
   
   
