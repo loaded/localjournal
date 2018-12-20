@@ -64,7 +64,7 @@ var home = (function(){
           let header = document.createElement('div');
           header.style.height = this.config.header.height + 'px';
           header.style.position = 'fixed';
-         // header.style.borderBottom = '1px solid gray'
+          header.style.borderBottom = '1px solid gray'
           header.style.top = this.config.header.top + 'px';          
           header.style.backgroundColor = 'white';
           
@@ -331,6 +331,7 @@ var home = (function(){
 
            
            videoTitle.innerHTML = video.title;   
+           
            $(videoTitle).hover(function(){
                this.style.color = 'limegreen';           
            },function(){
@@ -397,7 +398,8 @@ var home = (function(){
                 videoTitle.style.cursor = 'pointer';       
                 
                 videoTitle.style.color = '#00509d';
-                videoTitle.style.padding = 4 + 'px';    
+                videoTitle.style.padding = 4 + 'px';   
+                videoTitle.style.paddingLeft = 50 + 'px'; 
                 videoContent.style.marginLeft = 10 + 'px';
                 videoTitle.style.fontWeight = 600;
                
@@ -426,7 +428,8 @@ var home = (function(){
                 videoContent.style.width =  120 + 'px';
                 videoContent.style.height = 'auto';
                 videoTitle.style.fontSize= 14 + 'px';     
-                videoTitle.style.cursor = 'pointer';       
+                videoTitle.style.cursor = 'pointer';    
+               
                   
                
                 videoTitle.style.color = '#00509d';
@@ -436,7 +439,7 @@ var home = (function(){
                 videoTitle.style.padding = 4 + 'px';    
                 videoTitle.style.marginTop = 5 + 'px'
                 videoContent.style.marginLeft = 10 + 'px';
-               
+                  videoTitle.style.paddingLeft = 60 + 'px'  
                 container.style.width = 330 + 'px';
                 container.style.height = 195 + 'px';
                 //container.style.float = 'left';
@@ -470,7 +473,7 @@ var home = (function(){
        
        
        _gallery : function(elem,isThumb){
-         video = elem;
+         let video = elem;
           
           let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
       	 
@@ -921,6 +924,9 @@ var home = (function(){
            
           View._addEvent()          
            Router.event['index'].attach(function(sender,args){ 
+              Index.hide()
+              Video.hide();
+              Gallery.hide();
               if(View.inited)
                 View._show();
               else

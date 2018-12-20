@@ -1618,6 +1618,8 @@ var Gallery = (function(){
        
        input.style.display = 'block';       
        label.style.display = 'block';
+       
+       document.getElementById('back-reset').innerHTML = '  back'
      
      
       // this.createGallery.notify("I have been clicked");    
@@ -2079,6 +2081,7 @@ var Gallery = (function(){
     
     _setUpload  :function () {
     	 this.galleryName = document.getElementById('input-name').value;      // TODO regex for gallery name
+    	 document.getElementById('back-reset').innerHTML = this.galleryName;
     	 document.getElementById('input').style.display = 'none';
     	 document.getElementById('arrow').style.display = 'block';
     	 document.getElementById('back-next').style.display = 'block';
@@ -2103,6 +2106,8 @@ var Gallery = (function(){
              $('.space--upload').css('background-color','green');
              $(this).css('color','gray');        
         })  
+        
+        
     },
     
     _getInput : function(e){
@@ -3020,7 +3025,7 @@ var Gallery = (function(){
              events[elem] = new Event(this);
           
      	    
-     	     function router(username ,url){
+     	     function router(username ,url){ 
      	     	  let backOrNext = false; 
      	        if(url[0] == '#'){
      	           url = url.substring(1,url.length);
@@ -3054,7 +3059,7 @@ var Gallery = (function(){
      	     	  
      	     	  if(arg1 == 'gallery')
      	     	    url = 'archive'
-     	     	  
+     	     	  alert(arg3)
      	     	  if(!arg3)
      	          window.history.pushState(null,null,'/'+username +'/gallery/' + url);     	     
      	     }     
@@ -3188,6 +3193,9 @@ var Gallery = (function(){
         if(Collection.getUser() != args.username){ 
             let st = state();
             
+            if(document.getElementById('pp'))
+              document.getElementById('pp').remove();
+            
             if(st == 'gallery')
                if(document.getElementById('thumbview'))
                  document.getElementsByClassName('thumbview')[0].remove();
@@ -3316,8 +3324,8 @@ var Gallery = (function(){
                   View._showTile();
                   View.loadGalleries(xhr.responseText); 
                   document.getElementById('main').style.display = 'block';
-                  Router.route(args.username,'/images/'+args.data)
-                  //callback.call(View,args);
+                 // Router.route(args.username,'/images/'+args.data)
+                  callback.call(View,args);
                 }                        
             }      	
       	}

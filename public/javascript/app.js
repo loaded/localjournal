@@ -705,40 +705,60 @@ window.onload = function(){
 		  let route ; 
 		  let inside  ; 
 		  
+		  let user ;
+		  
 		  if(path[0] == '#') {
            path = path.substring(1,path.length)
            backOrNext = true;		  
-		  }  
+           
+           let a = document.createElement('a');
+           a.href = path;
+           let url = a.pathname;
+           
+           let pathParts = a.pathname.split('/');
+        
+            route = url.substring(pathParts[1].length + 1);
+            user = pathParts[1];
+         
+           
+		  }  else {
+		    user = username;
+   		  
+		  }
+        
+        
                
-        var pathArray = location.href.split( '/' );
+      /* var pathArray = location.href.split( '/' );
         var protocol = pathArray[0];
         var host = pathArray[2];
         var url = protocol + '//' + host;
        
-        if(url.length == path.length) return;    
+        if(url.length == path.length) return; 
+        
+            
        
-        route = path.slice(url.length + 1); 
+        route = path.slice(url.length + 1); */
         
         let routeSplited = route.split('/');
         
-        let index = modules.indexOf(routeSplited[0]);        
+        let index = modules.indexOf(routeSplited[1]);        
         if(index == -1) return;
         inside = backOrNext ? '#':''; 
         switch(index){
            case 0:
              Index.hide();
              Video.hide();
-             Gallery.router(username, inside + route.slice(routeSplited[0] + 1))  ;
+             Gallery.router(user, inside + route.slice(routeSplited[0] + 1))  ;
              break;
            case 1:
              Index.hide();
              Gallery.hide()
-             Video.router(username,'archive')
+             Video.router(user,'archive')
              break;
            case 2:
              Video.hide();
              Gallery.hide();
-             Index.router(username,inside + route.slice(routeSplited[0] + 1)) ;
+             Index.router(user,inside + route.slice(routeSplited[0] + 1)) ;
              break;
           
            case 3:
@@ -750,9 +770,18 @@ window.onload = function(){
            default:
             break;                                
         }         
+        
+        
+       
                        		
 		}		
 		
+		function process(user,path){
+         		
+		}
+		
+		
+	
       return {
          route : router ,
          homePage : homePage     
