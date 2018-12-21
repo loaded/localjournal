@@ -3288,12 +3288,16 @@ var Gallery = (function(){
       	 let child = document.getElementById('pool').children; 
       	 that.addedToCollection(data,child)
       	 View._recalculateMargin()
+      	 console.log(View.files.length)
+      	 if(uploaded > 0 && View.files.length == 0 ){
       	
-      	 if(uploaded == View.files.length ){
-      	 	View.files.length = 0;
       	   saveGallery(data);
-      	 }else
-      	   ++uploaded;
+      	 }else{ 
+      	       
+      	      ++uploaded;
+      	    
+      	 }
+      	 
       })
       
       socket.on('progress',function(data){          
@@ -3373,16 +3377,16 @@ var Gallery = (function(){
      }
      
      
-     function saveGallery(data){ 
+     function saveGallery(data){ alert('fucking')
      	 let container;  
      	 container = Object.assign({},data);
      	 container.tag = View.tags;
      	 container.location = View.location;
      	 container.getloc = View.getloc;
      	 container.date = Date.now()
-     	 container.gallery = data.galelry
+     	 container.gallery = data.gallery;
      	 container.type = 'gallery';
-     	 container.username = username;   	   
+     	 container.username = username;   	 console.log('this is gallery : ' + container);
          var xhr = new XMLHttpRequest();
          xhr.open('POST','/gallery/save');
          xhr.setRequestHeader('Content-Type','application/json')
@@ -3390,7 +3394,7 @@ var Gallery = (function(){
          
          xhr.onreadystatechange = function(data){
             if(this.readyState == 4){
-                      
+                   alert(data);   
             }         
          } 
      }
