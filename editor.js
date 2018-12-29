@@ -129,38 +129,8 @@ let socket = null;
        }) 
    }
    
-   function _upload(req,res){ /*
-       var form = new formidable.IncomingForm();
-       var socketId = req.headers.id;     
-       let calculatedByte = 0;
-       form.multiple = true;
-       form.keepExtension = true;
-       var date = Date.now()
-       var uploadPath = path.join(__dirname +"/"+options.dir+'/' + req.username + '/article' , date.toString() ); 
-       form.uploadDir = uploadPath;
-       
-       if(!fs.existsSync(uploadPath))
-         fs.mkdirSync(uploadPath)       
-       
-       form.on('progress',function(byteRecieved,byteExpected){ 
-           //var client = sockets.find(socketId);          
-           socket.to(socketId).emit('progresseditor',{recieved : byteRecieved,expected : byteExpected});
-       })  
-       
-       form.on('file',function(name,file){
-          var imagePath = path.join(uploadPath,file.name);
-          let filename = file.name;
-          addon.process(file.path,imagePath,function(im_width,im_height){        
-              //let socket = sockets.find(socketId);                
-              socket.to(socketId).emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')});                                                                 
-          })
-       })
-       
-       form.on('error',function(err){
-           console.log('\n upload error' + '  ' + err);       
-       })
-       
-       form.parse(req)*/
+   function _upload(req,res){ 
+
    }
    
    function saveImages(images){
@@ -224,16 +194,14 @@ let socket = null;
 				 
                 if(!fs.existsSync(gallery)){ 
                    fs.mkdirSync(gallery)       	
-                }
-       
+                }      
        
                var imagePath = path.join(gallery,filename); 
 					var out = fs.createWriteStream(imagePath);
 					inp.pipe( out);
 					inp.on('close',function(){                
 					   addon.process(options.temp + filename,imagePath,function(im_width,im_height){                 
-                 that.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')})                 
-                                            
+                  that.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')})             
                                                                                               
         
 				  });
@@ -257,9 +225,7 @@ let socket = null;
 				that.emit('a-continue', { 'place' : place, name : filename,'percent' :  data['data'].length});
 			}
    	
-  }
-
-   
+  }  
    
   function io(io){
        socket = io;

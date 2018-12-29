@@ -274,18 +274,7 @@ var Video = (function(){
       if(document.getElementById('v-menubar'))
         this._hideProfileMenu();
       else 
-        this._showProfileMenu()
-      /*
-      if(elem.state == 'show'){
-      	this._hideProfileMenu();
-          elem.state = 'hide';      
-      }        
-      else {        
-           this._showProfileMenu();   
-           elem.state = 'show';             
-       } 
-       */   
-    
+        this._showProfileMenu()   
     },   
     	   
     _menubar : function () {    	    
@@ -1150,15 +1139,19 @@ var Video = (function(){
       View._addEvents()
       Router.event['archive'].attach(function(sender,args){ 
       	 setUsername(args.username); 
-      	 if(!View.inited){     
-      	   getModels(args.username);       	 
-      	 }else if( Collection.getUser() != args.username) 
-      	   getModels(args.username)    	 
-      	 else {
-      	 	 document.querySelector('#videoContainer').style.display = 'block';
+      	 if(Collection.getUser()!= args.username){
+      	   getModels(args.username);
+      	 }else{
+      	   document.getElementById('videoContainer').style.display = 'block';  
       	 }
       	 
-      	  document.querySelector('#videoContainer').style.display = 'block';             
+      	 if(View._isLoggedIn() && document.getElementById('v-pp')){
+             document.getElementById('v-pp').remove(); 
+             let btn = document.getElementById('v-header-btn');
+             btn.classList.add('v-header-btn');     
+             btn.style.display = 'block';      
+           }   
+    
       })  
       
       socket.on('video',function(data){ 
@@ -1222,12 +1215,9 @@ var Video = (function(){
            View._showVideos(result); 
            if(View.slide == 1) 
               View._slideContainer(); 
-           if(View._isLoggedIn() && document.getElementById('v-pp')){
-              document.getElementById('v-pp').remove(); 
-              let btn = document.getElementById('v-header-btn');
-              btn.classList.add('v-header-btn');     
-              btn.style.display = 'block'      
-            }     	 
+              
+              document.getElementById('videoContainer').style.display = 'block'
+        	 
         	 }
         }	  
         xhr.setRequestHeader('username',username);

@@ -74,7 +74,7 @@ body {
 
 .mbreset {
   font-size: 12px;
-  width : 70px;
+ 
   top : 10px;
 }
 
@@ -82,7 +82,7 @@ body {
 .dbreset {
    font-size: 14px;;
    top : 8px;
-   width : 70px;
+  
 }
 
 #back-reset:hover{color:black;}
@@ -645,9 +645,9 @@ body {
  .g-gallery-title{
     height : 20px;
     position:relative;
-    
+    top : 8px;
     color:grey;
-    padding:3px;
+    
     float:right; 
  }
  

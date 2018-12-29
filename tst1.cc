@@ -493,9 +493,9 @@ void resize(const char * FileName,const char* output,int width,int height){
      fprintf(stderr,"can not read output file");
      return;  
   }  
-  printf("in resize : %s\n",FileName);
+  
   gdImageJpeg(out,fp,90);
-  printf("done\n");
+  
   fclose(fp);
   
   gdImageDestroy(in);
@@ -615,7 +615,7 @@ void makeThumbnail(const char* name){
     im_height = height;
     
    
-    printf("be resized %s \n",name);           
+           
     resize(name,result,width,height); 
     return;
 }  
@@ -655,12 +655,8 @@ void makeMobile(const char* name){
       height = 500;
       width = (int)(temp * height);           
     }
-    
-     
-
-    
    
-    printf("be resized %s \n",name);           
+           
     resize(name,result,width,height); 
     return;
 }  
@@ -702,7 +698,7 @@ void makeDesktop(const char* name){
     
 
    
-    printf("be resized %s \n",name);           
+           
     resize(name,result,width,height); 
     return;
 }  
@@ -730,10 +726,11 @@ int process_it(char* name){
   if(strcmp(extention,"jpeg") == 0 || strcmp(extention,"jpg") == 0 || 
                                strcmp(extention,"JPEG") == 0 || strcmp(extention,"JPG") == 0 ){
         
-                         	
+            printf("start process it %s\n",name);
+            printf("reading orientation \n");             	
          	orientation = 0;
             ReadJpegFile(name);
-                     
+            printf("end reading orientation \n");         
             switch(orientation){
                case 2 :                   
                    im = loadImageJpeg(name);
@@ -774,13 +771,21 @@ int process_it(char* name){
                    break;
                default : 
                   break;
-            }          
+            }
+            printf("end rotating file \n");          
             printf("makethumb %s\n",name);
-         
-            makeDesktop(name);
             
+            
+            printf("start desktop image \n");
+            makeDesktop(name);
+            printf("end desktop image \n");
+            printf("start mobile image\n");
             makeMobile(name);
+            printf("end mobile image \n");
+            printf("start thumb image\n");
             makeThumbnail(name);
+            printf("end thumb\n");
+            printf("end this file %s\n",name);
             
             return 1;
             

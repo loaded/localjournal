@@ -631,7 +631,7 @@ let View = {
              let profile = this._profilePic();
              
              profile.style.position = 'absolute';
-             profile.style.zIndex = 1000;
+             profile.style.zIndex = 800;
              
              profile.style.top = 10 + 'px';
              profile.style.left = (left -200) + 'px';

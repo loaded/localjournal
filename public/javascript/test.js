@@ -125,7 +125,7 @@ var Gallery = (function(){
     },
     
     
-    _setHeader : function(){
+    _setHeader : function(){ 
     	 var mobile = this.isMobile();
        this.header.el.style.height = this.header.height + 'px';
        var cgbtn = document.getElementById('cgbtn');
@@ -174,7 +174,7 @@ var Gallery = (function(){
     _setMain : function(){
     	 var mobile = this.isMobile();
     	 var main = document.getElementById('main'); 
-    	 main.style.display = 'block'
+    
     	
     	 if(mobile) { 
     	   main.style.width = (this.windowWidth -5) + 'px';
@@ -210,7 +210,7 @@ var Gallery = (function(){
       return username == this.username;
     },
    
-   _profilePic : function () {
+   _profilePic : function () { if(document.getElementById('pp')) document.getElementById('pp').remove()
     	  let container = document.createElement('div');
     	  container.style.width = 200 + 'px';
     	  container.style.height = 30 + 'px';
@@ -246,17 +246,7 @@ var Gallery = (function(){
       if(document.getElementById('g-menubar'))
         this._hideProfileMenu();
       else 
-       this._showProfileMenu();
-       /*      if(elem.state == 'show'){
-      	this._hideProfileMenu();
-          elem.state = 'hide';      
-      }        
-      else {
-        
-          this._showProfileMenu();   
-           elem.state = 'show';
-              
-       }       */
+       this._showProfileMenu();    
     
     },
     
@@ -535,9 +525,11 @@ var Gallery = (function(){
        	     
        	 this.config.mWidth = window.innerWidth -5;
     },
-    _init: function(){ 
+    _init: function(){  
+    
+      if(this.inited) return;
        this.inited = true;
-     
+      
        this._setMain();
        this._setHeader();
        this._setUploader();
@@ -545,7 +537,7 @@ var Gallery = (function(){
        this._setPool();
        
        document.getElementById('cgbtn').addEventListener(
-                          'click',this._createGallery.bind(this),false);
+                          'click',this._createGallery.bind(this),true);
        document.getElementById('arrow-up').addEventListener(
                           'click',this._arwUp.bind(this));
        document.getElementById('arrow-down').addEventListener(
@@ -590,43 +582,35 @@ var Gallery = (function(){
     	
       var that = this;      
       var tile = document.getElementById('tile');
-      if(tile['up']) return;
+      if(tile['up']) return; 
       if(tile['up']){
-        if(this.windowWidth < this.mainWidth)
-         
-        $('#tiler').animate({top : '+=155'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
-         tile['up'] = 0; 
-         document.getElementById('pool').innerHTML = '';
-        })
-       else 
-        $('#tiler').animate({top : '+=224'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
-         tile['up'] = 0; 
-         document.getElementById('pool').innerHTML = '';
-        })
+        if(this.windowWidth < this.mainWidth){
+             document.getElementById('tiler').style.top = 0 + 'px';
+             tile['up'] = 0; 
+             document.getElementById('pool').innerHTML = '';
+        }else {
+        
+                document.getElementById('tiler').style.top = 0 + 'px';
+             tile['up'] = 0; 
+             document.getElementById('pool').innerHTML = '';
+        }     
        
       }else {
       document.getElementById('pool').innerHTML = '';
-      $('#tiler').css('z-index',-200)  ; // I am not sure this is necessary
+   
      
       this._setPoolView();
-      if(this.windowWidth < this.mainWidth )             
-        $('#tiler').animate({top : '-=155'},10,function(){
-           document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
-           tile['up'] = 1; 
-               
-           that._showGalleries();
-        })  
-      else 
-         $('#tiler').animate({top : '-=224'},10,function(){
-           document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
-           tile['up'] = 1; 
-           
-           that._showGalleries();
-        })  
       
-      }
+            if(this.windowWidth < this.mainWidth ) {
+                  document.getElementById('tiler').style.top = -155 + 'px';
+             tile['up'] = 1; 
+              that._showGalleries();
+            }else{
+                    document.getElementById('tiler').style.top = -224 + 'px';
+             tile['up'] = 1; 
+             that._showGalleries();
+            }        
+      }       
     	
     }, 
     
@@ -1328,8 +1312,8 @@ var Gallery = (function(){
           $('#tiler').animate({top  : '+=155'},400,function(){
         	 this.style.zIndex=200;        
           document.getElementById('cgbtn').style.display = 'block';
-          document.getElementById('homeback').style.display = 'block';
-          document.getElementById('tile').src = makeUrl('public/arrow/tile.png');  
+          //document.getElementById('homeback').style.display = 'block';
+         // document.getElementById('tile').src = makeUrl('public/arrow/tile.png');  
           that.slideShow = 0;
           var tile = document.getElementById('tile');
           tile['up'] = 0;           
@@ -1338,8 +1322,8 @@ var Gallery = (function(){
           $('#tiler').animate({top  : '+=224'},400,function(){
         	 this.style.zIndex=200;        
           document.getElementById('cgbtn').style.display = 'block';
-          document.getElementById('homeback').style.display = 'block';
-          document.getElementById('tile').src = makeUrl('public/arrow/tile.png');  
+          //document.getElementById('homeback').style.display = 'block';
+         // document.getElementById('tile').src = makeUrl('public/arrow/tile.png');  
           that.slideShow = 0;
           var tile = document.getElementById('tile');
           tile['up'] = 0;           
@@ -1417,7 +1401,7 @@ var Gallery = (function(){
          span.innerHTML = gallery;   
          
        if(this._isLoggedIn()){ 
-          span.style.color = 'lightgrey';
+          span.style.color = 'grey';
           span.style.cursor = 'pointer';
           span.addEventListener('click',this._editGallery.bind(this,gallery));       
        }    
@@ -1451,19 +1435,20 @@ var Gallery = (function(){
     },
     
     _editGallery : function(gallery){
+    	 
     	 document.getElementById('g-gallery-title').remove();
     	 document.getElementById('back-sign').remove();    	 
     	 let images = Collection.getGallery(gallery);   
        document.getElementById('pool').innerHTML = '';
        let that = this;
     	 this._prepareEditGallery(gallery,function(){
-    	    that._setUpload();
+    	    that._setUpload(gallery);
     	     for(let i = 0 ; i < images.length ; i++){
           let child = document.getElementById('pool').children; 
           //this.addedToCollection(images[i],child)
           //this._removeFromPool(images[i]);
           
-          that._addModel(images[i],child.length);  
+          that._addModel(images[i],child.length,null);  
           that._recalculateMargin()    
        }
     	 });
@@ -1492,12 +1477,10 @@ var Gallery = (function(){
        }else{
             document.getElementById('cgbtn').style.display = 'block'; 
        }
-       
       
-       //this.loadGalleries(Collection.get)
-         Router.route(this.username,'archive');
-      /* $(document.getElementById('thumbview')).animate({left : '-=' + this.uploader.view},400)
-       window.history.pushState(null,null,'/gallery/archive')*/
+      
+        Router.route(this.username,'archive');
+
     },
     
     
@@ -1518,25 +1501,28 @@ var Gallery = (function(){
     _upload : function () { 
     	 this.upload.notify(this.queue)
     },
-    _remove : function(){  // not supported by IE
-        var that = this;
+    _remove : function(){  // not supported by IE     
+               var that = this;
         if(this.isMobile()){
            $('.mtemplate-upload').filter(function(index){ 
               return this['green'] == 0;
            }).animate({opacity : 0},400,function(){
-           	  that._removeFromPool({src : this['name']});
+           	  that._removeFromPool({src : this['name']},null);
               this.remove();                   
            })        
         }else {
            $('.template-upload').filter(function(index){
                return this['green'] == 0 ;                         
            }).animate({opacity : 0},400,function(){
-               that._removeFromPool({src : this['name']});               
+               that._removeFromPool({src : this['name']},null);               
                this.remove();           
            })
-        }
-        
+        }    
         this.remove.notify(this.removedDownload)    
+    },
+    _removeThumb : function(arr){
+    	 
+
     },
     _setCover : function(){},
     _createGallery : function(){
@@ -1546,7 +1532,7 @@ var Gallery = (function(){
        var input = document.getElementById('input');
        var label = document.getElementById('input-label');
        document.getElementById('input-name').value = "";
-       if( $(label).css('left') === '-100px')          
+       if($(label).css('left') === '-100px')          
           $(label).css('left',0).css('opacity',0.25) ;     
        document.getElementById('homeback').style.display = 'none'
        document.getElementById('arrow').style.display = 'none';
@@ -1555,18 +1541,19 @@ var Gallery = (function(){
        document.getElementById('back-reset').style.display = "block";    
        document.getElementById('galback').style.display = 'none';
        
+       
        var tile = document.getElementById('tile');
        if(tile && tile['up']){
                   if(this.windowWidth < this.mainWidth)
          
         $('#tiler').animate({top : '+=155'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+              
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
         })
        else 
         $('#tiler').animate({top : '+=224'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+             
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
         }) 
@@ -1619,7 +1606,7 @@ var Gallery = (function(){
        input.style.display = 'block';       
        label.style.display = 'block';
        
-       document.getElementById('back-reset').innerHTML = '  back'
+       document.getElementById('back-reset').innerHTML =  'back'
      
      
       // this.createGallery.notify("I have been clicked");    
@@ -1651,14 +1638,14 @@ var Gallery = (function(){
                   if(this.windowWidth < this.mainWidth)
          
         $('#tiler').animate({top : '+=155'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+            //document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
          callback();
         })
        else 
         $('#tiler').animate({top : '+=224'},400,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+           // document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
          document.getElementById('pool').innerHTML = '';
          callback()
@@ -1836,6 +1823,9 @@ var Gallery = (function(){
                let mytags = document.getElementById('mytags');
                let back = document.getElementById('e-tags-back');
                back.src = makeUrl('public/arrow/close.png') ;
+               
+               if(document.getElementsByClassName('e-tag-location')[0])
+                 document.getElementsByClassName('e-tag-location')[0].remove();
                let location = document.createElement('div');
                let input = document.createElement('input');
                input.type = 'text';
@@ -2033,7 +2023,7 @@ var Gallery = (function(){
        this.arwDown.notify("arw Down has been clicked");    
     },
     
-    _backReset : function(){
+    _backReset : function(){ 
       document.getElementById('input').style.display = 'none';
       document.getElementById('back-reset').style.display = 'none';
       document.getElementById('back-next').style.display = 'none';       // TODO add class to do this all
@@ -2055,8 +2045,8 @@ var Gallery = (function(){
       document.getElementById('galback').style.display = 'block';
       
       document.getElementById('back-reset').style.textAlign = 'right';
-      View._upTile();
-      Router.route(this.username,'/images/'+document.getElementById('back-reset').innerHTML);
+      View._upTile(); 
+      Router.route(username,'/images/'+document.getElementById('back-reset').innerHTML);
       
     },
     
@@ -2079,9 +2069,17 @@ var Gallery = (function(){
       $('#files').trigger('click');
     },
     
-    _setUpload  :function () {
-    	 this.galleryName = document.getElementById('input-name').value;      // TODO regex for gallery name
-    	 document.getElementById('back-reset').innerHTML = this.galleryName;
+    _setUpload  :function (gallery) {
+    	if(document.getElementById('input-name').value != ''){
+          	 this.galleryName = document.getElementById('input-name').value;      // TODO regex for gallery name
+       	 document.getElementById('back-reset').innerHTML = this.galleryName;	
+    	}else{
+    	  	 document.getElementById('back-reset').innerHTML = gallery;	
+    	}
+      
+      
+      document.getElementById('back-reset').style.display = 'block'
+    	
     	 document.getElementById('input').style.display = 'none';
     	 document.getElementById('arrow').style.display = 'block';
     	 document.getElementById('back-next').style.display = 'block';
@@ -2577,44 +2575,44 @@ var Gallery = (function(){
         if(this.windowWidth < this.mainWidth)
          
         $('#tiler').animate({top : '+=155'},1,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+            //document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
-         document.getElementById('pool').innerHTML = '';
+         //document.getElementById('pool').innerHTML = '';
         })
        else 
         $('#tiler').animate({top : '+=224'},1,function(){
-            document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
+            //document.getElementById('tile').src = makeUrl('public/arrow/tile.png');    
          tile['up'] = 0; 
-         document.getElementById('pool').innerHTML = '';
+         //document.getElementById('pool').innerHTML = '';
         })
        
       }else {
-      document.getElementById('pool').innerHTML = '';
-      $('#tiler').css('z-index',-200)  ; // I am not sure this is necessary
+      //document.getElementById('pool').innerHTML = '';
+     
       if(this.windowWidth < this.mainWidth )             
         $('#tiler').animate({top : '-=155'},1,function(){
-           document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
-           tile['up'] = 1; 
+           //document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
+           tile['up'] = 1; /*
            if(e != null)
             that.slideShow = 1;
            if(e !=null && e !=1)
-           that._showImage(e); 
+           that._showImage(e); */
         })  
       else 
          $('#tiler').animate({top : '-=224'},1,function(){
-           document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
+           //document.getElementById('tile').src = makeUrl('public/arrow/tileback.png');    
            tile['up'] = 1;
-           if(e != null) 
+          /* if(e != null) 
            that.slideShow = 1;
            if(e !=null && e != 1)
-           that._showImage(e);
+           that._showImage(e);*/
         })  
       
       }
     },
     
     
-    _addModel : function(thumb,index){     
+    _addModel : function(thumb,index,callback){     
     	 var that = this;
     	 var mobile = this.isMobile();
        var templateDownload = document.createElement('div');
@@ -2645,8 +2643,13 @@ var Gallery = (function(){
        image.src = makeUrl("uploads/" + thumb.username + '/gallery/'+thumb.gallery+"/thumb/"+thumb.src);
        $(image).addClass('template-green');
        
-       image.addEventListener('load',function(){          
-           $(templateDownload).animate({opacity: 1},400);           
+       image.addEventListener('load',function(){       
+           if(callback)   
+             $(templateDownload).animate({opacity: 1},400,function(){
+                callback()             
+             });    
+           else 
+            $(templateDownload).animate({opacity: 1},400);    
        })
        
        $(image).hover(function(){
@@ -2699,25 +2702,27 @@ var Gallery = (function(){
     
     },
     
-    _removeFromPool : function(args){ 
+    _removeFromPool : function(args,callback){ 
     	  var that = this;    	 
-    	  this.queue.splice(this.queue.indexOf(args.src),1); 
+    	 /* this.queue.splice(this.queue.indexOf(args.src),1); 
     	  for(var i = 0 ; i < this.files.length ; i++){
           if(this.files[i].name == args.src){ 
              this.files.splice(i,1);
              break;          
           } 	  
-    	  }    	  
+    	  }*/   	  
         if(args.hasOwnProperty('height')){ 
            if(this.isMobile()){
               $(".mtemplate-upload[name='" + args.src + "']").animate({opacity : 0},400,function(){              
                  this.remove();
-                 that._uploader(false);              
+                 that._uploader(false);    
+                 if(callback) callback(args);          
               })           
            }else { 
               $(".template-upload[name='" + args.src + "']").animate({opacity : 0},400,function(){
                  this.remove();               
-                 that._uploader(false);          
+                 that._uploader(false);  
+                 if(callback) callback(args);        
               }) 
            }        
         }else this._uploader(false);
@@ -2826,11 +2831,8 @@ var Gallery = (function(){
         this.galleries = Object.assign({},galleries);
         
         this._setPoolView();
-        this._showGalleries()
-        
-       /* for(var i in galleries ){
-            this._renderGallery(galleries[i][0]);
-        }   */        
+        this._showGalleries();   
+    
     },   
     
     _galleryTemplate : function(obj){
@@ -2842,16 +2844,16 @@ var Gallery = (function(){
     },
     
     _styleElements : function(){
-           	  var that = this;
-              var main = document.getElementById('indexContainer');
-              var header = document.getElementById('iheader');          
-              var contentArticle = document.getElementById('contentArticle')               
+       var that = this;
+       var main = document.getElementById('indexContainer');
+       var header = document.getElementById('iheader');          
+       var contentArticle = document.getElementById('contentArticle')               
                       
-              this.activeEditor = true;
-              this._createMenuEditor();                        
-           },
+       this.activeEditor = true;
+       this._createMenuEditor();                        
+   },
            
-           _returnMenuContent : function(type){
+    _returnMenuContent : function(type){
              let html = '',
         		template = '<span class="xbt-edit"><code class="btn-xs %btnClass%" title="%desc%" onmousedown="event.preventDefault();" onclick="doCommand(\'%cmd%\')"><i class="%iconClass%"></i> %cmd%</code></span>';
    	      commands.forEach(function(command) {
@@ -2922,8 +2924,7 @@ var Gallery = (function(){
                               
            	  })
               
-              header.appendChild(menuContainer);  
-           	  
+              header.appendChild(menuContainer);          	  
            },
            
            _iMenu : function(act){
@@ -2937,8 +2938,8 @@ var Gallery = (function(){
               
                if(act == "action")
            	    this.btns.forEach(function(item){
-              that._createButton(item);           
-             })
+                  that._createButton(item);           
+                })
            },
            
            _createButton : function (btn) {
@@ -3005,13 +3006,32 @@ var Gallery = (function(){
           models.push(model);      
        }
        
+       function removeGallery(arr,gal){
+       	let index;
+          if(arr.length == 0){
+            models = models.filter(function(elem){
+               return elem.gallery != gal; 
+             })
+          }else {
+            models = models.filter(function(elem){
+                   return undefined === arr.find(function(elm){
+                     return (elem.gallery == gal && elem.src == elm.src);
+                   })               
+               })  
+               
+          }       
+          
+           
+       }
+       
        return {
            setArchive : setModels,
            getModel : getModel,
            getGallery : getGallery,
            getModelTwo : getModelTwo,
            addModel : addModel,
-           getUser : getUser
+           getUser : getUser,
+           removeCollection : removeGallery
        }
      })()
       
@@ -3089,7 +3109,7 @@ var Gallery = (function(){
      	       View._upTile(null);
      	     
      	     } 
-     	     document.getElementById('main').style.display = 'block';
+     	     
      	     View.outsider = data.images;
            View._showImages(data.images,data.images[0].gallery);  
      })
@@ -3105,15 +3125,9 @@ var Gallery = (function(){
      })
      
      Router.event['archive'].attach(function(sender,args){ 
-        setUsername(args.username);
-        
-        if(!View.inited){
-        	  View._init();              
-        }
-        
-        document.getElementById('main').style.display = 'block';             
+        setUsername(args.username);               
        
-         if(Collection.getUser() != args.username){ 
+         if(Collection.getUser() != args.username){
            if(document.getElementById('pp'))
               document.getElementById('pp').remove()
             let st = state();
@@ -3126,11 +3140,13 @@ var Gallery = (function(){
             
             
             if(st == 'gallery'){
-                if(document.getElementById('thumbview'))
-                 document.getElementsByClassName('thumbview')[0].remove();
+                if(document.getElementById('thumbview')){
+                   
+                }                
                  if(document.getElementById('g-gallery-title'))
                   document.getElementById('g-gallery-title').remove();
-                 document.getElementById('back-sign').remove();
+               
+                 if(document.getElementById('back-sign')) document.getElementById('back-sign').remove();
             }
              
             if(st== 'show'){ 
@@ -3141,20 +3157,19 @@ var Gallery = (function(){
                  document.getElementsByClassName('thumbview')[0].remove();
                View._closeShowImage.call(View) ; 
             
-            }
-            
-           
-              
+            }          
             
             args.archive = true;
             galleries(args,null);
-         }else {
+         }else { 
           
          	let st = state();
             
             if(st == 'gallery'){
-               if(document.getElementById('thumbview'))
-                 document.getElementsByClassName('thumbview')[0].remove()
+               if(document.getElementById('thumbview')) { 
+                   // View._backToIndex();               
+               }
+                // document.getElementsByClassName('thumbview')[0].remove()
                   if(document.getElementById('g-gallery-title'))
                      document.getElementById('g-gallery-title').remove();
                  
@@ -3175,21 +3190,13 @@ var Gallery = (function(){
           
      	    args.archive = true;
           galleries(args,View._showTile);  
-         }
-          
-        /*
-     	  if(View.inited){
-          document.getElementById('main').style.display = 'block';     	  
-     	  }else{
-     	    View._init();
-     	    args.archive = true;
-          galleries(args,View._showTile);
-     	  } */    	  
+         }       
+     	   	  
      })
      
-     Router.event['images'].attach(function(sender,args){
+     Router.event['images'].attach(function(sender,args){ 
      	   setUsername(args.username); 
-        document.getElementById('main').style.display = 'block';
+       
         if(Collection.getUser() != args.username){ 
             let st = state();
             
@@ -3204,7 +3211,10 @@ var Gallery = (function(){
             
             args.archive = false;
             galleries(args,showImage);
-         }else { 
+         }else {         
+            let gals = Collection.getGallery(args.data);
+            if(gals.length == 0) return  Router.route(args.username,'archive');
+           
          	args.archive = false;
          	 let st = state();
             
@@ -3213,8 +3223,10 @@ var Gallery = (function(){
                  document.getElementsByClassName('thumbview')[0].remove();
             if(st== 'show')
                 View._closeShowImage.call(View) ; 
-         	View._showImages(Collection.getGallery(args.data),args.data);  
-         }
+            
+            document.getElementById('main').style.display = 'block'
+         	View._showImages(Collection.getGallery(args.data),args.data);           
+         }      
           
      })
      
@@ -3279,26 +3291,59 @@ var Gallery = (function(){
          else return 'archive';     
      }
 
-     var that =  this;     
+     let that =  this;     
  
-     
+      let events = [];
       let uploaded = 0;
       socket.on('thumb',function(data){      
-      	 Collection.addModel(data);     
-      	 let child = document.getElementById('pool').children; 
-      	 that.addedToCollection(data,child)
-      	 View._recalculateMargin()
+         data.type = 'thumb';
+    	   runUpload(data);
+      })
+      
+      function runUpload(data){
+         if(events.length == 0)
+           if(data.type == 'thumb')
+             onThumb(data);
+           else 
+             gContinue(data);
+         else 
+           events.push(data);                     
+      }
+      
+      
+      function nextOne() {
+         let data;      	
+      	if(events.length != 0){
+            data = events[0];
+            events.splice(0,1);    
+            if(data.type == 'thumb')
+             onThumb(data);
+            else 
+             gContinue(data);  	
+      	}
+      	 
+      	  
+      }
+      
+      function onThumb(data){
+         Collection.addModel(data);     
+      	let child = document.getElementById('pool').children; 
+         that.addedToCollection(data,child,thumbCallback); 
+      }
+      
+      
+      function thumbCallback(data){
+          View._recalculateMargin()
+          ++uploaded;
+      	 console.log(data);
+      	 console.log(uploaded)
       	 console.log(View.files.length)
-      	 if(uploaded > 0 && View.files.length == 0 ){
-      	
+      	 if(uploaded == View.files.length){      	
       	   saveGallery(data);
-      	 }else{ 
-      	       
-      	      ++uploaded;
-      	    
       	 }
       	 
-      })
+      	 nextOne();
+      }
       
       socket.on('progress',function(data){          
           View._progress(data)      
@@ -3315,22 +3360,24 @@ var Gallery = (function(){
       	//window.history.pushState(null,null,'/gallery/archive')
       	xhr.onreadystatechange = function(){
             if(this.readyState == 4){ 
-               Collection.setArchive(JSON.parse(xhr.responseText));                
+               Collection.setArchive(JSON.parse(xhr.responseText));  
+                    if(!View.inited);
+                   View._init();                
                if(args.archive){                     
                   View.loadGalleries(xhr.responseText); 
-                  View._showTile();                             
+                  View._showTile();   
+                 
+                if(document.getElementById('thumbview'))
+                  $(document.getElementById('thumbview')).animate({left : '-=' + View.uploader.view},400); 
+                                                 
                }                 
                 else { 
-                   //View.loadGalleries(xhr.responseText); 
-                  //View._showTile();
-                  if(!View.inited);
-                  View._init();
-                  View._showTile();
                   View.loadGalleries(xhr.responseText); 
-                  document.getElementById('main').style.display = 'block';
-                 // Router.route(args.username,'/images/'+args.data)
+                  View._showTile(); 
                   callback.call(View,args);
-                }                        
+                }               
+            
+                document.getElementById('main').style.display = 'block';                     
             }      	
       	}
       	xhr.setRequestHeader('username',args.username);
@@ -3338,32 +3385,38 @@ var Gallery = (function(){
       }
       
       
-      socket.on('g-continue', function (data){ 
-            let reader = new FileReader(); 
+      socket.on('g-continue', function (data){      	 
+          data.type = 'continue';
+          runUpload(data);  
+	   });
+	   
+	   
+	   function gContinue(data) {
+	         let reader = new FileReader(); 
 		      View._progress({percent : data['percent'],name : data['name']});
 				var place = data['place'] * 524288; //The Next Blocks Starting Position
 				var newFile; //The Variable that will hold the new Block of Data
-			 let index =  View.files.findIndex(function(elem){
+			   let index =  View.files.findIndex(function(elem){
 			   return elem.name == data['name']
 			 })
 			 
 			 reader.onload = function(e){ 
-            socket.emit('g-upload',{'name' : data['name'], data : e.target.result,gallery : View.galleryName})          
+            socket.emit('g-upload',{'name' : data['name'], data : e.target.result,gallery : View.galleryName}) ;      
+            
+            nextOne();
           }
-			 
+          			 
 			 newFile = View.files[index].slice(place, place + Math.min(524288, (View.files[index].size-place)));
-			 reader.readAsBinaryString(newFile);
-	   });
+			 reader.readAsBinaryString(newFile);   	
+	   }
+	  
      
       function Upload(sender,queue) {    
-       
-         uploaded = 0;
+     
+        uploaded = 0;
      	  for(var i= 0 ; i < sender.files.length ; i++){
-     	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;   
-     	  	
-     	  	  socket.emit('g-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})  
-     	  
-            	  	 
+     	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;       	  	
+     	  	  socket.emit('g-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})   	  	 
     	  
      	  }
      }
@@ -3374,57 +3427,68 @@ var Gallery = (function(){
         }     
         
         return obj1;
-     }
+     }     
      
-     
-     function saveGallery(data){ alert('fucking')
+     function saveGallery(data){ 
      	 let container;  
      	 container = Object.assign({},data);
      	 container.tag = View.tags;
      	 container.location = View.location;
      	 container.getloc = View.getloc;
-     	 container.date = Date.now()
+     	 container.date = Date.now();
      	 container.gallery = data.gallery;
      	 container.type = 'gallery';
-     	 container.username = username;   	 console.log('this is gallery : ' + container);
-         var xhr = new XMLHttpRequest();
-         xhr.open('POST','/gallery/save');
-         xhr.setRequestHeader('Content-Type','application/json')
-         xhr.send(JSON.stringify(container));
+     	 container.username = username;   	 
+       var xhr = new XMLHttpRequest();
+       xhr.open('POST','/gallery/save');
+       xhr.setRequestHeader('Content-Type','application/json')
+       xhr.send(JSON.stringify(container));
          
-         xhr.onreadystatechange = function(data){
-            if(this.readyState == 4){
-                   alert(data);   
-            }         
+       xhr.onreadystatechange = function(data){
+          if(this.readyState == 4){
+             View.files.length = 0;
+             View.queue.length = 0;  
+          }         
          } 
      }
-    
-     function Remove(sender,queue){
+     
+     function Remove(sender,queue){     	  
+     	   let gallery = document.getElementById('back-reset').innerHTML;
+     	   if(queue.length == 0)
+     	     queue = Collection.getGallery(gallery);
+     	     
+     	   if(queue.length == 0) return;
          var delThumb = new XMLHttpRequest();
          delThumb.open('POST','/gallery/delete');
          delThumb.onreadystatechange = function (data) { 
-            if(this.readyState == 4){ 
-               that.collection.removeCollection(queue);               
+            if(this.readyState == 4){               
+              that.removedFromCollection(queue);   
+              Collection.removeCollection(queue,gallery);                         
             }
          }
          delThumb.setRequestHeader('Content-Type','application/json');
-         delThumb.setRequestHeader('gallery',sender.galleryName)
+         delThumb.setRequestHeader('gallery',gallery)
          delThumb.send(JSON.stringify(queue));
      }
      
-     View.remove.attach(function(sender,args){        
+     View.remove.attach(function(sender,args){ 
          return  Remove(sender,args);
      })
      
      
      this.removedFromCollection= function(args){         
-        return  View._removeDownloadTemplate(args);
+       console.log(args);
+       for (let i = 0 ; i < args.length ; i++) {
+       	  View._removeDownloadTemplate(args[i]);
+       }
      }
      
-     this.addedToCollection = function(args,index){
-        View._removeFromPool(args);
-        View._addModel(args,index);     
-        return;
+     this.addedToCollection = function(args,index,callback){
+        View._removeFromPool(args,function () {
+          View._addModel(args,index,function(){
+             callback(args);          
+          });   	
+        });      
      }       
      
      View.showImage.attach(function(sender,args){     

@@ -7,7 +7,7 @@ window.onload = function(){
 		 config : {
 		 	  mainWidth : 900,
 		 	  d : {containerWidth : window.innerWidth},
-           menubar : ['home','article','video','gallery','about','login'],
+           menubar : ['home','article','video','gallery','about','login'],        
            inputs : ['username','password','email']
 		 },
 		 

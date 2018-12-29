@@ -5,12 +5,8 @@ var path  = require('path')
 
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
-//var sockets = require('./sockets.js')
 let socket = null;
  var files  = {}
-  //this socket should be removed
-  
-// var sockets ;  
   var clients = [];  
   var options = {
   	 pathname: 'uploads/',
@@ -34,22 +30,18 @@ let socket = null;
           '.jpg'  : 'image/jpeg'   
     },
     
-    init : function(){  // no need for this
+    init : function(){ 
        database.connect(this.db.image,function(err,dtb){
           if(err) throw err;
           dtb.close(); 
        })    
-    } 
-   
-  }
-  
- 
+    }    
+  } 
   
   function router(req,res){
      var reqUrl = req.url;
      pathname = url.parse(reqUrl).pathname;     
-     
-    // var route = options.route.regex.match(pathname)
+   
      let newUrl = pathname.replace(options.route.base,'');
      let route = newUrl.match(/^\/[a-z]+\/?/)    
     
@@ -156,7 +148,7 @@ let socket = null;
   
   function _delete(req,res){
      var jsonString = '';
-     var gallery = req.headers.gallery;
+     var gallery = req.headers.gallery; 
          
      req.on('data',function(data){
          jsonString += data;    
@@ -165,11 +157,14 @@ let socket = null;
      req.on('end',function(){
        var arr = JSON.parse(jsonString);
        for(var i = 0 ; i < arr.length ; i++){
-          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/galelry/'+gallery + '/',arr[i].src));
-          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/thumb/',arr[i].src));                 
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/',arr[i].src));
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/thumb/',arr[i].src));   
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/mobile/',arr[i].src)); 
+          fs.unlinkSync(path.join(__dirname + '/uploads/'+req.username + '/gallery/'+gallery + '/desktop/',arr[i].src));               
        }
-       
-       remove(arr,gallery,res)     
+       if(arr.length == 0)
+         deleteFolderRecursive(__dirname + '/uploads/'+req.username + '/gallery/'+gallery  )
+       remove(arr,gallery,req,res)     
      })
      
      return;
@@ -178,6 +173,22 @@ let socket = null;
   function _upload(req,res){
 
   }
+  
+  var deleteFolderRecursive = function(path) {
+ 
+  if (fs.existsSync(path)) { 
+    fs.readdirSync(path).forEach(function(file, index){
+      var curPath = path + "/" + file; 
+      if (fs.lstatSync(curPath).isDirectory()) {
+        deleteFolderRecursive(curPath);
+      } else { // delete file
+        fs.unlinkSync(curPath);
+       
+      }
+    });
+    fs.rmdirSync(path);
+  }
+};
   
   
   /*  ////////////////////////////////////// Upload Images /////////////////////////////////// */  
@@ -385,9 +396,9 @@ let socket = null;
         database.connect(options.db.image,function(err,db){
            db.collection('hash').insert(gal,function(err,db){
                if(err) throw err;
-               
+               res.setHeader('Content-Type','application/json');
                res.statusCode = 200;
-               res.end('fuck you');           
+               res.end();           
            })        
         })     
      })
@@ -404,6 +415,7 @@ let socket = null;
           {$set : {"text": obj.text}},function(err,result){
                if(err) throw err;
                res.statusCode = 200;
+               res.setHeader('Content-Type','application/json')
                res.end();
                db.close();          
           }  
@@ -411,21 +423,32 @@ let socket = null;
     })  
   }
   
-  function remove(arr,gallery,res){  
+  function remove(arr,gallery,req,res){  
     database.connect(options.db.image,function(err,db){
     	 if(err) throw err;
     	 var srcs = [];
 
     	 for(var i= 0 ; i < arr.length ; i++)
     	   srcs.push(arr[i].src);
-    	 
-       db.collection('gallery').deleteMany({gallery : gallery,src : {$in : srcs}},function(err,result){
-           if(err) throw err;
-           db.close()
-           
+    	 if(arr.length != 0)
+       db.collection('gallery').deleteMany({username : req.username,gallery : gallery,src : {$in : srcs}},function(err,result){
+           if(err) throw err;             
+           db.close();      
+           res.setHeader('Content-Type','application/json')     
            res.statusCode = 200;
            res.end();       
-       })    
+       });
+       else 
+        db.collection('gallery').deleteMany({gallery : gallery,username : req.username},function(err,result){
+           if(err) throw err;
+           db.collection('hash').deleteOne({gallery : gallery ,username : req.username},function(er,resu){
+             db.close();          
+             res.setHeader('Content-Type','application/json')
+             res.statusCode = 200;
+             res.end();          
+           })       
+       });
+             
     })
   }
   

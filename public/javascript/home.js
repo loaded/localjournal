@@ -68,7 +68,7 @@ var home = (function(){
           header.style.top = this.config.header.top + 'px';          
           header.style.backgroundColor = 'white';
           
-          header.style.zIndex = 1001;
+          header.style.zIndex = 800;
           if(this._isMobile()){
              header.style.width = this.config.m.mainWidth + 'px';
           
