@@ -248,7 +248,8 @@ var home = (function(){
        },
        
        _popUp : function(event,model){
-           
+           if(document.getElementsByClassName('h-thumb').length != 0)
+             document.getElementsByClassName('h-thumb')[0].remove();
            let evt = event.originalEvent;
            let container;
            if(model.hasOwnProperty('type') && model.type == 'article')
@@ -275,7 +276,7 @@ var home = (function(){
            container.style.left = -300 + 'px';
            container.style.backgroundColor = 'white';
            container.style.zIndex = 801;
-           
+           container.classList.add('h-thumb')
            container.addEventListener('click',function(){
               $(this).animate({left : '-=' + 300},100)           
            })

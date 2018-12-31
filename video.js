@@ -149,6 +149,7 @@ var database = require('mongodb').MongoClient;
 					var out = fs.createWriteStream(options.pathname + that.username + '/video/' + filename);
 					inp.pipe( out);
 					inp.on('close',function(){
+						delete files[that.id];
                   fs.unlink(options.temp + filename, function () { //This Deletes The Temporary File
 							exec("ffmpeg -i " + options.pathname  + that.username + '/video/'+ filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + that.username + '/video/'+ imageName, function(err){
 								//that.emit('done', {'url' : options.pathname + imageName});

@@ -250,8 +250,7 @@ var Gallery = (function(){
     
     },
     
-    _hideProfileMenu : function(){
-          
+    _hideProfileMenu : function(){          
       let canvas = document.getElementById('g-profile-menu')
       document.getElementById('g-menubar').remove()
       let radius = canvas.getAttribute('radius');
@@ -277,9 +276,9 @@ var Gallery = (function(){
           
                 
       },2)   
-        },
-    
-    	   _showProfileMenu : function(){
+      
+      },   
+    	 _showProfileMenu : function(){
 	       let that = this;
           let left  ;
           let top = 40;	       
@@ -303,9 +302,7 @@ var Gallery = (function(){
 	      canvas.style.top = top;
 	      canvas.style.left = left + 'px';
 	      
-	      canvas.style.zIndex = 100;
-	      
-	     
+	      canvas.style.zIndex = 100;    
 	      
 	      canvas.id = 'g-profile-menu';
 	      document.body.appendChild(canvas);         
@@ -329,13 +326,9 @@ var Gallery = (function(){
 
          },1)	  
 	       
-	   },
-	   
-	   
-	    _menubar : function () {
-	    	
-	    	
-	    	    
+	   },	   
+	  
+	   _menubar : function () {	    	    
           let left  ;
           let top = 60;	       
 	       if(this.isMobile()){
@@ -507,11 +500,8 @@ var Gallery = (function(){
     },
     
     
-    _setPool : function () {
-
-    	 
-    	 this._marginRight();
-    
+    _setPool : function () {   	 
+    	 this._marginRight();    
     },
     
     _start : function(){
@@ -619,11 +609,6 @@ var Gallery = (function(){
       var container = document.getElementById('g-archive-view');
       container.innerHTML = '';
       
-     /* if(this._isLoggedIn())
-           document.getElementById('cgbtn').style.display = 'block';*/
-        
-    
-       //document.getElementById('pool').appendChild(container);
        var t = 1;
        for (var i in this.galleries) {
        	 this._addGallery(this.galleries[i][0],t,container,i); 
@@ -1410,12 +1395,12 @@ var Gallery = (function(){
       if(mobile){
         backSign.classList.add('mback-sign');
         span.style.fontSize = 12 + 'px';
-        span.style.top = 8 + 'px';
+        span.style.top = 11 + 'px';
       }         
       else{
          backSign.classList.add('dback-sign');
          span.style.fontSize = 14 + 'px';
-         span.style.top = 8 + 'px'; 
+         span.style.top = 11 + 'px'; 
       }
        
       this.header.el.append(backSign); 
@@ -3401,8 +3386,7 @@ var Gallery = (function(){
 			 })
 			 
 			 reader.onload = function(e){ 
-            socket.emit('g-upload',{'name' : data['name'], data : e.target.result,gallery : View.galleryName}) ;      
-            
+            socket.emit('g-upload',{'name' : data['name'], data : e.target.result,gallery : View.galleryName}) ;                
             nextOne();
           }
           			 
@@ -3411,13 +3395,11 @@ var Gallery = (function(){
 	   }
 	  
      
-      function Upload(sender,queue) {    
-     
+      function Upload(sender,queue) {         
         uploaded = 0;
      	  for(var i= 0 ; i < sender.files.length ; i++){
      	  	 if(queue.indexOf(sender.files[i].name) == -1) continue;       	  	
-     	  	  socket.emit('g-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})   	  	 
-    	  
+     	  	  socket.emit('g-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})   	  
      	  }
      }
      

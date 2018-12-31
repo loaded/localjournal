@@ -2,7 +2,7 @@
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
-
+var sizeof = require('object-sizeof');
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 let socket = null;
@@ -20,6 +20,9 @@ let socket = null;
           image : "mongodb://localhost:27017/cg" ,
           hash : "mongodb://localhost:27017/hash"
      },
+     
+     dbServer : {
+              },
      
      extentions :   {
           '.js':'text/javascript',
@@ -257,7 +260,10 @@ let socket = null;
                var imagePath = path.join(gallery,filename); 
 					var out = fs.createWriteStream(imagePath);
 					inp.pipe( out);
-					inp.on('close',function(){                
+					inp.on('close',function(){       
+					console.log(sizeof(files));
+					delete files[that.id + filename];      
+					console.log(sizeof(files));  
 					   addon.process(options.temp + filename,imagePath,function(im_width,im_height){                 
                      that.emit('thumb' , {
           	             src : filename,

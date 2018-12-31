@@ -199,7 +199,8 @@ let socket = null;
                var imagePath = path.join(gallery,filename); 
 					var out = fs.createWriteStream(imagePath);
 					inp.pipe( out);
-					inp.on('close',function(){                
+					inp.on('close',function(){  
+					delete files[that.id+filename];              
 					   addon.process(options.temp + filename,imagePath,function(im_width,im_height){                 
                   that.emit('eduprog',{name : filename,url : imagePath.replace(__dirname,'')})             
                                                                                               

@@ -17,7 +17,7 @@ const {promisify} = require('util');
 
 const getAsync = promisify(client.get).bind(client);
   /*--------------------------- Helper Functions -----------------------------------*/
-
+  
   io.use((socket,next) =>{	  	
        let token = socket.handshake.query.token;
        

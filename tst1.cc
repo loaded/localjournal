@@ -445,13 +445,14 @@ void resize(const char * FileName,const char* output,int width,int height){
   FILE *fp;
   gdImagePtr in,out;
    
-  
+   
    int y = 0;
    struct stat st = {0};
    char* filename = (char*) malloc(strlen(FileName) + 1);
    strcpy(filename,FileName);
    char * slash_pos = strrchr(filename,'/');
    char * f_name = slash_pos + 1;
+   
   
    char* resize_file = (char*) malloc(strlen(output) + strlen(f_name) + 1);
    
@@ -466,15 +467,17 @@ void resize(const char * FileName,const char* output,int width,int height){
    } else{
     
 }
-  
+   
   fp = fopen(FileName,"rb");
   if(!fp){
     fprintf(stderr,"can not read image");
     return;  
   }
   
-  in = gdImageCreateFromJpeg(fp);
+  in = gdImageCreateFromJpegEx(fp,GD_TRUE);
+  
   fclose(fp);
+  
   if(!in){
      fprintf(stderr,"can not create gdimage");
      return;  
@@ -482,25 +485,26 @@ void resize(const char * FileName,const char* output,int width,int height){
   
   gdImageSetInterpolationMethod(in,GD_BILINEAR_FIXED);
   out = gdImageScale(in,width,height);
-  
+ 
   if(!out){
     fprintf(stderr,"can not output the file\n");
     return;  
   } 
-  
+    
   fp = fopen(resize_file,"wb");
   if(!fp){
      fprintf(stderr,"can not read output file");
      return;  
   }  
-  
+    
   gdImageJpeg(out,fp,90);
   
   fclose(fp);
   
   gdImageDestroy(in);
   gdImageDestroy(out);
-  
+  free(filename);
+  free(resize_file);
   return;
     
 }
@@ -614,14 +618,16 @@ void makeThumbnail(const char* name){
     im_width = width;
     im_height = height;
     
-   
+    gdImageDestroy(image);
            
     resize(name,result,width,height); 
+    free(result);
+    free(str_name);
     return;
 }  
 
 
-void makeMobile(const char* name){
+void makeMobile(const char* name){ printf("start of this funck\n");
     char * thumbnails = "mobile/";
     char * result;
     int l1,l2,height,width;
@@ -655,9 +661,11 @@ void makeMobile(const char* name){
       height = 500;
       width = (int)(temp * height);           
     }
-   
-           
+    gdImageDestroy(image);
+     printf("start of resize it \n");      
     resize(name,result,width,height); 
+    free(result);
+    free(str_name);
     return;
 }  
 
@@ -697,9 +705,11 @@ void makeDesktop(const char* name){
     }
     
 
-   
+   gdImageDestroy(image);
            
     resize(name,result,width,height); 
+    free(result);
+    free(str_name);
     return;
 }  
 
@@ -741,7 +751,7 @@ int process_it(char* name){
                case 3 : 
                      im  = loadImageJpeg(name);
                      rotate(180,im,name);
-                   break;
+                     break;
                case 4 : 
                    im = loadImageJpeg(name);
                    gdImageFlipHorizontal(im);
@@ -753,25 +763,31 @@ int process_it(char* name){
                   gdImageFlipHorizontal(im);
                   rotate(270,im,name);
                   
+                  
                   break;
                case 6 : 
                   im = loadImageJpeg(name);                            	
                   rotate(270,im,name);
+                  
                   break;
                case 7 : 
                   im = loadImageJpeg(name);               
                   gdImageFlipVertical(im);
                   rotate(270,im,name);
+                  
                   break;
                case 8:
                    
                    im = loadImageJpeg(name);
                    
-                   rotate(90,im,name);        
+                   rotate(90,im,name);
+                        
                    break;
                default : 
                   break;
             }
+            
+           
             printf("end rotating file \n");          
             printf("makethumb %s\n",name);
             
@@ -787,10 +803,18 @@ int process_it(char* name){
             printf("end thumb\n");
             printf("end this file %s\n",name);
             
+            
+            free(filename);
+            free(str);
+            
             return 1;
             
             
-  }else  return 0; 
+  }else {
+      free(filename);
+      free(str);
+      return 0;   
+  } 
 }
 
 napi_value Process(napi_env env,napi_callback_info info){
