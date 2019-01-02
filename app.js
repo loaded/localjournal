@@ -1,13 +1,10 @@
 var server = require('http').createServer(myApp);
 var io = require('socket.io')(server);
 var url = require('url')
-//var sockets = require('./sockets.js')
 var gallery = require('./gallery.js');
 var editor = require('./editor.js');
 var home = require('./index.js');
 var video = require('./video.js')
-//var redis = require('redis')
-//var client = redis.createClient();
 var login = require('./login.js')
 var index = require('./home.js')   
 
@@ -29,8 +26,7 @@ const getAsync = promisify(client.get).bind(client);
               return ;
         })
   }).on('connection',function(socket){
-       socket.emit('id',{id:socket.id,username :  socket.username});    
-      
+      socket.emit('id',{id:socket.id,username :  socket.username});      
       socket.on('disconnect',function(socket){
       	                  
       });    
@@ -48,16 +44,13 @@ const getAsync = promisify(client.get).bind(client);
       socket.on('a-start',editor.start.bind(socket))
       socket.on('a-upload',editor.upload.bind(socket))
   });
-  
    
  gallery.to(io);
- editor.to(io)  
-  
+ editor.to(io)    
     
-  async function checkUser(token,callback){
-  	  let username = await getAsync(token);
-  	  callback(username)
-      
+ async function checkUser(token,callback){
+  	 let username = await getAsync(token);
+  	 callback(username)     
   }
    
  server.listen(3000);
@@ -69,12 +62,9 @@ const getAsync = promisify(client.get).bind(client);
 
  function findRoute(request,response) {
  	let reqUrl = request.url;
- 	 let pathname = url.parse(reqUrl).pathname;
+ 	let pathname = url.parse(reqUrl).pathname; 
  	 
- 	 
- 	 
- 	 
- 	 let route = pathname.match(/^\/[a-z]+\/?/);
+ 	let route = pathname.match(/^\/[a-z]+\/?/);
  	 
  	 if(route == null)
  	   route = '';

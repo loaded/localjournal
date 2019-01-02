@@ -1735,11 +1735,13 @@ let View = {
      	            process(username,url,null,backOrNext)      	 
      	        }else if(splited.length == 2){
      	            process(username,splited[0],splited[1],backOrNext)
-     	        }else return;   	        
+     	        }else if(splited.length ==3){
+                  process(username,splited[1],splited[2],backOrNext)        	        
+     	        }     
      	    
      	     }     	    
      	     
-     	     function process (username,action,id,bn){
+     	     function process (username,action,id,bn){ 
      	     	  
               let url ;     	
               if(bn){
@@ -1865,52 +1867,12 @@ let View = {
         if(Collection.getUser() !=args.username)
           getModels(args.username)
         else 
-          View._archiveEditor(Collection.getArchive());  
-        
-         
-         /* if(View.currentContainer == null) 	{
-              	   getModels(args.username);
-              	   return;    
-          }
-      
-      	 else if(!args.bn){
-      	     View.currentContainer.style.display = 'block';
-      	     return;
-      	 }      	 
-      	 else { 
-            switch(state()){
-             case 'create':
-               document.getElementById('contentArticle').innerHTML = '';
-               document.getElementById('iheader').innerHTML = '';
-               document.getElementById('indexContainer').style.display = 'none';
-               break;
-             case 'show':
-               document.getElementById('editor-article').innerHTML = ''
-               document.getElementById('editor-article').style.display = 'none';
-               break;
-             case 'archive':
-               document.getElementById('editor-archive').innerHTML = '';
-               document.getElementById('editor-archive').style.display = 'none';
-               break;
-             default:
-               break;      	 
-      	  }             	 
-      	 } */
-      	 
-      	  
-      	                
+          View._archiveEditor(Collection.getArchive());       	                
       })
       
       Router.event['show'].attach(function(sender,args){ 
             setUsername(args.username);
-      	   if(!args.bn){
-      	   	  if(Collection.getModel(args.id) === undefined)
-      	   	     getModel(args.id)
-      	   	   else 
-      	          View._showArticle(Collection.getModel(args.id)); 
-      	        return;
-      	   }
-                   
+               
       	  	 switch(state()){
              case 'create':
                document.getElementById('contentArticle').innerHTML = '';
@@ -1928,17 +1890,32 @@ let View = {
              default:
                break;      	 
       	 }
-         View._showArticle(Collection.getModel(args.id)); 
-      })
-          
+      	 
+      	   if(!args.bn){
+      	   	  if(Collection.getModel(args.id) === undefined){
+      	   	   getModel(args.id)
+      	   	  }
+      	   	    
+      	   	   else{ 
+      	   	       View._showArticle(Collection.getModel(args.id)); 
+      	   	   } 
+      	        
+      	       
+      	   }else {
+      	      if(Collection.getUser() != args.username){ 
+      	             getModel(args.id)   
+      	      }
+      	   
+      	       else{ 
+      	         View._showArticle(Collection.getModel(args.id))  
+      	       }              	   
+      	   } 
+      })    
      	  
      	  
-     	function setUsername(username){
-         
-           View.username = username;
-             	
-     	}
-     // Router.route('archive')     
+     	function setUsername(username){         
+           View.username = username;             	
+     	}    
       
       View.insertImage.attach(function(sender,args){
          View._insertImage();        
@@ -2078,17 +2055,14 @@ let View = {
      	  	  socket.emit('a-start',{'name' :sender.files[i].name, 'size' : sender.files[i].size})     	  
      	  }     	  
      	
-     }
-        
- 
-        
+     }       
         
      })()
          
      return {
      	  hide : View._hide.bind(View),
         connect : connector  ,
-        router : function(username,path){
+        router : function(username,path){ 
            Router.route(username,path)        
         }
      }

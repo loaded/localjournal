@@ -181,7 +181,7 @@ var Gallery = (function(){
     	   main.style.height = (this.windowHeight -10) + 'px';
     	   main.style.left = this.main.mobile.left + 'px';    	    
     	 }else {    	 
-         main.style.width = (this.mainWidth  +5)+ 'px';
+         main.style.width = (this.mainWidth )+ 'px';
          main.style.height = (this.mainHeight -10) +  'px';      
          var margin_left = parseInt((this.windowWidth - 900)/2);
          main.style.left = margin_left + 'px';     
@@ -194,13 +194,13 @@ var Gallery = (function(){
        if(mobile){
            this.uploader.el.style.height = 133 + 'px';
            
-           this.uploader.mobile = this.windowWidth - 2*this.main.mobile.left ;
+           this.uploader.mobile = this.windowWidth - this.main.mobile.left ;
            this.uploader.view = this.uploader.mobile;
            this.uploader.el.style.width = this.uploader.mobile + 'px';
        }else {
           this.uploader.el.style.height = this.uploader.height + 'px'; 
           this.uploader.desktop = 900;
-          this.uploader.view = this.uploader.desktop;
+          this.uploader.view = this.uploader.desktop ;
           this.uploader.el.style.width = 900 + 'px';
        }    
     },
@@ -879,11 +879,11 @@ var Gallery = (function(){
           gallery = a;
           
           let activeImageIndex = document.getElementsByClassName('active-image')[0].getAttribute('index');
-          
+         
           if(activeImageIndex > index)
-             this._constructImage(index,gallery,'up')
+             this._constructImage(index,gallery,'down')
           else 
-             this._constructImage(index,gallery,'down');
+             this._constructImage(index,gallery,'up');
     },
     
     _showImage : function(e,a,b){ 
@@ -987,18 +987,20 @@ var Gallery = (function(){
            txtJur.addEventListener('click',function(){  
               if((that.galleries[gallery].length) > (parseInt(that.indexOfSlide) +1) && !that.busy){   
                 if(that.activeEditor) that._closeEditor();     
-                let model = Collection.getModelTwo(gallery,that.galleries[gallery][that.indexOfSlide + 1].src);       
-                window.history.pushState(null,null,'/gallery/show/' + model._id);  
-                that._constructImage(++that.indexOfSlide,gallery,'up');              
+                let model = Collection.getModelTwo(gallery,that.galleries[gallery][++that.indexOfSlide ].src);       
+               // window.history.pushState(null,null,'/gallery/show/' + model._id);  
+                  Router.route(that.username,'show/' + model._id)
+                //that._constructImage(++that.indexOfSlide,gallery,'up');              
               }
            })
                       
            txtXwar.addEventListener('click',function(){
               if((that.indexOfSlide-1) > -1  && !that.busy){
               	  if(that.activeEditor) that._closeEditor(); 
-              	  let model = Collection.getModelTwo(gallery,that.galleries[gallery][that.indexOfSlide - 1].src);       
-                 window.history.pushState(null,null,'/gallery/show/' + model._id);  
-                 that._constructImage(--that.indexOfSlide,gallery,'down');         
+              	  let model = Collection.getModelTwo(gallery,that.galleries[gallery][--that.indexOfSlide].src);       
+                 //window.history.pushState(null,null,'/gallery/show/' + model._id); 
+                  Router.route(that.username,'show/' + model._id) 
+                 //that._constructImage(--that.indexOfSlide,gallery,'down');         
               }
            })          
              
@@ -1451,23 +1453,19 @@ var Gallery = (function(){
         // document.getElementById('homeback').style.display = 'block';	
     	}catch(e){
     	
-    	}
-    
+    	}    
        
        if(!this._isLoggedIn()){      	
        	  if(document.getElementById('pp'))
        	    document.getElementById('pp').remove();
-       	   this.header.el.appendChild(this._profilePic())       	
-              
+       	   this.header.el.appendChild(this._profilePic())                 
        }else{
             document.getElementById('cgbtn').style.display = 'block'; 
-       }
+       }   
       
-      
-        Router.route(this.username,'archive');
+       Router.route(this.username,'archive');
 
-    },
-    
+    },  
     
     _getHeightView : function(){
     	   var header = 0;
@@ -3020,23 +3018,20 @@ var Gallery = (function(){
        }
      })()
       
-       var Router = (function () {     
-                    	     
+       var Router = (function () {                         	     
      	     let that = this; 
            let validUrl = ['archive','images','show','gallery'];
            let events = {};
            
            for(let elem of validUrl)
-             events[elem] = new Event(this);
-          
+             events[elem] = new Event(this);          
      	    
      	     function router(username ,url){ 
      	     	  let backOrNext = false; 
-     	        if(url[0] == '#'){
+     	        if(url[0] == '#'){ 
      	           url = url.substring(1,url.length);
      	           backOrNext = true;
-     	        }
-     	        
+     	        }   	        
      	       
      	        let splited = url.split('/');
      	        let length = splited.length;
@@ -3046,7 +3041,7 @@ var Gallery = (function(){
      	        else if(length == 2){
      	          process(username,splited[0],splited[1],backOrNext)
      	        }else if(length == 3){
-                 process(username,splited[1],splited[2],backOrNext)     	        
+                process(username,splited[1],splited[2],backOrNext)     	        
      	        };   
      	     }     	
      	     
@@ -3054,6 +3049,8 @@ var Gallery = (function(){
               let url;              
               
               if(validUrl.indexOf(arg1) == -1) return;
+              if(arg1 == 'gallery') arg1 = 'archive';
+             
      	     	  events[arg1].notify({username : username,data : arg2})
      	     	  
      	     	  if(arg2 == null){
@@ -3064,7 +3061,7 @@ var Gallery = (function(){
      	     	  
      	     	  if(arg1 == 'gallery')
      	     	    url = 'archive'
-     	     	  
+     	     	 
      	     	  if(!arg3)
      	          window.history.pushState(null,null,'/'+username +'/gallery/' + url);     	     
      	     }     
@@ -3111,7 +3108,7 @@ var Gallery = (function(){
      
      Router.event['archive'].attach(function(sender,args){ 
         setUsername(args.username);               
-       
+         
          if(Collection.getUser() != args.username){
            if(document.getElementById('pp'))
               document.getElementById('pp').remove()
@@ -3152,8 +3149,22 @@ var Gallery = (function(){
             
             if(st == 'gallery'){
                if(document.getElementById('thumbview')) { 
-                   // View._backToIndex();               
-               }
+                   try{
+                     document.getElementById('back-sign').remove();
+                     document.getElementById('g-gallery-title').remove()
+                    // document.getElementById('homeback').style.display = 'block';	
+    	             }catch(e){
+    	
+                	}    
+       
+                  if(!View._isLoggedIn()){      	
+       	           if(document.getElementById('pp'))
+       	           document.getElementById('pp').remove();
+       	           View.header.el.appendChild(View._profilePic())                 
+                 }else{
+                    document.getElementById('cgbtn').style.display = 'block'; 
+                 }             
+              }
                 // document.getElementsByClassName('thumbview')[0].remove()
                   if(document.getElementById('g-gallery-title'))
                      document.getElementById('g-gallery-title').remove();
@@ -3242,7 +3253,7 @@ var Gallery = (function(){
         socket.emit('getgal',{gal : args.data,username : args.username});
      }
      
-     Router.event['show'].attach(function(sender,args){
+     Router.event['show'].attach(function(sender,args){ 
      	   let model;
      	    model = Collection.getModel(args.data)
      	   

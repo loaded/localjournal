@@ -474,9 +474,7 @@ var Video = (function(){
         	   progress.appendChild(canvas);
         	   canvas.id = 'v-video-prgcanvas';
 
-        	   canvas.style.position = 'relative';// alert(video.offsetHeight + ' ' + that.config.d.containerWidth)
-
-        	   
+        	   canvas.style.position = 'relative';  
         	   
         	   if(that._isMobile()){
         	      mapContainer.style.top = -video.videoHeight + 'px';
@@ -733,7 +731,8 @@ var Video = (function(){
            
            videoTitle.setAttribute('vid',i);
            videoTitle.addEventListener('click',function(){
-              that._showVideo(videos[this.getAttribute('vid')]);
+           	 Router.route(that.username,'show/'+videos[this.getAttribute('vid')]._id);
+             // that._showVideo(videos[this.getAttribute('vid')]);
               //that._slideContainer();             
            })
            mainContainer.appendChild(container);
@@ -937,7 +936,7 @@ var Video = (function(){
         	   }else if(that.mapDown == false){ 
                 $('#v-video-map').animate({top : '+='+video.videoHeight},400,function(){
                    that.mapDown = true;	      
-                    document.getElementById('v-video-locationImage').src =    that._returnUrl('/public/arrow/b.png')           
+                    document.getElementById('v-video-locationImage').src = that._returnUrl('/public/arrow/b.png')           
                 })            	   
         	   }
   
@@ -947,12 +946,13 @@ var Video = (function(){
         video.style.marginRight = 'auto';
         video.style.marginTop = 5 + 'px';
         video.style.display = 'block';       
+        console.log("befoe back");
         
-        back.addEventListener('click',function () {
-        	  Router.route(model.username,'archive');
-        	  that._slideLeft.call(View);
-        	  
-        })
+        back.addEventListener('click',function () {         
+        	  Router.route(model.username,'archive');        	  
+        	  //that._slideLeft.call(View);        	 
+        },true)
+        
         if(this.slide != 1)
          this._slideContainer();
     },
@@ -1019,16 +1019,15 @@ var Video = (function(){
     	try {
     	   document.getElementById('v-header-upload').style.display = 'none'	
     	}catch(e){
-    	}
-    	
+    		
+    	}   	
     	
     	this.slide = 1;
       this._slideContainer();
     },
     
     _hide : function(){
-        document.getElementById('videoContainer').style.display = 'none';
-        
+        document.getElementById('videoContainer').style.display = 'none';        
      },
     
     _slideContainer : function(){
@@ -1048,28 +1047,28 @@ var Video = (function(){
         
        } else{
          $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){
-           that.slide = 0;
+             that.slide = 0;
              document.getElementById('v-video-back').remove()
              if(!that._isLoggedIn()){
                  document.getElementById('v-header-btn').style.display = 'none';; 
+             }else {
+                 document.getElementById('v-header-btn').style.display = 'block';             
              }
     	        
     	       document.getElementById('v-uploader').innerHTML = '';  
-         }) ;
+         });
          
        } 
       
       }else{
        if(this.slide == 0 || this.slide === undefined)	{
          $(vContentContainer).animate({left: '-=' + sliderWidth},400,function(){
-            that.slide = 1;
-            
+            that.slide = 1;            
          }) 
         
        } else{
        	that.slide = 0;
-         $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){
-           
+         $(vContentContainer).animate({left: '+=' + sliderWidth},400,function(){           
              document.getElementById('v-video-back').remove()
              if(!that._isLoggedIn()){
                    document.getElementById('v-header-btn').style.display = 'none';     
@@ -1084,9 +1083,7 @@ var Video = (function(){
       }
     }   
   
-  }
-        
-      
+  }      
               
        var Collection = (function(){
           let videos ;
@@ -1104,15 +1101,22 @@ var Video = (function(){
           function getUser(){
            return user ;         
           }
+          
+          function getModel(id) {
+          	if(videos.length != 0 )
+          	return videos.find(function(elem){
+               return elem._id = id;           	
+          	})
+          }
           return {
              total : videoCount,
              setVideos : setVideos,
-             getUser : getUser          
+             getUser : getUser,
+             getModel : getModel          
           }
        })()        
   
-       var Router = (function () {     
-                    	     
+       var Router = (function () {                    	     
      	     let that = this; 
            let validUrl = ['create','archive','show'];
            let events = {};
@@ -1138,20 +1142,22 @@ var Video = (function(){
   	         
       View._addEvents()
       Router.event['archive'].attach(function(sender,args){ 
-      	 setUsername(args.username); 
-      	 if(Collection.getUser()!= args.username){
+      	 setUsername(args.username);
+      	 if(Collection.getUser()!= args.username){ 
       	   getModels(args.username);
       	 }else{
-      	   document.getElementById('videoContainer').style.display = 'block';  
+      	   document.getElementById('videoContainer').style.display = 'block'; 
+      	       if(View.slide == 1) { 
+                  View._slideLeft();                        
+           } 
       	 }
       	 
-      	 if(View._isLoggedIn() && document.getElementById('v-pp')){
+      	 if(View._isLoggedIn() && document.getElementById('v-pp')){ 
              document.getElementById('v-pp').remove(); 
              let btn = document.getElementById('v-header-btn');
              btn.classList.add('v-header-btn');     
              btn.style.display = 'block';      
-           }   
-    
+           }     
       })  
       
       socket.on('video',function(data){ 
@@ -1167,6 +1173,12 @@ var Video = (function(){
       
       Router.event['show'].attach(function(sender,args){
       	setUsername(args.username)
+      	if(Collection.getUser == args.username){
+           let model = Collection.getModel(args.id);
+           if(model)
+             View._showVideo(model);      	
+      	}    
+      	else       	  
           socket.emit('video',{id : args.id})          
       }) 
       
@@ -1209,15 +1221,12 @@ var Video = (function(){
              let result = JSON.parse(xhr.responseText);
              Collection.setVideos(result)
              if(!View.inited)
-              View._init(); 
-               
+              View._init();             
              
            View._showVideos(result); 
-           if(View.slide == 1) 
-              View._slideContainer(); 
-              
-              document.getElementById('videoContainer').style.display = 'block'
-        	 
+           if(View.slide == 1)              
+              View._slideContainer();               
+              document.getElementById('videoContainer').style.display = 'block'        	 
         	 }
         }	  
         xhr.setRequestHeader('username',username);
@@ -1229,7 +1238,7 @@ var Video = (function(){
   
   return {
   	 hide : View._hide,
-    router : function(username,path){
+    router : function(username,path){ 
         Router.route(username,path)    
     }
   }

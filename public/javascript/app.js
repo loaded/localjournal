@@ -36,10 +36,7 @@ window.onload = function(){
           
           window.addEventListener('popstate',function(){
                Router.route('#' + document.location + '');          
-          },false)
-          
-         // document.getElementsByClassName('m-profile').addEventListener('click',this._showProfileMenu.bind(this))
-          
+          },false)        
       },
 		 
 	   _init : function(){
@@ -257,21 +254,18 @@ window.onload = function(){
             input.placeholder = 'Search';
             input.id = 'm-search-input'; 
             search.appendChild(input);
-           // document.body.appendChild(search);
+            // document.body.appendChild(search);
            container.appendChild(search); 
 	      }else{
             search.style.width = this.config.mainWidth + 'px';
             search.style.minHeight = window.innerHeight + 'px';
             search.id = 'm-search';
             input.style.width = this.config.mainWidth + 'px';
-            input.style.height = 40 + 'px';
-          //  search.style.left = (window.innerWidth-this.config.mainWidth)/2 + 'px';
-            
+            input.style.height = 40 + 'px';            
             input.placeholder = 'Search';
             input.id = 'm-search-input'; 
             search.appendChild(input);
-           // document.body.appendChild(search);
-           container.appendChild(search); 
+            container.appendChild(search); 
 	      }
 	      
 	      input.addEventListener('click',this._prepareSearch.bind(this));
@@ -700,7 +694,7 @@ window.onload = function(){
         }
 		}
 		
-		function router(path){   
+		function router(path){  
 		  let backOrNext = false;
 		  let route ; 
 		  let inside  ; 
@@ -742,8 +736,8 @@ window.onload = function(){
         let routeSplited = route.split('/');
         
         let index = modules.indexOf(routeSplited[1]);        
-        if(index == -1) return;
-        inside = backOrNext ? '#':''; 
+        
+        inside = backOrNext ? '#':'';
         switch(index){
            case 0:
              Index.hide();
@@ -768,6 +762,11 @@ window.onload = function(){
              home.router(inside+route.slice(routeSplited[0]+1));
             break;  
            default:
+             Video.hide();
+             Gallery.hide();
+             Index.hide();
+             home.router(inside+route.slice(routeSplited[0]+1));
+            
             break;                                
         }         
         

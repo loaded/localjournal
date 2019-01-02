@@ -219,8 +219,7 @@ function _loginHtml(req,res){
        if(err){
          console.log('\nindex can not be loaded!' + err);
          }
-       else {
-       	
+       else {       	
        	res.setHeader("Content-Type","text/html");
        	res.end(data);
        }   
@@ -231,14 +230,10 @@ async function createCookie(req,res){
     let now = (new Date()).valueOf().toString();
     let rand = Math.random().toString();
     let cook = crypto.createHash('sha256').update(now + rand).digest('hex');      
-    await client.set(cook,req.username);
-    
+    await client.set(cook,req.username);    
     res.setHeader('Set-Cookie','cook='+cook +';user='+req.username+';Expires='+new Date(new Date().getTime() + 12*60 * 60 * 1000).toUTCString());   
-   //res.setHeader('Set-Cookie','user='+req.username + ';Expires='+new Date(new Date().getTime() + 12*60 * 60 * 1000).toUTCString())
-    res.setHeader('Content-Type','text/html');
-    
-    res.end('')
-    
+    res.setHeader('Content-Type','text/html');    
+    res.end('');    
 }
 
 function _sendIndex(req,res){ 
