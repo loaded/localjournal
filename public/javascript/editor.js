@@ -95,7 +95,7 @@ var commands = [{
 	"cmd": "forwardDelete",
 	"desc": "Deletes the character ahead of the cursor's position.  It is the same as hitting the delete key."
 }, {
-	"type" : "action",
+	"type" : "actionf",
 	"cmd": "heading",
 	"val": "h3",
 	"icon": "header",
@@ -251,14 +251,16 @@ function icon(cmd) {
 
 function doCommand(cmdKey) {
 	if(cmdKey == "insertImage") {
-      Index.connect('insertImage'); return;
+     return Index.connect('insertImage'); 
 	}
 	var cmd = commandRelation[cmdKey];
 	if (supported(cmd) === "btn-error") {
 		alert("execCommand(“" + cmd.cmd + "”)\nis not supported in your browser");
 		return;
 	}
-	val = (typeof cmd.val !== "undefined") ? prompt("Value for " + cmd.cmd + "?", cmd.val) : "";
+	//val = (typeof cmd.val !== "undefined") ? prompt("Value for " + cmd.cmd + "?", cmd.val) : "";
+  // val = (typeof cmd.val !== "undefined") ? true : "";
+  val = cmd.val;
 	document.execCommand(cmd.cmd, false, (val || "")); // Thanks to https://codepen.io/bluestreak for finding this bug
 }
 

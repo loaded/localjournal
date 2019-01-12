@@ -4,7 +4,6 @@ var database = require('mongodb').MongoClient;
  var exec = require('child_process').exec
  var url = require('url');
  var path = require('path');
- var util = require('util')
  var files  = {}
  
  const options = {
@@ -67,7 +66,7 @@ var database = require('mongodb').MongoClient;
   }
   
   
-  function saveVideo(socket,name,image){
+  function saveVideo(socket,name,image){ console.log('saveVideo')
      database.connect(options.db,function(err,db){
         if(err) throw err;          
         let video = {
@@ -81,14 +80,15 @@ var database = require('mongodb').MongoClient;
            username : socket.username      
         }
         
-        
+       
         db.collection('video').insert(video,function(err,result){
             if(err){
                 socket.emit('error',{error : 'can not save in db'});
                 throw err;            
-            }        
-            delete files[socket.id];
-            socket.emit('done',video);
+            }           
+           
+            delete files[socket.id];            
+            socket.emit('done',video);            
         })     
      })     
   }
@@ -149,10 +149,11 @@ var database = require('mongodb').MongoClient;
 					var out = fs.createWriteStream(options.pathname + that.username + '/video/' + filename);
 					inp.pipe( out);
 					inp.on('close',function(){
-						delete files[that.id];
-                  fs.unlink(options.temp + filename, function () { //This Deletes The Temporary File
-							exec("ffmpeg -i " + options.pathname  + that.username + '/video/'+ filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + that.username + '/video/'+ imageName, function(err){
-								//that.emit('done', {'url' : options.pathname + imageName});
+					
+                  fs.unlink(options.temp + filename, function () { 
+                    console.log('entering exit')
+							exec("ffmpeg -i " + options.pathname  + that.username + '/video/'+ filename  + "  -vframes 1  -filter:v scale=150:-1 " + options.pathname + that.username + '/video/'+ imageName, function(err,stdout,stderr){
+	
 								if(err) throw err;
 								saveVideo(that,filename,imageName);
 							});
@@ -177,9 +178,7 @@ var database = require('mongodb').MongoClient;
 			}
    	
   }
-  
-
-  
+    
 module.exports.start = startUpload
 module.exports.upload = upload
 module.exports.router = router

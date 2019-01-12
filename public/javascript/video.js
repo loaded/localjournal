@@ -731,9 +731,7 @@ var Video = (function(){
            
            videoTitle.setAttribute('vid',i);
            videoTitle.addEventListener('click',function(){
-           	 Router.route(that.username,'show/'+videos[this.getAttribute('vid')]._id);
-             // that._showVideo(videos[this.getAttribute('vid')]);
-              //that._slideContainer();             
+           	 Router.route(that.username,'show/'+videos[this.getAttribute('vid')]._id);                 
            })
            mainContainer.appendChild(container);
            
@@ -1096,6 +1094,8 @@ var Video = (function(){
           	videos = arr;
             if(arr.length != 0) 
               user = arr[0].username;
+            else 
+              user = View.username;
           }
           
           function getUser(){
@@ -1125,9 +1125,16 @@ var Video = (function(){
              events[elem] = new Event(this);          
      	    
      	     function router(username,url){
+     	     	  let backOrNext = false;
+     	     	  if(url[0] == '#'){
+                url = url.substring(7,url.length);     
+                backOrNext = true;	     	  
+     	     	  }
+     	     	  
      	     	  if(validUrl.indexOf(url.split('/')[0]) == -1) return;
      	     	  events[url.split('/')[0]].notify({id : url.split('/')[1],username: username})
-     	        window.history.pushState(null,null,'/'+username+'/video/' + url);    
+     	     	  if(!backOrNext)
+     	          window.history.pushState(null,null,'/'+username+'/video/' + url);    
      	     }     	     
      	     
      	     return {
@@ -1143,21 +1150,21 @@ var Video = (function(){
       View._addEvents()
       Router.event['archive'].attach(function(sender,args){ 
       	 setUsername(args.username);
-      	 if(Collection.getUser()!= args.username){ 
-      	   getModels(args.username);
-      	 }else{
+      	 if(Collection.getUser()!= args.username){     	 
+      	   getModels(args.username); 
+      	 }else{ 
       	   document.getElementById('videoContainer').style.display = 'block'; 
       	       if(View.slide == 1) { 
                   View._slideLeft();                        
            } 
       	 }
       	 
-      	 if(View._isLoggedIn() && document.getElementById('v-pp')){ 
+      	 if(View._isLoggedIn() && document.getElementById('v-pp')){  
              document.getElementById('v-pp').remove(); 
              let btn = document.getElementById('v-header-btn');
              btn.classList.add('v-header-btn');     
              btn.style.display = 'block';      
-           }     
+           }    
       })  
       
       socket.on('video',function(data){ 
@@ -1197,10 +1204,10 @@ var Video = (function(){
       
       socket.on('continue', function (data){
 		      View._progress(data['percent']);
-				var place = data['place'] * 524288; //The Next Blocks Starting Position
-				var newFile; //The Variable that will hold the new Block of Data
+				var place = data['place'] * 524288; 
+				var newFile; 
 			
-			  newFile = View.file.slice(place, place + Math.min(524288, (View.file.size-place)));
+			   newFile = View.file.slice(place, place + Math.min(524288, (View.file.size-place)));
 				reader.readAsBinaryString(newFile);
 	   });
 			
@@ -1220,14 +1227,27 @@ var Video = (function(){
         	 if(this.readyState == 4){
              let result = JSON.parse(xhr.responseText);
              Collection.setVideos(result)
-             if(!View.inited)
-              View._init();             
-             
+             if(!View.inited){
+                View._init();   
+             }                       
+            
            View._showVideos(result); 
            if(View.slide == 1)              
               View._slideContainer();               
               document.getElementById('videoContainer').style.display = 'block'        	 
-        	 }
+        	  }
+        	  if(!View._isLoggedIn()){
+        	    let btn = document.getElementById('v-header-btn');
+        	    if(window.getComputedStyle(btn).getPropertyValue('display')== 'block')
+        	      btn.style.display = 'none';  
+        	      let vheader = document.getElementById('v-header');              
+              if(!document.getElementById('v-pp'))
+               vheader.appendChild(View._profilePic());
+        	  }else { 
+              let btn = document.getElementById('v-header-btn');
+              btn.style.display = 'block';
+        	  }
+
         }	  
         xhr.setRequestHeader('username',username);
         xhr.send();

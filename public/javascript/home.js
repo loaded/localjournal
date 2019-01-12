@@ -152,7 +152,7 @@ var home = (function(){
          
          viewPort.style.height = (window.innerHeight - 70) + 'px';
          viewPort.style.position = 'absolute';
-         viewPort.style.zIndex = 1000;
+         viewPort.style.zIndex = 805;
          viewPort.id = 'h-view';
          
          container.style.height = 'auto';
@@ -174,6 +174,10 @@ var home = (function(){
           suppressScrollX:true	 
     	 });      
          
+         
+         container.style.display = 'flex'
+         container.style.justifyContent = 'space-between';
+         container.style.flexWrap = 'wrap';
          this.models.forEach(function(model){
             if(model.type =='article')
                container.appendChild(that._article(model,false))
@@ -258,19 +262,10 @@ var home = (function(){
               container = this._gallery(model,true)
              else
             container = this._video(model,true);
-           
-        
-                      
-          //let container = document.createElement('div');
+       
            container.style.position = 'absolute';
            container.style.paddingTop = 10 + 'px';
            container.style.width = 300 + 'px'; 
-          // container.style.height = (window.innerHeight -70)/2 + 'px';
-            /*if(evt.clientY > (50 + (window.innerHeight -70)/2 ))
-             container.style.top = 0;
-              
-            else 
-             container.style.top =  (window.innerHeight - 70)/2 + 'px';*/
              
            container.style.top = 0;
            container.style.left = -300 + 'px';
@@ -674,12 +669,7 @@ var home = (function(){
            videoContent.classList.add('v-archive-content');
            videoTitle.classList.add('v-archive-title');
            videoTags.classList.add('v-archive-tags');
-           
-          // videoTitle.setAttribute('vid',i);
-           /*videoTitle.addEventListener('click',function(){
-              that._showVideo(videos[this.getAttribute('vid')]);
-              that._slideContainer();             
-           })*/
+        
            
            return container;
                
@@ -938,20 +928,16 @@ var home = (function(){
            socket.on('home',function(data){
            
            	let models = JSON.parse(data);
+           	models.sort(function(a,b){
+               return a - b;           	
+           	})
            	View.models = models;
-           	
-           	console.log(models)
-           	
+        
+        	
            	for(let i = 0 ; i < models.length ; i++)
-           	   { 
-           	     /* if(models[i].type == 'article'){ alert('asdf')
-           	         new L.Marker(models[i].getloc).addTo(View.map).on('click',function(e){
-                      View._popUp(e,models[i]);    
-                   });
-           	      }else*/
-           	      // It should be removed
+           	   {            	
            	      if(models[i].hasOwnProperty('username'))
-                 new L.Marker(models[i].location).addTo(View.map).on('click',function(e){
+                   new L.Marker(models[i].location).addTo(View.map).on('click',function(e){
                       View._popUp(e,models[i]);    
                    });                      	   
            	   }

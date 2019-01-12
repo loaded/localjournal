@@ -25,9 +25,7 @@ window.onload = function(){
 		 _start : function(){
 		 	 this._addEvents(); 	
 		 	 this._init();         	 
-		 },
-		 
-		 
+		 },	 
 		 
 		_addEvents : function(){
           for (let i = 0 ; i < this.config.menubar.length ; i++) {
@@ -68,8 +66,7 @@ window.onload = function(){
 	      canvas.addEventListener('click',this._showMenu.bind(this));
 	      
 	      document.body.appendChild(canvas);
-	   },
-	   
+	   },   
 	   
 	   _showProfileMenu : function(){
 	       
@@ -719,19 +716,7 @@ window.onload = function(){
 		    user = username;
    		  
 		  }
-        
-        
-               
-      /* var pathArray = location.href.split( '/' );
-        var protocol = pathArray[0];
-        var host = pathArray[2];
-        var url = protocol + '//' + host;
-       
-        if(url.length == path.length) return; 
-        
-            
-       
-        route = path.slice(url.length + 1); */
+  
         
         let routeSplited = route.split('/');
         
@@ -742,19 +727,18 @@ window.onload = function(){
            case 0:
              Index.hide();
              Video.hide();
-             Gallery.router(user, inside + route.slice(routeSplited[0] + 1))  ;
+             Gallery.router(user, inside + route.slice(routeSplited[0] + 1));
              break;
            case 1:
              Index.hide();
              Gallery.hide()
-             Video.router(user,'archive')
+             Video.router(user,inside + route.slice(routeSplited[0] + 1));
              break;
            case 2:
              Video.hide();
              Gallery.hide();
              Index.router(user,inside + route.slice(routeSplited[0] + 1)) ;
-             break;
-          
+             break;          
            case 3:
              Video.hide();
              Gallery.hide();

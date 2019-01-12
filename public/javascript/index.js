@@ -46,8 +46,9 @@ let View = {
               documentWidth : window.innerWidth, // i changed it if it didn't work i should change to previous value
               documentHeight : window.innerHeight,
               events : ['insertImage'],
-              btns : ['location','reorder','caption','text','tags','description','save'],
-              menubar : ['article','video','gallery','about']
+              btns : ['header','location','reorder','caption','text','tags','description','save'],
+              menubar : ['article','video','gallery','about'],
+              redbtn : ['header','location','tags','description','save']
            },         
            
            currentContainer : null,           
@@ -70,6 +71,7 @@ let View = {
            completed : 0,
            elems : [],         
            files : [],
+           greenbtns : [],
            
            _init : function(){
               for(let t = 0 ; t < this.config.btns.length ; t++)
@@ -529,8 +531,12 @@ let View = {
            
            _createEditor : function(){
            	  let container =  document.getElementById('indexContainer');
-           	  container.style.display = 'block';  
-           	 
+              document.getElementById('iheader').innerHTML = '';
+              document.getElementById('contentArticle').innerHTML = '';
+           	  container.style.display = 'block';            	  
+           	  this.files.length = 0;
+           	  this.greenbtns.length = 0;
+           	  this.content.length = 0;
            	  this.currentContainer = container;
               this.config.documentWidth = window.innerWidth; /// this is wierd because in config is set to window.innerWidth
               this._eventBinding();
@@ -543,6 +549,7 @@ let View = {
              this.location.attach(this._addLocation.bind(this))
              this.tags.attach(this._addTags.bind(this));
              this.description.attach(this._addDescription.bind(this))
+             this.header.attach(this._addHeader.bind(this));
              let that = this;
              Sortable.create(contentArticle,{    
                 scroll : true,         
@@ -561,15 +568,33 @@ let View = {
          	       if(cy < wh + 50 && cy > wh -50)
          	         if(cx < ww -50 && cx > ww - 150){
          	         	   if(e.item.classList.contains('fit')){
-         	         	       let index = that.files.findIndex(function(elem){
-         	         	            	         	       
+         	         	       let index = that.files.findIndex(function(elem){         	         	            	         	       
                                return elem['name'] == e.item['name']; 	   
               	             })
               	            
          	         	    that.files.splice(index,1)    
          	         	    that.content.splice(index,1)        	         	   
          	         	   }        
-              	             
+              	            if(e.item.querySelector('.description')) {
+              	               let index = that.greenbtns.indexOf('description'); 
+              	               if(index > -1){
+              	                  that.greenbtns.splice(index,1);
+              	                  document.getElementById('ei-description').classList.add('e-redbtn');
+              	                  document.getElementById('ei-description').classList.remove('e-greenbtn');
+              	               }
+              	                
+              	            }
+              	            
+              	            if(e.item.querySelector('.ei-header')){   
+                              let index = that.greenbtns.indexOf('header');
+                              if(index > -1 ){
+                                  that.greenbtns.splice(index , -1);  
+                                  document.getElementById('ei-header').classList.add('e-redbtn');
+                                  document.getElementById('ei-header').classList.remove('e-greenbtn');
+                              }
+                                           	            
+              	            }
+              	              
               	            e.item.remove()     	         
          	         }
          	           
@@ -623,8 +648,7 @@ let View = {
                left = window.innerWidth - 10;
                 
 	          }else{
-               left = 900 + (window.innerWidth - 900)/2 ;
-             
+               left = 900 + (window.innerWidth - 900)/2 ;             
              }
              
               let editor = document.getElementById('editor-article');
@@ -634,13 +658,9 @@ let View = {
              profile.style.zIndex = 800;
              
              profile.style.top = 10 + 'px';
-             profile.style.left = (left -200) + 'px';
+             profile.style.left = (left -200) + 'px';      
              
-           
-             
-             
-              document.getElementById('indexContainer').style.display = 'none';
-          
+              document.getElementById('indexContainer').style.display = 'none';     
              
               editor.innerHTML = '';
                 editor.appendChild(profile);
@@ -896,6 +916,7 @@ let View = {
                 let span = document.createElement('span');
                 span.classList.add('i-menu-middle');
                 span.innerHTML = item;
+                if(item == 'action') span.style.color = 'red';
                 menuItem.appendChild(span);
                 span.addEventListener('click',function(e){
                    that._iMenu(this.innerHTML);             
@@ -919,52 +940,108 @@ let View = {
               
                if(act == "action")
            	    this.config.btns.forEach(function(item){
-              that._createButton(item);           
+              that._createButton.call(that,item);           
              })
            },
            
            _createButton : function (btn) {
            	  let that = this;  	  
            	  let span = document.createElement('span');
-           	  span.classList.add('xbt-edit');
            	  
+           	  span.classList.add('xbt-edit');
+           	  span.id = 'ei-' + btn;
            	  let code = "<code class='btn-xs'>" + btn + "</code>";
-           	  span.innerHTML = code;
+           	  span.innerHTML = code; 
+           	  if(this.config.redbtn.includes(btn) && !this.greenbtns.includes(btn))
+           	    span.classList.add('e-redbtn');
+           	  else if(this.config.redbtn.includes(btn) && this.greenbtns.includes(btn))
+           	    span.classList.add('e-greenbtn');
            	  document.getElementById('iheader').appendChild(span);
            	  document.getElementsByClassName('i-subItem')[0].appendChild(span)
            	  span.addEventListener('click',function(){
                   that[btn].notify('');          	  
            	  })         	  
            },
-           
-           
-           _addDescription : function(){
-              let tag = 'span';
+           _addHeader : function(){
+              let tag = 'h3';
               var sel, range;
-    
+              let that = this;
               if (window.getSelection) {
-               sel = window.getSelection();
+                 sel = window.getSelection();
         
-               if (sel.rangeCount) {
-               range = sel.getRangeAt(0);
-               selectedText = range.toString();
-               range.deleteContents();
-               let span = document.createElement('span')
-               span.innerHTML = selectedText;
-               span.classList.add('description')
-               range.insertNode(span);
+                 if (sel.rangeCount) {
+                   range = sel.getRangeAt(0);
+                   selectedText = range.toString();
+                   if(selectedText == '') return;
+                   range.deleteContents();
+                   let span = document.createElement('h3')
+                   span.innerHTML = selectedText;
+                   span.classList.add('ei-header');
+                   //span.classList.add('description')
+                   range.insertNode(span);
+                   let header = document.getElementById('ei-header');
+                   if(header.classList.contains('e-redbtn')){
+                      header.classList.remove('e-redbtn');
+                      header.classList.add('e-greenbtn');
+                      that.greenbtns.push('header');                   
+                   }
+                    
+                 }
               }
-             }
-            else if (document.selection && document.selection.createRange) {
-             range = document.selection.createRange();
-             selectedText = document.selection.createRange().text + "";
-             range.text = '[' + tag + ']' + selectedText + '[/' + tag + ']';
-           }
-
-
+              else if (document.selection && document.selection.createRange) {
+                range = document.selection.createRange();
+                selectedText = document.selection.createRange().text + "";
+                if(selectedText == '') return;
+                range.text = '[' + tag + "class='ei-header'"+ ']' + selectedText + '[/' + tag + ']';
+                   let header = document.getElementById('e-header');
+                   if(header.classList.contains('e-redbtn')){
+                      header.classList.remove('e-redbtn');
+                      header.classList.add('e-greenbtn');
+                      that.greenbtns.push('header');                   
+                   }
+              }
            },
            
-           _reorder : function(){
+           _addDescription : function(e){ 
+              let tag = 'span';
+              var sel, range;
+              let that= this;
+    
+              if (window.getSelection) {
+                 sel = window.getSelection();
+        
+                 if (sel.rangeCount) {
+                   range = sel.getRangeAt(0);
+                   selectedText = range.toString();
+                   if(selectedText == '') return;
+                   range.deleteContents();
+                   let span = document.createElement('span')
+                   span.innerHTML = selectedText;
+                   span.classList.add('description')
+                   range.insertNode(span);
+                   let header = document.getElementById('ei-description');
+                   if(header.classList.contains('e-redbtn')){
+                      header.classList.remove('e-redbtn');
+                      header.classList.add('e-greenbtn');
+                      that.greenbtns.push('description')                   
+                   }
+                 }
+              }
+              else if (document.selection && document.selection.createRange) {
+                range = document.selection.createRange();
+                selectedText = document.selection.createRange().text + "";
+                if(selectedText == '') return;
+                range.text = '[' + tag + ']' + selectedText + '[/' + tag + ']';
+                   let header = document.getElementById('ei-description');
+                   if(header.classList.contains('e-redbtn')){
+                      header.classList.remove('e-redbtn');
+                      header.classList.add('e-greenbtn');
+                      that.greenbtns.push('description')                   
+                   }
+              }
+           },
+           
+           _reorder : function(){ 
                let container = document.getElementById('contentArticle');
                let elems = container.children;
                document.getElementById('iheader').style.display = 'none';
@@ -985,7 +1062,7 @@ let View = {
                       
                       elem.style.width = 100 + 'px';
                       elem.style.height = newHeight + 'px';
-                      elem.style.marginTop = 20 + 'px';
+                      //elem.style.marginTop = 20 + 'px';
                       let child = elem.children;
                       child[0].style.width = 100 + 'px';
                       child[0].style.height = newHeight + 'px';
@@ -1002,7 +1079,7 @@ let View = {
                       elem.style.height = 20 + 'px';
                       elem.style.overflow = 'hidden';
                       elem.style.fontSize = 10 + 'px';
-                      elem.style.top = 20 + 'px';
+                      //elem.style.marginTop = 10 + 'px';
                       elem.classList.add('reorder-move');
                   }else if(elem.classList.contains('pureEditable')){
                      let style = window.getComputedStyle(elem,null);
@@ -1015,7 +1092,7 @@ let View = {
                      elem.style.width =  100 + 'px';
                      elem.style.minHeight =  0;
                      elem.style.height = 40 + 'px';
-                     elem.style.marginTop = 20 + 'px';
+                     //elem.style.marginTop = 20 + 'px';
                      elem.style.overflow = 'hidden';
                      elem.style.fontSize = 10 + 'px';
                      elem.classList.add('reorder-move');
@@ -1372,13 +1449,15 @@ let View = {
                let that = this;
                let contentArticle =  document.getElementById('contentArticle');
                let iheader =  document.getElementById('iheader');
-               let  dialog=  document.getElementById('e-dialog');
+               let  dialog=  document.createElement('div');
+               dialog.innerHTML = lck;
+               
+               document.body.appendChild(dialog);
                
                if(contentArticle.hasOwnProperty('hidden')){              
                  contentArticle.style.display = 'none';
                  iheader.style.display = 'none';     
-                 dialog.style.display = 'block';     
-                 return;            
+                 dialog.style.display = 'block';                     
                }       	       
                 
                              
@@ -1394,11 +1473,17 @@ let View = {
                let btn = document.getElementById('e-dialog-headerbtn');
                let mymap = document.getElementById('mapSelect');
                let back = document.getElementById('e-dialog-back');
-               back.src = this._returnUrl('/public/arrow/home.png') ;
+               back.src = this._returnUrl('/public/arrow/close.png') ;
                let location = document.createElement('div');
                let marker;
                
                
+               back.style.width = 15 + 'px';
+               back.style.height = 15 + 'px';
+               back.style.position= 'relative';
+               back.style.top = 10 + 'px';
+               back.style.cursor = 'pointer';
+               back.style.float = 'left';
                if(this._isMobile()){
                  dialogContainer.style.width = this.config.mWidth + 'px';
                  header.style.height = 30 + 'px';
@@ -1408,7 +1493,7 @@ let View = {
                  mymap.style.top = 20 + 'px';
                  mymap.style.backgroundColor = 'lightblue'
                  btn.classList.add('de-dialog-headerbtn');
-                 back.classList.add('e-dialog-back')  
+                 //back.classList.add('e-dialog-back')  
                  location.classList.add('e-dialog-location')
                  location.style.left = ((this.config.mWidth)/2 -100) + 'px';                  
                }else{
@@ -1420,7 +1505,7 @@ let View = {
                  mymap.style.top = 20 + 'px';
                  mymap.style.backgroundColor = 'lightblue'
                  btn.classList.add('de-dialog-headerbtn');
-                 back.classList.add('e-dialog-back')  
+                 //back.classList.add('e-dialog-back')  
                  location.classList.add('e-dialog-location')
                  location.style.left = ((this.config.mainWidth)/2 -100) + 'px';                            
                } 
@@ -1449,22 +1534,33 @@ let View = {
                        marker.addTo(map)
                    } 
                   
-                 })  
+                 }) 
+                 
+
+       
                  
                  back.addEventListener('click',function(){
                  	  dialog.style.display = 'none';  
                     contentArticle.style.display = 'block';
-                    iheader.style.display = 'block';                        
+                    iheader.style.display = 'block';    
+                    dialog.remove();                    
                  })     
                  
                  btn.addEventListener('click',function(){
                     if(location.hasOwnProperty('position')){
                        that.content.push({type : 'location', location : location.position})
-                       that.content.push({getloc :  [location.position.lng,location.position.lat]})
-                                      
-                    }                        
-                   
-                 	  dialog.style.display = 'none';  
+                       that.content.push({getloc :  [location.position.lng,location.position.lat]})                                      
+                    }
+                    
+                    
+                   let locationButton = document.getElementById('ei-location');
+                   if(locationButton.classList.contains('e-redbtn')){
+                      locationButton.classList.remove('e-redbtn');
+                      locationButton.classList.add('e-greenbtn');     
+                      that.greenbtns.push('location');              
+                   }                        
+                    
+                 	  dialog.remove();  
                     contentArticle.style.display = 'block';
                     iheader.style.display = 'block';         
                                      
@@ -1475,15 +1571,15 @@ let View = {
            	   let that = this;
                let contentArticle =  document.getElementById('contentArticle');
                let iheader =  document.getElementById('iheader');
-               let  tags=  document.getElementById('e-tags');
+               let  tags=  document.createElement('div');
+               tags.innerHTML = tgs;
                
+               document.body.appendChild(tags)
                if(contentArticle.hasOwnProperty('hidden')){              
                  contentArticle.style.display = 'none';
                  iheader.style.display = 'none';     
-                 tags.style.display = 'block';     
-                 return;            
-               }       	       
-                
+                 tags.style.display = 'block';                        
+               }       	                      
                              
                contentArticle.style.display = 'none';
                iheader.style.display = 'none'; 
@@ -1497,7 +1593,7 @@ let View = {
                let btn = document.getElementById('e-tags-headerbtn');
                let mytags = document.getElementById('mytags');
                let back = document.getElementById('e-tags-back');
-               back.src = this._returnUrl('/public/arrow/home.png') ;
+               back.src = this._returnUrl('/public/arrow/close.png') ;
                let location = document.createElement('div');
                let input = document.createElement('input');
                input.type = 'text';
@@ -1513,6 +1609,13 @@ let View = {
                let current = document.getElementById('e-tags-current')
                let prev = document.getElementById('e-tags-prev')
                let prevhead = document.getElementById('e-tags-prevhead');
+                              
+               back.style.width = 15 + 'px';
+               back.style.height = 15 + 'px';
+               back.style.position= 'relative';
+               back.style.top = 10 + 'px';
+               back.style.cursor = 'pointer';
+               back.style.float = 'left';               
                
                if(this._isMobile()){
                  tagsContainer.style.width = this.config.mWidth + 'px';
@@ -1523,7 +1626,7 @@ let View = {
                  mytags.style.top = 20 + 'px';
              
                  btn.classList.add('de-tags-headerbtn');
-                 back.classList.add('e-tags-back');
+               //  back.classList.add('e-tags-back');
                  location.classList.add('e-tags-location');
                  location.style.left = ((this.config.mWidth)/2 -100) + 'px';
                  
@@ -1541,7 +1644,7 @@ let View = {
                  mytags.style.top = 20 + 'px';
              
                  btn.classList.add('de-tags-headerbtn');
-                 back.classList.add('e-tags-back');
+                 //back.classList.add('e-tags-back');
                  location.classList.add('e-tags-location');
                  location.style.left = ((this.config.mainWidth)/2 -100) + 'px';
                  
@@ -1551,7 +1654,8 @@ let View = {
                  prev.style.height = (window.innerHeight - 110) + 'px';
                  prevhead.style.height = 30 + 'px'
                                              
-               } 
+               }         
+         
                
                btn.addEventListener('click',function(){
                	 if(input.value =='') return;
@@ -1562,24 +1666,31 @@ let View = {
                })
                
                back.addEventListener('click',function(){
-                  let tags = [];
-                 
+                  let tgs = [];                
                 
                   if(document.getElementsByClassName('e-tags-tagspan'))  {
                     for(let tag of document.getElementsByClassName('e-tags-tagspan')){
-                        tags.push(tag.innerHTML)                    
+                        tgs.push(tag.innerHTML)                    
                     }
-                    that.content.push({type : 'tag', tag : tags});
-                  }
-                   
-                   
-                  document.getElementById('e-tags').style.display = 'none';      
+                    that.content.push({type : 'tag', tag : tgs});
+                  }                  
+                  
+                  tags.remove(); 
+                  let tagsBtn = document.getElementById('ei-tags');
+                  
+                  if(tgs.length !=0)
+                    if(tagsBtn.classList.contains('e-redbtn')){
+                      tagsBtn.classList.remove('e-redbtn');
+                      tagsBtn.classList.add('e-greenbtn');       
+                      that.greenbtns.push('tags');            
+                    }
+                  // document.getElementById('e-tags').style.display = 'none';      
                   contentArticle.style.display = 'block';
-                  iheader.style.display = 'block';     
+                  iheader.style.display = 'block';    
+              
                })
               
-               header.appendChild(location)
-              
+               header.appendChild(location)              
            },
            
            _progress : function(progress){
@@ -1840,6 +1951,8 @@ let View = {
       	 }
       	 
           View._createEditor();     
+          
+          
       })
       
       Router.event['archive'].attach(function(sender,args){  

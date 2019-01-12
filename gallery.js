@@ -347,19 +347,7 @@ let socket = null;
      })  
   }
   
-  /*---------------------------     Socket      ------------------------------------*/
 
- /* function comunicate(server){
-      io.listen(server).on('connection',function(socket){ 
-      socket.emit('id',{id : socket.id})
-      clients.push(socket)
-  
-      socket.on('disconnect',function(){
-        var index = clients.indexOf(socket);
-        if(index > -1) clients.splice(index,1)  
-      })
-    })      
-  } */
    
   /*--------------------------- Helper Functions -----------------------------------*/
   
