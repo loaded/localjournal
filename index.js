@@ -8,7 +8,7 @@ var path  = require('path')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 
-let host = 'localhost';
+let host = 'weborient.ir';
 var index = (function(){
 	
 const extentions =   {

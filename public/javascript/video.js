@@ -562,6 +562,9 @@ var Video = (function(){
     _showVideos : function(videos){
     	let that = this;
     	let mainContainer = document.getElementById('v-video-archive');
+    	mainContainer.style.display = 'flex';
+    	mainContainer.style.justifyContent = 'space-between';
+    	mainContainer.style.flexWrap = 'wrap';
     	mainContainer.innerHTML = '';
     	let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
     	let video;
@@ -1168,6 +1171,7 @@ var Video = (function(){
       })  
       
       socket.on('video',function(data){ 
+         app.clearLayer();
       	setUsername(data.video.username)
       	if(View.inited){
       		document.querySelector('#videoContainer').style.display = 'block';
@@ -1185,8 +1189,11 @@ var Video = (function(){
            if(model)
              View._showVideo(model);      	
       	}    
-      	else       	  
-          socket.emit('video',{id : args.id})          
+      	else {
+      		app.createLayer();
+      	   socket.emit('video',{id : args.id}) 
+      	}      	  
+                  
       }) 
       
       function setUsername(username){
@@ -1221,10 +1228,12 @@ var Video = (function(){
 	   })
 	   
 	  function getModels(username){
+	  	  app.createLayer();
         let xhr = new XMLHttpRequest();
         xhr.open('POST','/video/index');
         xhr.onreadystatechange = function (data) {
         	 if(this.readyState == 4){
+        	 	 app.clearLayer();
              let result = JSON.parse(xhr.responseText);
              Collection.setVideos(result)
              if(!View.inited){

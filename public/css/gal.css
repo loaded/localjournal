@@ -1469,7 +1469,9 @@ box-sizing:border-box;
 
 .a-archive-descContainer{
   padding:3px;
- 
+  max-height: 45px;
+  line-height: 15px;
+  overflow-y: hidden;
   color:darkgray;
 }
 

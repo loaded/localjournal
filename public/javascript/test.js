@@ -927,6 +927,7 @@ var Gallery = (function() {
             image.src = makeUrl(url);
             image.style.opacity = 0;
             image.style.display = 'none';
+            
             image.addEventListener('load', function() {
                 that.busy = 0;
                 image.style.display = 'block'
@@ -1519,11 +1520,11 @@ var Gallery = (function() {
             if (mobile) {
                 backSign.classList.add('mback-sign');
                 span.style.fontSize = 12 + 'px';
-                span.style.top = 11 + 'px';
+                span.style.top = 9 + 'px';
             } else {
                 backSign.classList.add('dback-sign');
                 span.style.fontSize = 14 + 'px';
-                span.style.top = 11 + 'px';
+                span.style.top = 9 + 'px';
             }
 
             this.header.el.append(backSign);
@@ -3607,11 +3608,13 @@ var Gallery = (function() {
 
 
         function galleries(args, callback) {
+        	   app.createLayer();
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/gallery/index');
             //window.history.pushState(null,null,'/gallery/archive')
             xhr.onreadystatechange = function() {
                 if (this.readyState == 4) {
+                	  app.clearLayer();
                     Collection.setArchive(JSON.parse(xhr.responseText));
                     if (!View.inited);
                     View._init();
@@ -3622,7 +3625,7 @@ var Gallery = (function() {
                         if (document.getElementById('thumbview'))
                             $(document.getElementById('thumbview')).animate({
                                 left: '-=' + View.uploader.view
-                            }, 200);
+                            }, 360);
 
                     } else {
                         View.loadGalleries(xhr.responseText);

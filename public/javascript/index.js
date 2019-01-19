@@ -2061,19 +2061,23 @@ let View = {
       
       
       function getModel(id){
+      	app.createLayer();
          socket.emit('article',{id : id});
      
       }
       
-      socket.on('article',function(data){         
+      socket.on('article',function(data){  
+         app.clearLayer();       
          View._showArticle(data.article);         
       })
         
       function getModels(username){
+        app.createLayer();
         let xhr = new XMLHttpRequest();
         xhr.open('POST','/editor/articles');
         xhr.onreadystatechange = function(data){
            if(this.readyState == 4){
+           	  app.clearLayer();
               let result = JSON.parse(xhr.responseText);
               Collection.setArchive(result);
               View._archiveEditor(result)             

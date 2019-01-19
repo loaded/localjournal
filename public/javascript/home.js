@@ -845,6 +845,7 @@ var home = (function(){
                 headerContainer.style.fontSize = 14 + 'px';
                 descContainer.style.fontSize = 12 + 'px';
                 descContainer.style.paddingRight = 10 + 'px';
+                
                 if(width > height){
                     newHeight = (height/width) * 150; 
                     newWidth = 150;

@@ -38,13 +38,30 @@ window.onload = function(){
      
        
        this._fillRegister(registerDiv);
-       this._fillLogin(loginDiv)
+       this._fillLogin(loginDiv);
+       this._createGuest();
        mainBox.appendChild(loginDiv);
        mainBox.appendChild(registerDiv);  
        
        container.appendChild(mainBox)
+       
+       
        document.body.appendChild(container)
     },
+    
+    _createGuest : function(){
+       let div = document.createElement('div');
+       div.innerHTML = 'continue as gust';
+       div.style.marginLeft = 'auto';
+       div.style.marginRight = 'auto';
+       div.style.color = 'blue';
+       div.style.cursor = 'pointer';
+       div.style.fontSize = 14 + 'px';
+       div.style.marginTop = '20px';
+       document.body.appendChild(div);
+    },
+    
+    
     
     
     _fillRegister : function(register){

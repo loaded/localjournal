@@ -28,12 +28,14 @@ window.onload = function(){
 		 },	 
 		 
 		_addEvents : function(){
+			 let that = this;
           for (let i = 0 ; i < this.config.menubar.length ; i++) {
        	    this.defineProp(this,this.config.menubar[i],new Event(this))
           }    
           
           window.addEventListener('popstate',function(){
-               Router.route('#' + document.location + '');          
+          	   if(!that.processing)
+                Router.route('#' + document.location + '');          
           },false)        
       },
 		 
@@ -650,6 +652,37 @@ window.onload = function(){
         mainContainer.appendChild(title);
        
         return mainContainer;    
+    },
+    
+    _createLayer : function () {
+    	 let div = document.createElement('div');
+    	 div.style.position = 'fixed';
+    	 div.style.width = window.innerWidth + 'px';
+    	 div.style.height = window.innerHeight + 'px';
+    	 div.style.background = 'white';
+    	 div.style.zIndex = 1039;
+    	 div.style.top = 0;
+    	 div.style.left = 0;
+    	 div.style.opacity = 0;
+    	 div.id = 'a-layer';
+    	 
+    	 div.addEventListener('click',function(e){
+           e.preventDefault();    	 
+    	 })
+    	 View.processing = true;
+    	 document.body.appendChild(div);
+    	 $(div).animate({opacity : 0.5},50);
+    	 
+    	 
+    	 
+    },
+    
+    _clearLayer : function(){
+      View.processing = false;
+     let layer=  document.getElementById('a-layer');
+     $(layer).animate({opacity : 0},20,function(){
+         this.remove();     
+     })
     }
     
 	   
@@ -814,7 +847,9 @@ window.onload = function(){
    })()
    
      return {
-     	 
+     	  createLayer : View._createLayer,
+     	  clearLayer  :View._clearLayer,
+     	  
         router : function(username,path){
            Router.homePage(username,path)        
         }
