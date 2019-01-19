@@ -69,6 +69,7 @@ window.onload = function(){
        
        this._fillRegister(registerDiv);
        this._fillLogin(loginDiv)
+       
        mainBox.appendChild(loginDiv);
        mainBox.appendChild(registerDiv);  
        
@@ -93,6 +94,25 @@ window.onload = function(){
       })
       
       login.appendChild(this._term('Reset Password'))
+      login.appendChild(this._createGuest());
+    },
+    
+    _createGuest : function(){
+        let that = this;        
+        let div = document.createElement('div');
+        div.innerHTML = 'or loggin as guest';
+        div.style.width = 200 + 'px';
+        div.style.marginLeft = 100 + 'px';
+        div.style.color = 'lightsteelblue';
+        div.style.textDecoration = 'underline';
+        div.style.letterSpacing = '1px';
+        div.style.marginTop = 15 + 'px';
+        div.style.cursor = 'pointer'
+        
+        div.addEventListener('click',function(){
+           that._ajax({user : 'guest', pass : '123456789',action:'login'})   
+        })
+        return div;    
     },
     
     
@@ -116,10 +136,7 @@ window.onload = function(){
         register.style.height = 20 + 'px';
         register.style.color = 'lightgrey';
         register.innerHTML = 'Register' 
-        register.style.cursor = 'pointer'
-        
-        
-     
+        register.style.cursor = 'pointer'     
         
         register.addEventListener('mouseenter',function(){
            if(mainBox.animated == 'register'){
