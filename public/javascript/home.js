@@ -236,7 +236,7 @@ var home = (function(){
           }) 
           
           that.map = map;
-           that.getloc.notify({bottom : map.getBounds().getSouthWest(), upper : map.getBounds().getNorthEast()});
+           
                  
        },
        
@@ -922,6 +922,7 @@ var home = (function(){
                 View._show();
               else{
               	 View._start(); 
+              	 View.getloc.notify({bottom : View.map.getBounds().getSouthWest(), upper : View.map.getBounds().getNorthEast()});
               }
                          
            })
