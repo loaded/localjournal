@@ -745,7 +745,7 @@ var Gallery = (function() {
             image.style.position = 'relative';
             image.style.left = left;
 
-            image.src = makeUrl("image/" + thumb.username + '/gallery/' + thumb.gallery + "/thumb/" + thumb.src);
+            image.src = makeUrl("uploads/" + thumb.username + '/gallery/' + thumb.gallery + "/thumb/" + thumb.src);
             // $(image).addClass('template-green');
 
             image.addEventListener('load', function() {
@@ -808,7 +808,7 @@ var Gallery = (function() {
             image.style.position = 'relative';
             image.style.left = left;
 
-            image.src = makeUrl("image/" + thumb.username + '/gallery/' + thumb.gallery + "/thumb/" + thumb.src);
+            image.src = makeUrl("uploads/" + thumb.username + '/gallery/' + thumb.gallery + "/thumb/" + thumb.src);
             // $(image).addClass('template-green');
 
             image.addEventListener('load', function() {
@@ -872,7 +872,7 @@ var Gallery = (function() {
             var longWidth = this.uploader.view;
 
             if (this.isMobile()) {
-                url = 'image/' + this.galleries[gallery][index].username + '/gallery/' + gallery + '/mobile/' + this.galleries[gallery][index].src;
+                url = 'uploads/' + this.galleries[gallery][index].username + '/gallery/' + gallery + '/mobile/' + this.galleries[gallery][index].src;
                 if (width > height) {
                     if (width > this.uploader.view) {
                         image.width = this.uploader.view;
@@ -897,7 +897,7 @@ var Gallery = (function() {
                     }
                 }
             } else {
-                url = 'image/' + this.galleries[gallery][index].username + '/gallery/' + gallery + '/desktop/' + this.galleries[gallery][index].src;
+                url = 'uploads/' + this.galleries[gallery][index].username + '/gallery/' + gallery + '/desktop/' + this.galleries[gallery][index].src;
                 if (width > height) {
                     if (width > this.uploader.view) {
                         image.width = this.uploader.view;
@@ -2395,7 +2395,7 @@ var Gallery = (function() {
             }
 
             label.innerHTML = img.gallery;
-            image.src = makeUrl('image/' + img.username + '/gallery/' + img.gallery + '/thumb/' + img.src);
+            image.src = makeUrl('uploads/' + img.username + '/gallery/' + img.gallery + '/thumb/' + img.src);
 
             preview.appendChild(image);
             templateGallery.setAttribute('name', img.gallery);

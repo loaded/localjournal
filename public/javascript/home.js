@@ -236,6 +236,7 @@ var home = (function(){
           }) 
           
           that.map = map;
+           that.getloc.notify({bottom : map.getBounds().getSouthWest(), upper : map.getBounds().getNorthEast()});
                  
        },
        
@@ -251,10 +252,10 @@ var home = (function(){
        	 document.getElementById('home').style.display = 'block';
        },
        
-       _popUp : function(event,model){
+       _popUp : function(model){
            if(document.getElementsByClassName('h-thumb').length != 0)
              document.getElementsByClassName('h-thumb')[0].remove();
-           let evt = event.originalEvent;
+           //let evt = event.originalEvent;
            let container;
            if(model.hasOwnProperty('type') && model.type == 'article')
              container =  this._article(model,true)
@@ -675,7 +676,7 @@ var home = (function(){
                
        },
        
-       _article : function(elem,isThumb){console.log(elem)
+       _article : function(elem,isThumb){
             let monthShortNames = ["Jan", "Feb", "Mar", "Apr", "May", "Jun","Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
            
            	 
@@ -918,8 +919,10 @@ var home = (function(){
               Gallery.hide();
               if(View.inited)
                 View._show();
-              else
-                View._start();           
+              else{
+              	 View._start(); 
+              }
+                         
            })
            
            View.getloc.attach(function(sender,args){  
@@ -939,9 +942,18 @@ var home = (function(){
            	   {            	
            	      if(models[i].hasOwnProperty('username'))
                    new L.Marker(models[i].location).addTo(View.map).on('click',function(e){
-                      View._popUp(e,models[i]);    
+                      View._popUp(models[i]);    
                    });                      	   
            	   }
+           	   let it = 0;
+           	   let iter = window.setInterval(function () {
+           	   	 if(it < models.length){
+           	   	 	
+                       if(models[it])
+                         View._popUp(models[it++]);           	   	 
+           	   	 }
+                            
+           	   },3000)
                           
            })
            
