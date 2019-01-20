@@ -252,7 +252,8 @@ var home = (function(){
        	 document.getElementById('home').style.display = 'block';
        },
        
-       _popUp : function(model){
+       _popUp : function(where,model){
+       	  if(View.iter && where == 'interval') return;
            if(document.getElementsByClassName('h-thumb').length != 0)
              document.getElementsByClassName('h-thumb')[0].remove();
            //let evt = event.originalEvent;
@@ -937,20 +938,23 @@ var home = (function(){
            	})
            	View.models = models;
         
-        	
+        	   View.iter = false;
            	for(let i = 0 ; i < models.length ; i++)
            	   {            	
            	      if(models[i].hasOwnProperty('username'))
                    new L.Marker(models[i].location).addTo(View.map).on('click',function(e){
-                      View._popUp(models[i]);    
+                   	 View.iter = true;
+                      View._popUp('click',models[i]);    
                    });                      	   
            	   }
            	   let it = 0;
            	   let iter = window.setInterval(function () {
+           	   	 if(View.iter) clearInterval(iter);
            	   	 if(it < models.length){
            	   	 	
                        if(models[it])
-                         View._popUp(models[it++]);           	   	 
+                         View._popUp('interval',models[it++]);  
+                        else clearInterval(iter)         	   	 
            	   	 }
                             
            	   },3000)
