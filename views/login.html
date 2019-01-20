@@ -100,7 +100,7 @@ window.onload = function(){
     _createGuest : function(){
         let that = this;        
         let div = document.createElement('div');
-        div.innerHTML = 'or loggin as guest';
+        div.innerHTML = 'or login as guest';
         div.style.width = 200 + 'px';
         div.style.marginLeft = 100 + 'px';
         div.style.color = 'lightsteelblue';
@@ -304,8 +304,7 @@ window.onload = function(){
 
       // line color
       context.strokeStyle = 'lightblue';
-      context.stroke();  
-          
+      context.stroke();           
                 
       },50)  
     },
@@ -410,11 +409,7 @@ window.onload = function(){
        content.open('POST','/')
        content.onreadystatechange = function(data){
          if(this.readyState == 4){
-         window.location.reload()
-         //document.open();
-         //document.write(content.responseText);
-        //document.close();
-           
+         window.location.reload();
          }
        }
        
