@@ -942,7 +942,7 @@ var home = (function(){
            	View.models = models;
             
         	   View.iter = false;
-        	   if(iter) window.clearInterval(itr);
+        	   if(iter) window.clearInterval(iter);
            	for(let i = 0 ; i < models.length ; i++)
            	   {            	
            	      if(models[i].hasOwnProperty('username'))
