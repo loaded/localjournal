@@ -827,6 +827,7 @@ var Gallery = (function() {
             mypool.appendChild(templateDownload)
         },
         _constructImage: function(index, gallery, upOdown) {
+        	   app.createLayer();
             var that = this;
             that.busy = 1;
             var url = '';
@@ -929,6 +930,7 @@ var Gallery = (function() {
             image.style.display = 'none';
             
             image.addEventListener('load', function() {
+            	 app.clearLayer()
                 that.busy = 0;
                 image.style.display = 'block'
                 if (upOdown == null) {

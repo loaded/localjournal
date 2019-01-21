@@ -27,7 +27,7 @@ body {
   border-bottom:1px solid gray;
   overflow:hidden;
   background-color: white;
-  z-index : 100;
+  z-index : 500;
 }
 
 #cgbtn {
