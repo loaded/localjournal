@@ -932,7 +932,7 @@ var home = (function(){
            })
            
            
-           let itr;
+           let iter;
            socket.on('home',function(data){
            
            	let models = JSON.parse(data);
