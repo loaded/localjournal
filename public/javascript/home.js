@@ -931,6 +931,8 @@ var home = (function(){
               socket.emit('getloc',JSON.stringify(args))   
            })
            
+           
+           let itr;
            socket.on('home',function(data){
            
            	let models = JSON.parse(data);
@@ -938,8 +940,9 @@ var home = (function(){
                return a - b;           	
            	})
            	View.models = models;
-        
+            
         	   View.iter = false;
+        	   if(itr) window.clearInterval(itr);
            	for(let i = 0 ; i < models.length ; i++)
            	   {            	
            	      if(models[i].hasOwnProperty('username'))
@@ -949,7 +952,7 @@ var home = (function(){
                    });                      	   
            	   }
            	   let it = 0;
-           	   let iter = window.setInterval(function () {
+           	    iter = window.setInterval(function () {
            	   	 if(View.iter) clearInterval(iter);
            	   	 if(it < models.length){
            	   	 	
