@@ -1529,7 +1529,7 @@ var Gallery = (function() {
                 span.style.top = 9 + 'px';
             }
 
-            this.header.el.append(backSign);
+            this.header.el.appendChild(backSign);
             this.header.el.appendChild(span)
 
             //var arr = this.galleries[gallery];
