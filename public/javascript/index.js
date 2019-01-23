@@ -384,7 +384,7 @@ let View = {
               let dte = new Date(date);
               let archive = document.createElement('div');
               archive.classList.add('a-archive');
-              archiveContainer.append(archive);
+              archiveContainer.appendChild(archive);
               
               let timeContainer = document.createElement('div');
               timeContainer.classList.add('a-archive-timeContainer');
