@@ -1035,9 +1035,9 @@ var Gallery = (function() {
 
             txtpng.src = makeUrl('public/arrow/txt.png');
             txtpng.setAttribute('id', 'txtpng');
-            txt.append(txtpng);
-            txt.append(txtJur);
-            txt.append(txtXwar);
+            txt.appendChild(txtpng);
+            txt.appendChild(txtJur);
+            txt.appendChild(txtXwar);
 
             txtpng.addEventListener('click', function() {
                 if (parseInt(this['overlay'])) {
@@ -1046,8 +1046,8 @@ var Gallery = (function() {
             })
 
 
-            closeSign.append(closeImage)
-            this.header.el.append(closeSign)
+            closeSign.appendChild(closeImage)
+            this.header.el.appendChild(closeSign)
             this.header.el.appendChild(setting)
             this.header.el.appendChild(txt);
 
@@ -1190,7 +1190,7 @@ var Gallery = (function() {
                     opacity: 1
                 }, 1000)
             })
-            container.append(txt);
+            container.appendChild(txt);
 
 
         },
@@ -1206,7 +1206,7 @@ var Gallery = (function() {
 
             menu.innerHTML = menuHtml;
 
-            thumbview.append(menu);
+            thumbview.appendChild(menu);
             var childs = menu.childNodes;
             for (var i = 0; i < childs.length; i++) {
                 childs[i].setAttribute('id', this.menu[i]);
@@ -1284,7 +1284,7 @@ var Gallery = (function() {
             input.style.width = var1;
             input.style.height = var2;
 
-            container.append(input);
+            container.appendChild(input);
             this._adminText();
         },
 
