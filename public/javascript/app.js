@@ -148,9 +148,9 @@ window.onload = function(){
          document.body.appendChild(div);
          
  	      let canvas = document.createElement('canvas');
-	      canvas.width = 2*window.innerHeight;
+ 	      canvas.width = 2*window.innerHeight;
 	      canvas.height = 2*window.innerHeight;
-	   
+ 	        
 	      
 	      let context = canvas.getContext('2d');
 	      
@@ -167,10 +167,15 @@ window.onload = function(){
 	     
 	      e.target.remove();
 	      canvas.id = 'm-menu';
-	      document.body.appendChild(canvas);         
+	      document.body.appendChild(canvas);
+	      let limit ;
+	      if(this._isMobile())
+	        limit = window.innerWidth;
+	      else 
+	        limit = window.innerHeight;
 	        
           let id = window.setInterval(function(){ 
-            if(radius > window.innerHeight){
+            if(radius > limit){
                clearInterval(id);               
                that._menubar();
                that._addSearch(div);
