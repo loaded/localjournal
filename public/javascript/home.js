@@ -72,7 +72,7 @@ var home = (function(){
           if(this._isMobile()){
              header.style.width = this.config.m.mainWidth + 'px';
           
-          }else{
+          }else{console.log('this is defenetly not mobile' + this.config.mainWidth);
              header.style.width = this.config.mainWidth + 'px';
           }
           
