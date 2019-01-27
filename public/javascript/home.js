@@ -59,7 +59,7 @@ var home = (function(){
             }else {
               home.style.width = this.config.mainWidth + 'px';
             }
-            home.style.width =   + 'px';
+          
             home.style.height = window.innerHeight + 'px';
             home.style.position = 'relative';   	
        },
