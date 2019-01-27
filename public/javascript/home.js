@@ -240,7 +240,7 @@ var home = (function(){
                  
        },
        
-       _isMobile : function () {
+       _isMobile : function () { console.log(window.innerWidth )
        	 return window.innerWidth > this.config.mainWidth ? false : true;
        },
        
