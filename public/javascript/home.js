@@ -54,7 +54,12 @@ var home = (function(){
        
        _setHome : function () {
             let home = document.getElementById('home');
-            home.style.width = window.innerWidth  + 'px';
+            if(this._isMobile()){
+               header.style.width = this.config.m.mainWidth + 'px';            
+            }else {
+              home.style.width = this.config.mainWidth + 'px';
+            }
+            home.style.width =   + 'px';
             home.style.height = window.innerHeight + 'px';
             home.style.position = 'relative';   	
        },
