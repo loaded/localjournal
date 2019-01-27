@@ -2191,7 +2191,7 @@ var Gallery = (function() {
                 iheader.style.display = 'block';
             });
 
-            document.appendChild(dialog);
+            document.body.appendChild(dialog);
             this.arwDown.notify("arw Down has been clicked");
         },
 
