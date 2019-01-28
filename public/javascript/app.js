@@ -1,6 +1,7 @@
 window.resize = function () {
 	alert(window.innerWidth)
 }
+
 window.onload = function(){
  app =  (function(){
 	
