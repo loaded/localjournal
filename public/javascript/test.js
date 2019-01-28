@@ -868,7 +868,7 @@ var Gallery = (function() {
                 touchDistance = e.touches[0].clientY - touchStart;
               }
 
-             function endMove(e){
+             function endMove(e){ console.log(touchDistance);
 	        if(touchDistance> 0)
 		    $('.txtJur:first').trigger('click');
 		else 
@@ -1105,7 +1105,7 @@ var Gallery = (function() {
                     txtXwar.style.opacity = 0.5;
                 }
 
-                txtJur.addEventListener('click', function() {
+                txtJur.addEventListener('click', function() {console.log('txtjur')
                     if ((that.galleries[gallery].length) > (parseInt(that.indexOfSlide) + 1) && !that.busy) {
                         if (that.activeEditor) that._closeEditor();
                         let model = Collection.getModelTwo(gallery, that.galleries[gallery][++that.indexOfSlide].src);
@@ -1115,7 +1115,7 @@ var Gallery = (function() {
                     }
                 })
 
-                txtXwar.addEventListener('click', function() {
+                txtXwar.addEventListener('click', function() {console.log('txtXwar');
                     if ((that.indexOfSlide - 1) > -1 && !that.busy) {
                         if (that.activeEditor) that._closeEditor();
                         let model = Collection.getModelTwo(gallery, that.galleries[gallery][--that.indexOfSlide].src);
