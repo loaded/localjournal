@@ -858,7 +858,28 @@ var Gallery = (function() {
             imageContainer.style.marginTop = 10 + 'px';
             //imageContainer.style.position = 'absolute'
             div.appendChild(imageContainer);
+           
 
+           $(div).on('touchstart', function(e) {
+              var touchStart = e.touches[0].clientY;
+              var touchDistance = 0;
+
+              function touchMove(e) {
+                touchDistance = e.touches[0].clientY - touchStart;
+              }
+
+             function end(e){
+	        if(touchDistance> 0)
+		    $('.txtJur:first').trigger('click');
+		else 
+		    $('.txtXwar:first').trigger('click');
+	     }
+
+
+             $(this).on('touchmove', touchMove).one('touchend', function() {
+             $(this).off('touchmove', touchMove);
+             });
+           });
             var height = this.galleries[gallery][index].height;
             var width = this.galleries[gallery][index].width;
 
