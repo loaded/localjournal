@@ -868,7 +868,7 @@ var Gallery = (function() {
                 touchDistance = e.touches[0].clientY - touchStart;
               }
 
-             function end(e){
+             function endMove(e){
 	        if(touchDistance> 0)
 		    $('.txtJur:first').trigger('click');
 		else 
@@ -877,7 +877,7 @@ var Gallery = (function() {
 
 
              $(this).on('touchmove', touchMove).one('touchend', function() {
-             $(this).off('touchmove', touchMove);
+             $(this).off('touchmove', endMove);
              });
            });
             var height = this.galleries[gallery][index].height;
