@@ -62,6 +62,8 @@ var home = (function(){
           
             home.style.height = window.innerHeight + 'px';
             home.style.position = 'relative';   	
+            home.style.marginLeft = 'auto';
+            home.style.marginRight = 'auto';
        },
        
        _setHeader : function(){
@@ -77,7 +79,7 @@ var home = (function(){
           if(this._isMobile()){
              header.style.width = this.config.m.mainWidth + 'px';
           
-          }else{console.log('this is defenetly not mobile' + this.config.mainWidth);
+          }else{
              header.style.width = this.config.mainWidth + 'px';
           }
           
