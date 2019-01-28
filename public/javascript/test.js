@@ -860,12 +860,12 @@ var Gallery = (function() {
             div.appendChild(imageContainer);
            
 
-           $(div).on('touchstart', function(e) {
-              var touchStart = e.touches[0].clientY;
+          $(div).on('touchstart', function(e) {
+              var touchStart = e.originalEvent.touches[0].clientY;
               var touchDistance = 0;
 
               function touchMove(e) {
-                touchDistance = e.touches[0].clientY - touchStart;
+                touchDistance = e.originalEvent.touches[0].clientY - touchStart;
               }
 
              function endMove(e){ console.log(touchDistance);
