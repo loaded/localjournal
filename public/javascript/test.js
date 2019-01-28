@@ -860,7 +860,7 @@ var Gallery = (function() {
             div.appendChild(imageContainer);
            
 
-          $(div).on('touchstart', function(e) {
+          $(div).on('touchstart', function(e) { console.log('touchstart')
               var touchStart = e.originalEvent.touches[0].clientY;
               var touchDistance = 0;
 
@@ -876,8 +876,9 @@ var Gallery = (function() {
 	     }
 
 
-             $(this).on('touchmove', touchMove).one('touchend', function() {
-             $(this).off('touchmove', endMove);
+             $(this).on('touchmove', touchMove).one('touchend', function() { console.log('end move');
+                     endMove();
+		     $(this).off('touchmove', touchMove);
              });
            });
             var height = this.galleries[gallery][index].height;
