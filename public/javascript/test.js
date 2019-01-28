@@ -858,7 +858,7 @@ var Gallery = (function() {
             imageContainer.style.marginTop = 10 + 'px';
             //imageContainer.style.position = 'absolute'
             div.appendChild(imageContainer);
-           
+          
 
           $(div).on('touchstart', function(e) { console.log('touchstart')
               var touchStart = e.originalEvent.touches[0].clientY;
@@ -870,9 +870,9 @@ var Gallery = (function() {
 
              function endMove(e){ console.log(touchDistance);
 	        if(touchDistance> 0)
-		    $('.txtJur:first').trigger('click');
+		   that._txtXwar(gallery);
 		else 
-		    $('.txtXwar:first').trigger('click');
+		    that._txtJur(gallery);
 	     }
 
 
@@ -1139,6 +1139,31 @@ var Gallery = (function() {
             this._constructImage(index, gallery, null);
 
         },
+
+	_txtXwar : function(gallery){
+		let that = this;
+	                      if ((that.indexOfSlide - 1) > -1 && !that.busy) {
+                        if (that.activeEditor) that._closeEditor();
+                        let model = Collection.getModelTwo(gallery, that.galleries[gallery][--that.indexOfSlide].src);
+                        //window.history.pushState(null,null,'/gallery/show/' + model._id); 
+                        Router.route(that.username, 'show/' + model._id)
+                            //that._constructImage(--that.indexOfSlide,gallery,'down');         
+                    }
+
+	},
+	_txtJur : function(gallery)
+	    {
+
+		    let that = this;
+	    
+	             if ((that.galleries[gallery].length) > (parseInt(that.indexOfSlide) + 1) && !that.busy) {
+                        if (that.activeEditor) that._closeEditor();
+                        let model = Collection.getModelTwo(gallery, that.galleries[gallery][++that.indexOfSlide].src);
+                        // window.history.pushState(null,null,'/gallery/show/' + model._id);  
+                        Router.route(that.username, 'show/' + model._id)
+                            //that._constructImage(++that.indexOfSlide,gallery,'up');              
+                    }
+	    },
 
         _closeShowImage: function() {
 
