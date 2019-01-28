@@ -848,7 +848,7 @@ window.onload = function(){
           })
           
          //Video.router('archive');   
-         home.router('index')      
+         setTimeout(home.router('index'),20)      
    })()
    
      return {
