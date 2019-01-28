@@ -41,7 +41,7 @@ var home = (function(){
        } 
        },
        
-       _init : function(){ alert(window.innerWidth)
+       _init : function(){ 
        	
        	 this._setHome()
        	 
