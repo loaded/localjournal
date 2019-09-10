@@ -1612,11 +1612,6 @@ var Gallery = (function() {
                     that._recalculateMargin()
                 }
             });
-
-
-
-
-
         },
 
         _backToIndex: function() {

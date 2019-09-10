@@ -2118,7 +2118,7 @@ let View = {
              View.content.push({type : 'header',html : header.innerHTML})
           }else {
           	alert('you have to insert header!')
-          	return; //actually you must examine it before upload of pictures.
+          	return; 
           }
            
           

@@ -1,6 +1,4 @@
 var http = require('http');
-
-//var io = require('socket.io')
 var url = require('url')
 var fs = require('fs')
 var path  = require('path')
@@ -8,7 +6,7 @@ var path  = require('path')
 var addon = require("bindings")("process")
 var database = require('mongodb').MongoClient;
 
-let host = 'localhost';
+let host = '89.165.9.169';
 var index = (function(){
 	
 const extentions =   {
